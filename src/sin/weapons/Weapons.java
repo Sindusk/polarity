@@ -18,8 +18,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.hud.HUD;
-import sin.network.DecalData;
-import sin.network.ShotData;
+import sin.data.DecalData;
+import sin.data.ShotData;
+import sin.network.Networking;
 import sin.tools.T;
 import sin.world.World;
 
@@ -142,13 +143,13 @@ public class Weapons{
                     int player = Integer.parseInt(closest.getGeometry().getName().substring(0, 2));
                     float dmg = calculate(part);
                     app.hud.addFloatingText(GameClient.players[player].getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.character.getLocation(), dmg);
-                    if(GameClient.CLIENT_CONNECTED) {
-                        GameClient.myClient.send(new ShotData(GameClient.CLIENT_ID, player, dmg));
+                    if(Networking.isConnected()) {
+                        Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                     }
                 }else{
                     app.dcs.createDecal(closest.getContactPoint());
-                    if(GameClient.CLIENT_CONNECTED) {
-                        GameClient.myClient.send(new DecalData(closest.getContactPoint()));
+                    if(Networking.isConnected()) {
+                        Networking.client.send(new DecalData(closest.getContactPoint()));
                     }
                 }
             }

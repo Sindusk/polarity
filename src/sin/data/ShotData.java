@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package sin.network;
+package sin.data;
 
 import com.jme3.audio.AudioNode;
 import com.jme3.network.AbstractMessage;

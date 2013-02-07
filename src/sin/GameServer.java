@@ -1,5 +1,15 @@
 package sin;
 
+import sin.data.ErrorData;
+import sin.data.IDData;
+import sin.data.ShotData;
+import sin.data.PingData;
+import sin.data.DecalData;
+import sin.data.DisconnectData;
+import sin.data.MoveData;
+import sin.data.WorldData;
+import sin.data.ConnectData;
+import sin.data.SoundData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -16,7 +26,6 @@ import com.jme3.renderer.RenderManager;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sin.network.*;
 import sin.world.*;
 
 /**
@@ -54,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class GameServer extends SimpleApplication implements ConnectionListener {
     
-    private static final String SERVER_VERSION = "ALPHA 0.03";
+    private static final String SERVER_VERSION = "ALPHA 0.04";
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     private Player[] players = new Player[16];
     private int[][] world;
