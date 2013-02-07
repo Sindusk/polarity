@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sin.appstates.GameplayState;
 import sin.hud.HUD;
 import sin.input.InputHandler;
 import sin.network.Networking;
@@ -65,29 +66,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 public class GameClient extends Application{
     // --- Global Constant Variables --- //
-    // Network Variables:
-    private static final boolean MODE_DEBUG = false;
-    public static final String INPUT_MAPPING_EXIT = "SIMPLEAPP_Exit";
-    public static final String INPUT_MAPPING_CAMERA_POS = "SIMPLEAPP_CameraPos";
-    public static final String INPUT_MAPPING_MEMORY = "SIMPLEAPP_Memory";
-    public static final String INPUT_MAPPING_HIDE_STATS = "SIMPLEAPP_HideStats";
-    
-    public static final String CLIENT_VERSION = "ALPHA 0.04";
+    private static final boolean MODE_DEBUG = false;            // Debug Mode
+    public static final String CLIENT_VERSION = "ALPHA 0.04";   // Client Version (Important for client-server connections)
     
     // Important System Variables:
-    private static boolean CLIENT_KEYS_CLEARED = false;
     private static final Logger logger = Logger.getLogger(GameClient.class.getName());
     private static BulletAppState bulletAppState;   // Physics State.
     private static GameClient app;                  // The application itself (this).
+    // App States:
+    private static GameplayState gameplayState;     // Gameplay State
     
     // Nodes:
     private static Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     private static Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
+    /* (In GameplayState.java)
     private static Node collisionNode = new Node();     // Node encompassing anything able to be shot [single, world, player].
     private static Node singleNode = new Node();        // Node encompassing single player testing (Static).
     private static Node worldNode = new Node();         // Node encompassing terrain and environment (Static).
     private static Node playerNode = new Node();        // Node encompassing player models (Kinematic).
     private static Node tracerNode = new Node();        // Node encompassing tracers, mainly for testing.
+    */
     
     // Custom Variables:
     private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
@@ -105,16 +103,19 @@ public class GameClient extends Application{
         return guiNode;
     }
     public static Node getWorld(){
-        return worldNode;
+        return gameplayState.getWorld();
+    }
+    public static Node getSingleNode(){
+        return gameplayState.getSingleNode();
     }
     public static Node getPlayerNode(){
-        return playerNode;
+        return gameplayState.getPlayerNode();
     }
     public static Node getCollisionNode(){
-        return collisionNode;
+        return gameplayState.getCollisionNode();
     }
     public static Node getTracerNode(){
-        return tracerNode;
+        return gameplayState.getTracerNode();
     }
     public static Char getCharacter(){
         return character;
@@ -165,7 +166,7 @@ public class GameClient extends Application{
         set.setSamples(0);
         set.setVSync(false);
         set.setRenderer(AppSettings.LWJGL_OPENGL1);
-        set.setTitle("Sin's FPS Game");
+        set.setTitle("Polarity");
         app.setSettings(set);
         app.start();
         
@@ -184,23 +185,19 @@ public class GameClient extends Application{
         // Tune logger down to warnings and worse:
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         
-        // Initialize physics and attach to state manager:
-        bulletAppState = new BulletAppState();  
-        stateManager.attach(bulletAppState);
-        bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
-        
         // Initialize keybinds.
         input.initialize(app, context);
         
         // Initialize the World class and create a basic place:
-        World.initialize(assetManager, bulletAppState);
+        /*World.initialize(assetManager, bulletAppState);
         World.createSinglePlayerArea(singleNode);
         collisionNode.attachChild(singleNode);
         collisionNode.attachChild(worldNode);
         collisionNode.attachChild(playerNode);
-        rootNode.attachChild(collisionNode);
+        rootNode.attachChild(collisionNode);*/
         
         // Initialize new HUD & remove debug HUD elements:
+        World.initialize(app);
         Networking.initialize(app);
         Recoil.initialize(app);
         Weapons.initialize(app);
@@ -212,6 +209,13 @@ public class GameClient extends Application{
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
         //setDisplayFps(false);
+        
+        // Initialize App States:
+        bulletAppState = new BulletAppState();  
+        stateManager.attach(bulletAppState);
+        gameplayState = new GameplayState();
+        stateManager.attach(gameplayState);
+        bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
         
         // Create the player character:
         character = new Char(
@@ -237,14 +241,9 @@ public class GameClient extends Application{
         float tpf = timer.getTimePerFrame() * speed;
         // update states
         stateManager.update(tpf);
-
-        // Clear client keys which are buggy and annoying:
-        if(!CLIENT_KEYS_CLEARED) {
-            ClearClientKeys();
-        }
         
         // Update audio listeners:
-        listener.setLocation(cam.getLocation());
+        /*listener.setLocation(cam.getLocation());
         listener.setRotation(cam.getRotation());
         
         // Update character location & hud:
@@ -254,7 +253,7 @@ public class GameClient extends Application{
         // Update network if connected:
         if(Networking.isConnected()) {
             Networking.update(tpf);
-        }
+        }*/
         rootNode.updateLogicalState(tpf);
         guiNode.updateLogicalState(tpf);
         rootNode.updateGeometricState();
@@ -266,22 +265,6 @@ public class GameClient extends Application{
             // Render:
         
         stateManager.postRender();
-    }
-
-    // Actions/Input
-    private void ClearClientKeys(){
-        //if(inputManager.hasMapping("FLYCAM_ZoomIn")){
-  //          inputManager.deleteMapping("FLYCAM_ZoomIn");
-  //          inputManager.deleteMapping("FLYCAM_ZoomOut");
-  //          inputManager.deleteMapping("FLYCAM_StrafeLeft");
-  //          inputManager.deleteMapping("FLYCAM_StrafeRight");
-  //          inputManager.deleteMapping("FLYCAM_Forward");
- //           inputManager.deleteMapping("FLYCAM_Backward");
-//            inputManager.deleteMapping(DebugKeysAppState.INPUT_MAPPING_CAMERA_POS);
-//            inputManager.deleteMapping(DebugKeysAppState.INPUT_MAPPING_MEMORY);
-            inputManager.setCursorVisible(false);
-            CLIENT_KEYS_CLEARED = true;
-       // }
     }
     
     @Override

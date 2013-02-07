@@ -23,6 +23,7 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture.WrapMode;
+import sin.GameClient;
 
 /**
 Copyright (c) 2003-2011 jMonkeyEngine
@@ -58,14 +59,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @author SinisteRing
  */
 public class World {
+    private static GameClient app;
+    
     // Constant Variables:
     public static final float ZONE_SIZE = 50;
     public static final int ZONE_VARIATIONS = 3;
     public static final int ZONE_X_NUM = 10;
     public static final int ZONE_Z_NUM = 10;
     
-    private static AssetManager assetManager;
-    private static BulletAppState bulletAppState;
+    //private static AssetManager assetManager;
+    //private static BulletAppState bulletAppState;
     
     private static Vector3f v3f(float x, float y, float z){
         return new Vector3f(x, y, z);
@@ -77,7 +80,7 @@ public class World {
     // Create Geometry class:
     public static class CG{
         private static Material getMaterial(ColorRGBA color){
-            Material m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             m.setColor("Color", color);
             if(color.getAlpha() < 1){
                 m.setTransparent(true);
@@ -86,8 +89,8 @@ public class World {
             return m;
         }
         private static Material getMaterial(String tex){
-            Material m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            m.setTexture("ColorMap", assetManager.loadTexture(tex));
+            Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+            m.setTexture("ColorMap", app.getAssetManager().loadTexture(tex));
             m.getTextureParam("ColorMap").getTextureValue().setWrap(WrapMode.Repeat);
             return m;
         }
@@ -107,8 +110,8 @@ public class World {
             Box b = new Box(trans, size.getX(), size.getY(), size.getZ());
             b.scaleTextureCoordinates(scale);
             Geometry g = new Geometry(name, b);
-            Material m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            m.setTexture("ColorMap", assetManager.loadTexture(tex));
+            Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+            m.setTexture("ColorMap", app.getAssetManager().loadTexture(tex));
             m.getTextureParam("ColorMap").getTextureValue().setWrap(WrapMode.Repeat);
             g.setMaterial(m);
             if(node != null) {
@@ -122,7 +125,7 @@ public class World {
             RigidBodyControl rbc = new RigidBodyControl(cs, 0);
             rbc.setKinematic(true);
             g.addControl(rbc);
-            bulletAppState.getPhysicsSpace().add(rbc);
+            GameClient.getBulletAppState().getPhysicsSpace().add(rbc);
             return g;
         }
         
@@ -157,7 +160,7 @@ public class World {
             RigidBodyControl rbc = new RigidBodyControl(cs, 0);
             rbc.setKinematic(true);
             g.addControl(rbc);
-            bulletAppState.getPhysicsSpace().add(rbc);
+            GameClient.getBulletAppState().getPhysicsSpace().add(rbc);
             return g;
         }
         
@@ -218,9 +221,10 @@ public class World {
         return node;
     }
     
-    public static void initialize(AssetManager assetManager, BulletAppState bulletAppState){
-        World.assetManager = assetManager;
-        World.bulletAppState = bulletAppState;
+    public static void initialize(GameClient app){
+        World.app = app;
+        //World.assetManager = assetManager;
+        //World.bulletAppState = bulletAppState;
     }
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
