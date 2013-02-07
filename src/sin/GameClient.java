@@ -3,8 +3,6 @@ package sin;
 import com.jme3.app.Application;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
-import com.jme3.bullet.control.CharacterControl;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -36,15 +34,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.hud.HUD;
 import sin.network.*;
+import sin.player.Char;
 import sin.player.Player;
 import sin.tools.T;
 import sin.weapons.Weapons;
 import sin.weapons.Weapons.RangedWeapon.AK47;
 import sin.weapons.Weapons.RangedWeapon.LaserPistol;
 import sin.weapons.Weapons.RangedWeapon.M4A1;
-import sin.weapons.Weapons.RangedWeapon.RangedReloadWeapon;
 import sin.weapons.Weapons.RangedWeapon.Raygun;
-import sin.weapons.Weapons.Weapon;
 import sin.world.World;
 import sin.world.World.CG;
 
@@ -97,10 +94,6 @@ public class GameClient extends Application{
     
     private static final String CLIENT_VERSION = "ALPHA 0.03";
     
-    public final int MOVE_FORWARD = 0; public final int MOVE_BACKWARD = 1;  // Variables for handling
-    public final int MOVE_LEFT = 2;    public final int MOVE_RIGHT = 3;     // character movement indexes.
-    public final int MOVE_CROUCH = 4;   // For crouch detection.
-    
     // Networking Variables:
     public static boolean CLIENT_CONNECTED = false;
     public static int     CLIENT_ID = -1;
@@ -119,7 +112,7 @@ public class GameClient extends Application{
     public static Node tracerNode = new Node();         // Node encompassing tracers, mainly for testing.
     
     // Custom Variables:
-    public static Character character;                     // Character data for the current client.
+    public static Char character;                     // Character data for the current client.
     public static Player[] players = new Player[16];        // Array of networked players.
     private static Networking network = new Networking();   // Class for controlling Networking.
     public Recoil recoil = new Recoil();               // Class for controlling Camera movement (recoil/decoil).
@@ -488,209 +481,6 @@ public class GameClient extends Application{
         }
     }
     
-    // --- Character (Client's Player)  --- //
-    public class Character{
-        private class CharStats{
-            // Instance Variables:
-            private float health;
-            private float health_max;
-            private float shields;
-            private float shields_max;
-            
-            public CharStats(float health_max, float shields_max){
-                this.health = health_max;
-                this.health_max = health_max;
-                this.shields = shields_max;
-                this.shields_max = shields_max;
-                hud.setBarMax(HUD.HEALTH, (int) health_max);
-                hud.setBarMax(HUD.SHIELD, (int) shields_max);
-                hud.updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
-                hud.updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
-            }
-            
-            public void update(){
-                hud.updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
-                hud.updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
-            }
-            public void damage(float damage){
-                if(shields > 0){
-                    shields -= damage;
-                    if(shields <= 0){
-                        health += shields;
-                        shields = 0;
-                        if(health <= 0){
-                            character.kill();
-                        }
-                    }
-                }else{
-                    health -= damage;
-                    if(health <= 0){
-                        character.kill();
-                    }
-                }
-                update();
-            }
-            public void refresh(){
-                health = health_max;
-                shields = shields_max;
-                update();
-            }
-        }
-        // Constant Variables:
-        private static final float MOVE_SPEED = 0.25f;
-        private static final float CROUCH_PENALTY = 0.6f;
-        
-        // Instance Variables:
-        private Weapon[][] weapons = new Weapon[2][2];
-        private int set = 0;
-        private CharStats charStats;
-        private CharacterControl player;
-        private Node charNode = new Node();
-        // Move: 0 = forward, 1 = backward, 2 = left, 3 = right, 4 = crouch
-        public boolean movement[] = new boolean[]{false, false, false, false, false};
-        
-        public final void create(){
-            CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 10f, 1);
-            player = new CharacterControl(capsuleShape, 0.05f);
-            player.setJumpSpeed(30);
-            player.setFallSpeed(30);
-            player.setGravity(70);
-            player.setPhysicsLocation(new Vector3f(0, 110, 0));
-            bulletAppState.getPhysicsSpace().add(player);
-        }
-        public Character(Weapon a, Weapon b, Weapon c, Weapon d, float health, float shields){
-            weapons[0][0] = a;
-            weapons[0][1] = b;
-            weapons[1][0] = c;
-            weapons[1][1] = d;
-            weapons[0][0].enable(charNode);
-            weapons[0][1].enable(charNode);
-            //charNode.attachChild(weapons[2].model);
-            //charNode.attachChild(weapons[3].model);
-            rootNode.attachChild(charNode);
-            charStats = new CharStats(health, shields);
-            this.create();
-        }
-        
-        public void setFiring(boolean left, boolean firing){
-            if(left) {
-                weapons[set][0].setFiring(firing);
-            }
-            else {
-                weapons[set][1].setFiring(firing);
-            }
-        }
-        public Vector3f getLocation(){
-            return player.getPhysicsLocation();
-        }
-        public CharacterControl getPlayer(){
-            return player;
-        }
-        public Node getNode(){
-            return charNode;
-        }
-        
-        public void damage(float damage){
-            charStats.damage(damage);
-        }
-        public void kill(){
-            charStats.refresh();
-            player.setPhysicsLocation(T.v3f(0, 10, 0));
-        }
-        public void move(){
-            // Initialize temporary variables:
-            Vector3f dir;// = v3f(0, 0, 0);
-            Vector3f wd = T.v3f(0, 0, 0);
-            float x, z, angle;
-            double rad;
-            // Calculate forward/backward points:
-            if(movement[MOVE_FORWARD] || movement[MOVE_BACKWARD]){
-                dir = cam.getDirection();
-                x = dir.getZ();
-                z = dir.getX();
-                angle = (float) Math.toDegrees(Math.atan2(x/2 - x, z/2 - z));
-                if(angle < 0){
-                    angle += 360;
-                }
-                rad = Math.toRadians(angle);
-                float xWard = (float) -Math.cos(rad) * MOVE_SPEED;
-                float zWard = (float) -Math.sin(rad) * MOVE_SPEED;
-                if(movement[MOVE_FORWARD]) {
-                    wd.addLocal(xWard, 0, zWard);
-                }
-                if(movement[MOVE_BACKWARD]) {
-                    wd.addLocal(-xWard, 0, -zWard);
-                }
-            }
-            // Calculate sidestep points:
-            if(movement[MOVE_LEFT] || movement[MOVE_RIGHT]){
-                dir = cam.getLeft();
-                x = dir.getZ();
-                z = dir.getX();
-                angle = (float) Math.toDegrees(Math.atan2(x/2 - x, z/2 - z));
-                if(angle < 0){
-                    angle += 360;
-                }
-                rad = Math.toRadians(angle);
-                float xSide = (float) -Math.cos(rad) * MOVE_SPEED;
-                float zSide = (float) -Math.sin(rad) * MOVE_SPEED;
-                if(movement[MOVE_LEFT]) {
-                    wd.addLocal(xSide, 0, zSide);
-                }
-                if(movement[MOVE_RIGHT]) {
-                    wd.addLocal(-xSide, 0, -zSide);
-                }
-            }
-
-            // If moving at a diagonal, reduce movement.
-            if((movement[MOVE_FORWARD] || movement[MOVE_BACKWARD])
-                    && (movement[MOVE_LEFT] || movement[MOVE_RIGHT])){
-                wd.setX(wd.getX()/1.414f);
-                wd.setZ(wd.getZ()/1.414f);
-            }
-
-            // If crouching, lower view.
-            if(movement[MOVE_CROUCH]){
-                cam.setLocation(player.getPhysicsLocation().add(T.v3f(0, -1.5f, 0)));
-                wd.setX(wd.getX()*CROUCH_PENALTY);
-                wd.setZ(wd.getZ()*CROUCH_PENALTY);
-            }else{
-                cam.setLocation(player.getPhysicsLocation());
-            }
-            
-            player.setWalkDirection(wd);
-            charNode.setLocalTranslation(cam.getLocation());
-            //UpdateWeaponUI();
-        }
-        public void reload(){
-            if(weapons[set][0] instanceof RangedReloadWeapon){
-                RangedReloadWeapon e = (RangedReloadWeapon) weapons[set][0];
-                e.reload();
-            }
-            if(weapons[set][1] instanceof RangedReloadWeapon){
-                RangedReloadWeapon e = (RangedReloadWeapon) weapons[set][1];
-                e.reload();
-            }
-        }
-        public void swapGuns(){
-            weapons[set][0].disable();
-            weapons[set][1].disable();
-            if(set == 0){
-                set = 1;
-            }else if(set == 1){
-                set = 0;
-            }
-            weapons[set][0].enable();
-            weapons[set][1].enable();
-        }
-        
-        public void update(float tpf){
-            this.move();
-            weapons[set][0].tick(tpf);
-            weapons[set][1].tick(tpf);
-            recoil.decoil(tpf);
-        }
-    }
     // --- Input Handling --- //
     private class InputHandler implements ActionListener, AnalogListener{
         // Constant Variables:
@@ -698,15 +488,15 @@ public class GameClient extends Application{
         public void onAction(String bind, boolean down, float tpf) {
             // Movement:
             if(bind.equals("Move_Left")){
-                character.movement[MOVE_LEFT] = down;
+                character.movement[Char.MOVE_LEFT] = down;
             }else if(bind.equals("Move_Right")){
-                character.movement[MOVE_RIGHT] = down;
+                character.movement[Char.MOVE_RIGHT] = down;
             }else if(bind.equals("Move_Forward")){
-                character.movement[MOVE_FORWARD] = down;
+                character.movement[Char.MOVE_FORWARD] = down;
             }else if(bind.equals("Move_Backward")){
-                character.movement[MOVE_BACKWARD] = down;
+                character.movement[Char.MOVE_BACKWARD] = down;
             }else if(bind.equals("Move_Crouch")){
-                character.movement[MOVE_CROUCH] = down;
+                character.movement[Char.MOVE_CROUCH] = down;
             }else if(bind.equals("Move_Jump") && down){
                 character.getPlayer().jump();
             }
@@ -810,11 +600,17 @@ public class GameClient extends Application{
     public Node getRoot(){
         return rootNode;
     }
-    public Node getGUI() {
+    public Node getGUI(){
         return guiNode;
+    }
+    public Recoil getRecoil(){
+        return recoil;
     }
     public AppSettings getSettings(){
         return settings;
+    }
+    public BulletAppState getBulletAppState(){
+        return bulletAppState;
     }
     
     // Main:
@@ -874,6 +670,7 @@ public class GameClient extends Application{
         // Initialize new HUD & remove debug HUD elements:
         Weapons.initialize(app);
         Player.initialize(app);
+        Char.initialize(app);
         hud.initialize(app);
         dcs.initialize();
         rootNode.attachChild(dcs.node);
@@ -882,7 +679,7 @@ public class GameClient extends Application{
         //setDisplayFps(false);
         
         // Create the player character:
-        character = new Character(
+        character = new Char(
                 new M4A1(true), new LaserPistol(false),
                 new Raygun(true), new AK47(false), 100, 100);
         
