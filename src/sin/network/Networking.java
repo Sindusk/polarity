@@ -112,7 +112,7 @@ public class Networking {
 
         // Send updated movement data:
         if(timers[MOVE] >= MOVE_INTERVAL){
-            client.send(new MoveData(CLIENT_ID, GameClient.character.getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
+            client.send(new MoveData(CLIENT_ID, GameClient.getCharacter().getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
     }
@@ -122,10 +122,10 @@ public class Networking {
 
         private void ConnectMessage(ConnectData d){
             final int id = d.getID();
-            if(!GameClient.players[d.getID()].created){
+            if(!GameClient.getPlayer(d.getID()).created){
                 app.enqueue(new Callable<Void>(){
                     public Void call() throws Exception{
-                        GameClient.players[id].create();
+                        GameClient.getPlayer(id).create();
                         return null;
                     }
                 });
@@ -144,7 +144,7 @@ public class Networking {
             final int id = d.getID();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    GameClient.players[id].destroy();
+                    GameClient.getPlayer(id).destroy();
                     return null;
                 }
             });
@@ -163,7 +163,7 @@ public class Networking {
             final Quaternion rot = d.getRotation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    GameClient.players[id].move(loc, rot);
+                    GameClient.getPlayer(id).move(loc, rot);
                     return null;
                 }
             });
@@ -172,7 +172,7 @@ public class Networking {
             final float pingTime = app.getTimer().getTimeInSeconds() - time;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    app.hud.ping.setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
+                    GameClient.hud.ping.setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
                     return null;
                 }
             });
@@ -183,7 +183,7 @@ public class Networking {
                 final float damage = d.getDamage();
                 app.enqueue(new Callable<Void>(){
                     public Void call() throws Exception{
-                        GameClient.character.damage(damage);
+                        GameClient.getCharacter().damage(damage);
                         return null;
                     }
                 });
@@ -194,7 +194,7 @@ public class Networking {
                 return;
             }
             final String s = d.getSound();
-            final Vector3f loc = GameClient.players[d.getID()].getLocation();
+            final Vector3f loc = GameClient.getPlayer(d.getID()).getLocation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     AudioNode node = new AudioNode(app.getAssetManager(), s);
@@ -211,8 +211,8 @@ public class Networking {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     //worldNode.detachAllChildren();
-                    GameClient.character.kill();
-                    World.create(world, app.getWorld());
+                    GameClient.getCharacter().kill();
+                    World.create(world, GameClient.getWorld());
                     return null;
                 }
             });

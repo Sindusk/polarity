@@ -125,7 +125,7 @@ public class HUD {
             text.move(topLeft.getX(), topLeft.getY(), 2);
             bar.attachChild(text);
 
-            app.getGUI().attachChild(bar);
+            GameClient.getGUI().attachChild(bar);
         }
         public void destroy(){
             //
@@ -148,7 +148,7 @@ public class HUD {
             text.setColor(ColorRGBA.Magenta);
             text.setSize(SIZE);
             text.setQueueBucket(RenderQueue.Bucket.Transparent);
-            app.getRoot().attachChild(text);
+            GameClient.getRoot().attachChild(text);
             used = false;
             timer = 0;
         }
@@ -200,13 +200,13 @@ public class HUD {
     }
 
     private void createCrosshairs(float length, float offset, float width){
-        crosshair[0] = World.CG.createLine(app.getGUI(), "", width, T.v3f(cx-(length+offset), cy), T.v3f(cx-offset, cy), ColorRGBA.Red);
-        crosshair[1] = World.CG.createLine(app.getGUI(), "", width, T.v3f(cx, cy-(length+offset)), T.v3f(cx, cy-offset), ColorRGBA.Red);
-        crosshair[2] = World.CG.createLine(app.getGUI(), "", width, T.v3f(cx+(length+offset), cy), T.v3f(cx+offset, cy), ColorRGBA.Red);
-        crosshair[3] = World.CG.createLine(app.getGUI(), "", width, T.v3f(cx, cy+(length+offset)), T.v3f(cx, cy+offset), ColorRGBA.Red);
+        crosshair[0] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx-(length+offset), cy), T.v3f(cx-offset, cy), ColorRGBA.Red);
+        crosshair[1] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx, cy-(length+offset)), T.v3f(cx, cy-offset), ColorRGBA.Red);
+        crosshair[2] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx+(length+offset), cy), T.v3f(cx+offset, cy), ColorRGBA.Red);
+        crosshair[3] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx, cy+(length+offset)), T.v3f(cx, cy+offset), ColorRGBA.Red);
     }
     private void updateCrosshairs(){
-        float mod = app.recoil.getSpreadMod();
+        float mod = GameClient.getRecoil().getSpreadMod();
         crosshair[0].setLocalTranslation(T.v3f(-mod, 0));
         crosshair[1].setLocalTranslation(T.v3f(0, -mod));
         crosshair[2].setLocalTranslation(T.v3f(mod, 0));
@@ -238,7 +238,7 @@ public class HUD {
             }
             i++;
         }
-        if(app.recoil.getSpreadMod() != 0){
+        if(GameClient.getRecoil().getSpreadMod() != 0){
             updateCrosshairs();
         }
     }
@@ -268,7 +268,7 @@ public class HUD {
         ping.setSize(16);
         ping.setLocalTranslation(T.v3f(20, cy*2-20));
         ping.setText("Not Connected");
-        app.getGUI().attachChild(ping);
+        GameClient.getGUI().attachChild(ping);
 
         // Initialize floating texts:
         int i = 0;

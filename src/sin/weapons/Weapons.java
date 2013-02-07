@@ -49,12 +49,12 @@ public class Weapons{
                 this.barIndex = HUD.AMMO_RIGHT;
             }
             //app.hud.bar[barIndex].setMax(max);
-            app.hud.setBarMax(barIndex, max);
-            app.hud.updateBar(barIndex, clip);
+            GameClient.hud.setBarMax(barIndex, max);
+            GameClient.hud.updateBar(barIndex, clip);
         }
 
         public void updateBar(){
-            app.hud.updateBar(barIndex, clip);
+            GameClient.hud.updateBar(barIndex, clip);
         }
         public void shot(){
             clip--;
@@ -133,16 +133,16 @@ public class Weapons{
         }
         private void handle(Ray ray){
             CollisionResults results = new CollisionResults();
-            GameClient.collisionNode.collideWith(ray, results);
+            GameClient.getCollisionNode().collideWith(ray, results);
             if(results.size() > 0){
                 CollisionResult closest = results.getClosestCollision();
                 //createTracer(cam.getLocation(), closest.getContactPoint());
-                World.CG.createLine(GameClient.tracerNode, "tracer", 3, app.getCamera().getLocation(), closest.getContactPoint(), ColorRGBA.Blue);
+                World.CG.createLine(GameClient.getTracerNode(), "tracer", 3, app.getCamera().getLocation(), closest.getContactPoint(), ColorRGBA.Blue);
                 int part = hitPlayer(closest.getGeometry().getName());
                 if(part >= 0){
                     int player = Integer.parseInt(closest.getGeometry().getName().substring(0, 2));
                     float dmg = calculate(part);
-                    app.hud.addFloatingText(GameClient.players[player].getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.character.getLocation(), dmg);
+                    GameClient.hud.addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
                     if(Networking.isConnected()) {
                         Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                     }
@@ -184,8 +184,8 @@ public class Weapons{
 
         public void apply(Vector3f target){
             float spread_mult = s_base;
-            spread_mult += s_recoil*(app.recoil.getRecoil(true)+app.recoil.getRecoil(false));
-            if(!GameClient.character.getPlayer().onGround()) {
+            spread_mult += s_recoil*(GameClient.getRecoil().getRecoil(true)+GameClient.getRecoil().getRecoil(false));
+            if(!GameClient.getCharacter().getPlayer().onGround()) {
                 spread_mult += s_base*SPREAD_INC*.05;
             }
             float spread_sub = spread_mult/2;
@@ -315,7 +315,7 @@ public class Weapons{
             Vector3f target = app.getCamera().getDirection().clone();
             spread.apply(target);
             damage.handle(new Ray(app.getCamera().getLocation(), target));
-            app.recoil.recoil(recoils.up(), recoils.left());
+            GameClient.getRecoil().recoil(recoils.up(), recoils.left());
             ammo.shot();
             audio.fire();
             cooling += cooldown;
@@ -345,17 +345,17 @@ public class Weapons{
         }
 
         public void enable(){
-            GameClient.character.getNode().attachChild(model);
-            app.hud.setBarMax(ammo.barIndex, ammo.max);
+            GameClient.getCharacter().getNode().attachChild(model);
+            GameClient.hud.setBarMax(ammo.barIndex, ammo.max);
             ammo.updateBar();
         }
         public void enable(Node node){
             node.attachChild(model);
-            app.hud.setBarMax(ammo.barIndex, ammo.max);
+            GameClient.hud.setBarMax(ammo.barIndex, ammo.max);
             ammo.updateBar();
         }
         public void disable(){
-            GameClient.character.getNode().detachChild(model);
+            GameClient.getCharacter().getNode().detachChild(model);
             firing = false;
         }
     }

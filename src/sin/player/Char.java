@@ -54,13 +54,13 @@ public class Char {
                         health += shields;
                         shields = 0;
                         if(health <= 0){
-                            GameClient.character.kill();
+                            GameClient.getCharacter().kill();
                         }
                     }
                 }else{
                     health -= damage;
                     if(health <= 0){
-                        GameClient.character.kill();
+                        GameClient.getCharacter().kill();
                     }
                 }
                 update();

@@ -30,6 +30,7 @@ import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
 import sin.tools.T;
+import sin.weapons.Recoil;
 import sin.weapons.Weapons;
 import sin.weapons.Weapons.RangedWeapon.AK47;
 import sin.weapons.Weapons.RangedWeapon.LaserPistol;
@@ -75,11 +76,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 public class GameClient extends Application{
-
     // --- Global Constant Variables --- //
     // Network Variables:
-    private Node guiNode = new Node("Gui Node");
-    private Node rootNode = new Node("Root Node");
+    private static final boolean MODE_DEBUG = false;
     public static final String INPUT_MAPPING_EXIT = "SIMPLEAPP_Exit";
     public static final String INPUT_MAPPING_CAMERA_POS = "SIMPLEAPP_CameraPos";
     public static final String INPUT_MAPPING_MEMORY = "SIMPLEAPP_Memory";
@@ -94,18 +93,20 @@ public class GameClient extends Application{
     private static GameClient app;                  // The application itself (this).
     
     // Nodes:
-    public static Node collisionNode = new Node();      // Node encompassing anything able to be shot [single, world, player].
+    private static Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
+    private static Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
+    private static Node collisionNode = new Node();     // Node encompassing anything able to be shot [single, world, player].
     private static Node singleNode = new Node();        // Node encompassing single player testing (Static).
     private static Node worldNode = new Node();         // Node encompassing terrain and environment (Static).
-    public static Node playerNode = new Node();         // Node encompassing player models (Kinematic).
-    public static Node tracerNode = new Node();         // Node encompassing tracers, mainly for testing.
+    private static Node playerNode = new Node();        // Node encompassing player models (Kinematic).
+    private static Node tracerNode = new Node();        // Node encompassing tracers, mainly for testing.
     
     // Custom Variables:
-    public static Char character;                     // Character data for the current client.
-    public static Player[] players = new Player[16];        // Array of networked players.
     private static Networking network = new Networking();   // Class for controlling Networking.
-    public Recoil recoil = new Recoil();               // Class for controlling Camera movement (recoil/decoil).
-    public HUD hud = new HUD();                         // Class for controlling User Interface & HUD.
+    private static Player[] player = new Player[16];        // Array of networked players.
+    private static Char character;                      // Character data for the current client.
+    private static Recoil recoil = new Recoil();        // Class for controlling Camera movement (recoil/decoil).
+    public static HUD hud = new HUD();                         // Class for controlling User Interface & HUD.
     public DecalSystem dcs = new DecalSystem();         // Class for controlling Bullet Decals.
     private InputHandler input = new InputHandler();    // Class for handling all forms of input.
     
@@ -145,124 +146,6 @@ public class GameClient extends Application{
                 i++;
             }
             //rootNode.attachChild(node);
-        }
-    }
-    // --- Recoil & Spread --- //
-    public class Recoil{
-        // Constant Variables:
-        private static final float RECOIL_SENSITIVITY = 1;
-        private static final float RECOIL_UP_INC = FastMath.PI*0.0001f;
-        private static final float RECOIL_LEFT_INC = FastMath.PI*0.0003f;
-        private static final float DECOIL_UP_PERC_MULT = 3;
-        private static final float DECOIL_LEFT_PERC_MULT = 3;
-        
-        // Index Holders:
-        private static final int UP = 0;
-        private static final int UP_TOTAL = 1;
-        private static final int LEFT = 2;
-        private static final int LEFT_TOTAL = 3;
-        // Recoil: 0 = up, 1 = up-total, 2 = left, 3 = left-total
-        public float recoil[] = new float[]{0, 0, 0, 0};
-        
-        public void rotateCamera(float value, float sensitivity, Vector3f axis){
-            Matrix3f mat = new Matrix3f();
-            mat.fromAngleNormalAxis(sensitivity * value, axis);
-
-            Vector3f up = cam.getUp();
-            Vector3f left = cam.getLeft();
-            Vector3f dir = cam.getDirection();
-            Quaternion quat = new Quaternion();
-            quat.lookAt(dir, up);
-
-            mat.mult(up, up);
-            mat.mult(left, left);
-            mat.mult(dir, dir);
-
-            Quaternion q = new Quaternion();
-            q.fromAxes(left, up, dir);
-            q.normalizeLocal();
-            
-            float angleY = dir.angleBetween(Vector3f.UNIT_Y);
-            float angleYDegree = angleY * 180 / FastMath.PI ;
-            if(angleYDegree>=5 && angleYDegree<=175 && up.y>=0) {
-                cam.setAxes(q);
-            }
-        }
-        
-        public void RecoilUp(float mod){
-            cam.getRotation().multLocal(new Quaternion().fromAngleAxis(-RECOIL_UP_INC*mod, Vector3f.UNIT_X));
-            
-            // Update variables:
-            recoil[UP] += RECOIL_UP_INC*mod;
-            recoil[UP_TOTAL] = recoil[UP];
-        }
-        public void RecoilLeft(float mod){
-            rotateCamera(RECOIL_LEFT_INC*mod, RECOIL_SENSITIVITY, Vector3f.UNIT_Y);
-            
-            // Update variables:
-            recoil[LEFT] += RECOIL_LEFT_INC*mod;
-            recoil[LEFT_TOTAL] = recoil[LEFT];
-        }
-        public void DecoilUp(float mod){
-            cam.getRotation().multLocal(new Quaternion().fromAngleAxis(-mod, Vector3f.UNIT_X));
-        }
-        public void DecoilLeft(float mod){
-            rotateCamera(mod, RECOIL_SENSITIVITY, Vector3f.UNIT_Y);
-        }
-        
-        public Recoil(){
-            //
-        }
-        
-        public float getSpreadMod(){
-            return (FastMath.abs(recoil[UP])+FastMath.abs(recoil[LEFT]))*100;
-        }
-        public float getRecoil(boolean up){
-            if(up) {
-                return recoil[UP];
-            }
-            else {
-                return recoil[LEFT];
-            }
-        }
-        public void recoil(float up, float left){
-            RecoilUp(up);
-            RecoilLeft(left);
-        }
-        public void decoil(float tpf){
-            if(recoil[UP] != 0){
-                float decoil_up = RECOIL_UP_INC*tpf;
-                float decoil_up_perc = recoil[UP_TOTAL]*DECOIL_UP_PERC_MULT*tpf;
-                if(recoil[UP] < 0){
-                    decoil_up *= -1;
-                    //decoil_up_perc *= -1;
-                }
-                decoil_up += decoil_up_perc;
-                if(FastMath.abs(recoil[UP]) < FastMath.abs(decoil_up)){
-                    decoil_up = recoil[UP];
-                    recoil[UP] = 0;
-                }else{
-                    recoil[UP] -= decoil_up;
-                }
-                DecoilUp(-decoil_up);
-            }
-            
-            if(recoil[LEFT] != 0){
-                float decoil_left = RECOIL_LEFT_INC*tpf;
-                float decoil_left_perc = recoil[LEFT_TOTAL]*DECOIL_LEFT_PERC_MULT*tpf;
-                if(recoil[LEFT] < 0){
-                    decoil_left *= -1;
-                    //decoil_left_perc *= -1;
-                }
-                decoil_left += decoil_left_perc;
-                if(FastMath.abs(recoil[LEFT]) < FastMath.abs(decoil_left)){
-                    decoil_left = recoil[LEFT];
-                    recoil[LEFT] = 0;
-                }else{
-                    recoil[LEFT] -= decoil_left;
-                }
-                DecoilLeft(-decoil_left);
-            }
         }
     }
     
@@ -315,8 +198,8 @@ public class GameClient extends Application{
                     tracerNode.detachAllChildren();
                     dcs.resetDecals();
                 }else if(bind.equals("Misc_Key_3")){
-                    players[4].create();
-                    players[4].move(T.v3f(0, 105, -45), Quaternion.ZERO);
+                    getPlayer(4).create();
+                    getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
                 }else if(bind.equals("Misc_Key_4")){
                     //hud.bar[0].update(30);
                 }else if(bind.equals("Exit")){
@@ -382,16 +265,31 @@ public class GameClient extends Application{
             }
         }
     }
-    public Node getRoot(){
+    public static Node getRoot(){
         return rootNode;
     }
-    public Node getGUI(){
+    public static Node getGUI(){
         return guiNode;
     }
-    public Node getWorld(){
+    public static Node getWorld(){
         return worldNode;
     }
-    public Recoil getRecoil(){
+    public static Node getPlayerNode(){
+        return playerNode;
+    }
+    public static Node getCollisionNode(){
+        return collisionNode;
+    }
+    public static Node getTracerNode(){
+        return tracerNode;
+    }
+    public static Char getCharacter(){
+        return character;
+    }
+    public static Player getPlayer(int index){
+        return player[index];
+    }
+    public static Recoil getRecoil(){
         return recoil;
     }
     public AppSettings getSettings(){
@@ -408,11 +306,13 @@ public class GameClient extends Application{
     }
     public static void main(String[] args) throws IOException {
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
-        try {
-            logger.addHandler(new FileHandler("FPSlog.xml"));
-            Logger.getLogger("com.jme3").addHandler(new FileHandler("FPSlog2.xml"));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
+        if(MODE_DEBUG){
+            try {
+                logger.addHandler(new FileHandler("FPSlog.xml"));
+                Logger.getLogger("com.jme3").addHandler(new FileHandler("FPSlog2.xml"));
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         app = new GameClient();
         AppSettings set = new AppSettings(true);
@@ -457,6 +357,7 @@ public class GameClient extends Application{
         
         // Initialize new HUD & remove debug HUD elements:
         Networking.initialize(app);
+        Recoil.initialize(app);
         Weapons.initialize(app);
         Player.initialize(app);
         Char.initialize(app);
@@ -475,7 +376,7 @@ public class GameClient extends Application{
         // Create all the player characters.
         int i = 0;
         while(i < 16){
-            players[i] = new Player(i, T.v3f(0, 10, 0));
+            player[i] = new Player(i, T.v3f(0, 10, 0));
             i++;
         }
     }
