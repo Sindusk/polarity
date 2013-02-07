@@ -2,27 +2,18 @@ package sin;
 
 import com.jme3.app.Application;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseAxisTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.system.AppSettings;
-import com.jme3.system.JmeContext.Type;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.hud.HUD;
+import sin.input.InputHandler;
 import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
@@ -85,8 +76,8 @@ public class GameClient extends Application{
     
     // Important System Variables:
     private static boolean CLIENT_KEYS_CLEARED = false;
-    public static final Logger logger = Logger.getLogger(GameClient.class.getName());
-    public static BulletAppState bulletAppState;    // Physics State.
+    private static final Logger logger = Logger.getLogger(GameClient.class.getName());
+    private static BulletAppState bulletAppState;   // Physics State.
     private static GameClient app;                  // The application itself (this).
     
     // Nodes:
@@ -99,130 +90,14 @@ public class GameClient extends Application{
     private static Node tracerNode = new Node();        // Node encompassing tracers, mainly for testing.
     
     // Custom Variables:
+    private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
     private static Networking network = new Networking();   // Class for controlling Networking.
     private static Player[] player = new Player[16];        // Array of networked players.
     private static Char character;                      // Character data for the current client.
     private static Recoil recoil = new Recoil();        // Class for controlling Camera movement (recoil/decoil).
     private static HUD hud = new HUD();                 // Class for controlling User Interface & HUD.
     private static Decals dcs = new Decals();           // Class for controlling Bullet Decals.
-    private InputHandler input = new InputHandler();    // Class for handling all forms of input.
     
-    // --- Input Handling --- //
-    private class InputHandler implements ActionListener, AnalogListener{
-        // Constant Variables:
-        public static final float MOUSE_SENSITIVITY = 1;
-        public void onAction(String bind, boolean down, float tpf) {
-            // Movement:
-            if(bind.equals("Move_Left")){
-                character.movement[Char.MOVE_LEFT] = down;
-            }else if(bind.equals("Move_Right")){
-                character.movement[Char.MOVE_RIGHT] = down;
-            }else if(bind.equals("Move_Forward")){
-                character.movement[Char.MOVE_FORWARD] = down;
-            }else if(bind.equals("Move_Backward")){
-                character.movement[Char.MOVE_BACKWARD] = down;
-            }else if(bind.equals("Move_Crouch")){
-                character.movement[Char.MOVE_CROUCH] = down;
-            }else if(bind.equals("Move_Jump") && down){
-                character.getPlayer().jump();
-            }
-            // Actions:
-            else if(bind.equals("Trigger_Right")){
-                character.setFiring(false, down);
-            }else if(bind.equals("Trigger_Left")){
-                character.setFiring(true, down);
-            }else if(bind.equals("Trigger_Reload")){
-                if(down) {
-                    character.reload();
-                }
-            }
-            if(down){
-                // Weapon Swapping:
-                if(bind.equals("Swap_1")){
-                    character.swapGuns();
-                }
-                // Miscellaneous:
-                else if(bind.equals("Server_Connect")){
-                    // Networking:
-                    network.connect();
-                }else if(bind.equals("Misc_Key_1")){
-                    if(rootNode.hasChild(tracerNode)) {
-                        rootNode.detachChild(tracerNode);
-                    }
-                    else {
-                        rootNode.attachChild(tracerNode);
-                    }
-                }else if(bind.equals("Misc_Key_2")){
-                    tracerNode.detachAllChildren();
-                    dcs.resetDecals();
-                }else if(bind.equals("Misc_Key_3")){
-                    getPlayer(4).create();
-                    getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
-                }else if(bind.equals("Misc_Key_4")){
-                    //hud.bar[0].update(30);
-                }else if(bind.equals("Exit")){
-                    stop();
-                }
-            }
-        }
-
-        public void onAnalog(String name, float value, float tpf) {
-            // Camera:
-            if (name.equals("Cam_Left")){
-                recoil.rotateCamera(value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
-            }else if (name.equals("Cam_Right")){
-                recoil.rotateCamera(-value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
-            }else if (name.equals("Cam_Up")){
-                recoil.rotateCamera(-value, MOUSE_SENSITIVITY, cam.getLeft());
-            }else if (name.equals("Cam_Down")){
-                recoil.rotateCamera(value, MOUSE_SENSITIVITY, cam.getLeft());
-            }
-        }
-        
-        private void createMapping(String name, KeyTrigger trigger){
-            inputManager.addMapping(name, trigger);
-            inputManager.addListener(this, name);
-        }
-        private void createMapping(String name, MouseButtonTrigger trigger){
-            inputManager.addMapping(name, trigger);
-            inputManager.addListener(this, name);
-        }
-        private void createMapping(String name, MouseAxisTrigger trigger){
-            inputManager.addMapping(name, trigger);
-            inputManager.addListener(this, name);
-        }
-        public void initialize(){
-            // Camera:
-            createMapping("Cam_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
-            createMapping("Cam_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));
-            createMapping("Cam_Up", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
-            createMapping("Cam_Down", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
-            // Movement:
-            createMapping("Move_Left", new KeyTrigger(KeyInput.KEY_A));
-            createMapping("Move_Right", new KeyTrigger(KeyInput.KEY_D));
-            createMapping("Move_Forward", new KeyTrigger(KeyInput.KEY_W));
-            createMapping("Move_Backward", new KeyTrigger(KeyInput.KEY_S));
-            createMapping("Move_Crouch", new KeyTrigger(KeyInput.KEY_LCONTROL));
-            createMapping("Move_Jump", new KeyTrigger(KeyInput.KEY_SPACE));
-            // Actions:
-            createMapping("Trigger_Left", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-            createMapping("Trigger_Right", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-            createMapping("Trigger_Reload", new KeyTrigger(KeyInput.KEY_R));
-            // Weapon Swapping:
-            createMapping("Swap_1", new KeyTrigger(KeyInput.KEY_Q));
-            // Miscellaneous:
-            createMapping("Server_Connect", new KeyTrigger(KeyInput.KEY_C));
-            createMapping("Game_Menu", new KeyTrigger(KeyInput.KEY_ESCAPE));
-            createMapping("Misc_Key_1", new KeyTrigger(KeyInput.KEY_V));
-            createMapping("Misc_Key_2", new KeyTrigger(KeyInput.KEY_B));
-            createMapping("Misc_Key_3", new KeyTrigger(KeyInput.KEY_O));
-            createMapping("Misc_Key_4", new KeyTrigger(KeyInput.KEY_I));
-            // Menu/Swapping:
-            if(context.getType() == Type.Display){
-                createMapping("Exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
-            }
-        }
-    }
     public static Node getRoot(){
         return rootNode;
     }
@@ -256,11 +131,17 @@ public class GameClient extends Application{
     public static Recoil getRecoil(){
         return recoil;
     }
+    public static Networking getNetwork(){
+        return network;
+    }
     public AppSettings getSettings(){
         return settings;
     }
-    public BulletAppState getBulletAppState(){
+    public static BulletAppState getBulletAppState(){
         return bulletAppState;
+    }
+    public static Logger getLogger(){
+        return logger;
     }
     
     // Main:
@@ -309,7 +190,7 @@ public class GameClient extends Application{
         bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
         
         // Initialize keybinds.
-        input.initialize();
+        input.initialize(app, context);
         
         // Initialize the World class and create a basic place:
         World.initialize(assetManager, bulletAppState);

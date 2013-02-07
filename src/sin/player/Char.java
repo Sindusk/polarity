@@ -91,7 +91,7 @@ public class Char {
         player.setFallSpeed(30);
         player.setGravity(70);
         player.setPhysicsLocation(new Vector3f(0, 110, 0));
-        app.getBulletAppState().getPhysicsSpace().add(player);
+        GameClient.getBulletAppState().getPhysicsSpace().add(player);
     }
     public Char(Weapons.Weapon a, Weapons.Weapon b, Weapons.Weapon c, Weapons.Weapon d, float health, float shields){
         weapons[0][0] = a;

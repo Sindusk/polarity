@@ -84,7 +84,7 @@ public class Networking {
             try {
                 client = Network.connectToServer("5.216.174.196", 6143);
             } catch (IOException ex) {
-                GameClient.logger.log(Level.SEVERE, null, ex);
+                GameClient.getLogger().log(Level.SEVERE, null, ex);
             }
             this.registerSerials();
             client.start();

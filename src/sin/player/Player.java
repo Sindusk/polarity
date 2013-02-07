@@ -145,7 +145,7 @@ public class Player{
         }
         public void destroy(){
             node.removeControl(rbc);
-            GameClient.bulletAppState.getPhysicsSpace().remove(rbc);
+            GameClient.getBulletAppState().getPhysicsSpace().remove(rbc);
             GameClient.getPlayerNode().detachChild(node);
         }
     }

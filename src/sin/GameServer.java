@@ -1,15 +1,5 @@
 package sin;
 
-import sin.data.ErrorData;
-import sin.data.IDData;
-import sin.data.ShotData;
-import sin.data.PingData;
-import sin.data.DecalData;
-import sin.data.DisconnectData;
-import sin.data.MoveData;
-import sin.data.WorldData;
-import sin.data.ConnectData;
-import sin.data.SoundData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -26,6 +16,16 @@ import com.jme3.renderer.RenderManager;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sin.data.ConnectData;
+import sin.data.DecalData;
+import sin.data.DisconnectData;
+import sin.data.ErrorData;
+import sin.data.IDData;
+import sin.data.MoveData;
+import sin.data.PingData;
+import sin.data.ShotData;
+import sin.data.SoundData;
+import sin.data.WorldData;
 import sin.world.*;
 
 /**
