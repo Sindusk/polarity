@@ -10,12 +10,9 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.system.AppSettings;
@@ -36,8 +33,8 @@ import sin.weapons.Weapons.RangedWeapon.AK47;
 import sin.weapons.Weapons.RangedWeapon.LaserPistol;
 import sin.weapons.Weapons.RangedWeapon.M4A1;
 import sin.weapons.Weapons.RangedWeapon.Raygun;
+import sin.world.Decals;
 import sin.world.World;
-import sin.world.World.CG;
 
 
 /**
@@ -106,48 +103,9 @@ public class GameClient extends Application{
     private static Player[] player = new Player[16];        // Array of networked players.
     private static Char character;                      // Character data for the current client.
     private static Recoil recoil = new Recoil();        // Class for controlling Camera movement (recoil/decoil).
-    public static HUD hud = new HUD();                         // Class for controlling User Interface & HUD.
-    public DecalSystem dcs = new DecalSystem();         // Class for controlling Bullet Decals.
+    private static HUD hud = new HUD();                 // Class for controlling User Interface & HUD.
+    private static Decals dcs = new Decals();           // Class for controlling Bullet Decals.
     private InputHandler input = new InputHandler();    // Class for handling all forms of input.
-    
-    // --- Bullet Decals --- //
-    public class DecalSystem{
-        // Constant Variables:
-        private static final int   DECAL_NUM = 150;
-        private static final float DECAL_SIZE = 0.2f;
-        
-        // Instance Variables:
-        private Node node = new Node();
-        private int next = 0;
-        private Geometry[] decal = new Geometry[DECAL_NUM];
-        
-        public DecalSystem(){
-            //rootNode.attachChild(node);
-        }
-        
-        public void createDecal(Vector3f loc){
-            decal[next].setLocalTranslation(loc);
-            next++;
-            if(next >= decal.length){
-                next = 0;
-            }
-        }
-        public void resetDecals(){
-            int i = 0;
-            while(i < decal.length){
-                decal[i].setLocalTranslation(Vector3f.ZERO);
-                i++;
-            }
-        }
-        public void initialize(){
-            int i = 0;
-            while(i < decal.length){
-                decal[i] = CG.createSphere(node, "decal", DECAL_SIZE, T.v3f(0, 0, 0), ColorRGBA.Black);
-                i++;
-            }
-            //rootNode.attachChild(node);
-        }
-    }
     
     // --- Input Handling --- //
     private class InputHandler implements ActionListener, AnalogListener{
@@ -289,6 +247,12 @@ public class GameClient extends Application{
     public static Player getPlayer(int index){
         return player[index];
     }
+    public static HUD getHUD(){
+        return hud;
+    }
+    public static Decals getDCS(){
+        return dcs;
+    }
     public static Recoil getRecoil(){
         return recoil;
     }
@@ -363,7 +327,7 @@ public class GameClient extends Application{
         Char.initialize(app);
         hud.initialize(app);
         dcs.initialize();
-        rootNode.attachChild(dcs.node);
+        rootNode.attachChild(dcs.getNode());
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
         //setDisplayFps(false);

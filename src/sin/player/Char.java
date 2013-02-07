@@ -37,15 +37,15 @@ public class Char {
                 this.health_max = health_max;
                 this.shields = shields_max;
                 this.shields_max = shields_max;
-                app.hud.setBarMax(HUD.HEALTH, (int) health_max);
-                app.hud.setBarMax(HUD.SHIELD, (int) shields_max);
-                app.hud.updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
-                app.hud.updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
+                GameClient.getHUD().setBarMax(HUD.HEALTH, (int) health_max);
+                GameClient.getHUD().setBarMax(HUD.SHIELD, (int) shields_max);
+                GameClient.getHUD().updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
+                GameClient.getHUD().updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
             }
             
             public void update(){
-                app.hud.updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
-                app.hud.updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
+                GameClient.getHUD().updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
+                GameClient.getHUD().updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
             }
             public void damage(float damage){
                 if(shields > 0){
@@ -102,7 +102,7 @@ public class Char {
         weapons[0][1].enable(charNode);
         //charNode.attachChild(weapons[2].model);
         //charNode.attachChild(weapons[3].model);
-        app.getRoot().attachChild(charNode);
+        GameClient.getRoot().attachChild(charNode);
         charStats = new CharStats(health, shields);
         this.create();
     }
@@ -223,7 +223,7 @@ public class Char {
         this.move();
         weapons[set][0].tick(tpf);
         weapons[set][1].tick(tpf);
-        app.getRecoil().decoil(tpf);
+        GameClient.getRecoil().decoil(tpf);
     }
     
     public static void initialize(GameClient app){

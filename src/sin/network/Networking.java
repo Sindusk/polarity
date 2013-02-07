@@ -135,7 +135,7 @@ public class Networking {
             final Vector3f loc = d.getLocation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    app.dcs.createDecal(loc);
+                    GameClient.getDCS().createDecal(loc);
                     return null;
                 }
             });
@@ -172,7 +172,7 @@ public class Networking {
             final float pingTime = app.getTimer().getTimeInSeconds() - time;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    GameClient.hud.ping.setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
+                    GameClient.getHUD().ping.setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
                     return null;
                 }
             });

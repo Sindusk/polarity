@@ -49,12 +49,12 @@ public class Weapons{
                 this.barIndex = HUD.AMMO_RIGHT;
             }
             //app.hud.bar[barIndex].setMax(max);
-            GameClient.hud.setBarMax(barIndex, max);
-            GameClient.hud.updateBar(barIndex, clip);
+            GameClient.getHUD().setBarMax(barIndex, max);
+            GameClient.getHUD().updateBar(barIndex, clip);
         }
 
         public void updateBar(){
-            GameClient.hud.updateBar(barIndex, clip);
+            GameClient.getHUD().updateBar(barIndex, clip);
         }
         public void shot(){
             clip--;
@@ -142,12 +142,12 @@ public class Weapons{
                 if(part >= 0){
                     int player = Integer.parseInt(closest.getGeometry().getName().substring(0, 2));
                     float dmg = calculate(part);
-                    GameClient.hud.addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
+                    GameClient.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
                     if(Networking.isConnected()) {
                         Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                     }
                 }else{
-                    app.dcs.createDecal(closest.getContactPoint());
+                    GameClient.getDCS().createDecal(closest.getContactPoint());
                     if(Networking.isConnected()) {
                         Networking.client.send(new DecalData(closest.getContactPoint()));
                     }
@@ -346,12 +346,12 @@ public class Weapons{
 
         public void enable(){
             GameClient.getCharacter().getNode().attachChild(model);
-            GameClient.hud.setBarMax(ammo.barIndex, ammo.max);
+            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
             ammo.updateBar();
         }
         public void enable(Node node){
             node.attachChild(model);
-            GameClient.hud.setBarMax(ammo.barIndex, ammo.max);
+            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
             ammo.updateBar();
         }
         public void disable(){
