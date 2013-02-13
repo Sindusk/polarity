@@ -3,6 +3,7 @@ package sin;
 import com.jme3.app.Application;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.ColorRGBA;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
@@ -13,6 +14,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.appstates.GameplayState;
+import sin.appstates.MenuState;
 import sin.hud.HUD;
 import sin.input.InputHandler;
 import sin.network.Networking;
@@ -71,21 +73,15 @@ public class GameClient extends Application{
     
     // Important System Variables:
     private static final Logger logger = Logger.getLogger(GameClient.class.getName());
-    private static BulletAppState bulletAppState;   // Physics State.
     private static GameClient app;                  // The application itself (this).
     // App States:
-    private static GameplayState gameplayState;     // Gameplay State
+    private static BulletAppState bulletAppState;   // Physics State.
+    private static GameplayState gameplayState;     // Gameplay State.
+    private static MenuState menuState;             // Main Menu State.
     
     // Nodes:
     private static Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     private static Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
-    /* (In GameplayState.java)
-    private static Node collisionNode = new Node();     // Node encompassing anything able to be shot [single, world, player].
-    private static Node singleNode = new Node();        // Node encompassing single player testing (Static).
-    private static Node worldNode = new Node();         // Node encompassing terrain and environment (Static).
-    private static Node playerNode = new Node();        // Node encompassing player models (Kinematic).
-    private static Node tracerNode = new Node();        // Node encompassing tracers, mainly for testing.
-    */
     
     // Custom Variables:
     private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
@@ -188,14 +184,6 @@ public class GameClient extends Application{
         // Initialize keybinds.
         input.initialize(app, context);
         
-        // Initialize the World class and create a basic place:
-        /*World.initialize(assetManager, bulletAppState);
-        World.createSinglePlayerArea(singleNode);
-        collisionNode.attachChild(singleNode);
-        collisionNode.attachChild(worldNode);
-        collisionNode.attachChild(playerNode);
-        rootNode.attachChild(collisionNode);*/
-        
         // Initialize new HUD & remove debug HUD elements:
         World.initialize(app);
         Networking.initialize(app);
@@ -213,8 +201,13 @@ public class GameClient extends Application{
         // Initialize App States:
         bulletAppState = new BulletAppState();  
         stateManager.attach(bulletAppState);
+        
         gameplayState = new GameplayState();
-        stateManager.attach(gameplayState);
+        //stateManager.attach(gameplayState);
+        
+        menuState = new MenuState();
+        stateManager.attach(menuState);
+        
         bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
         
         // Create the player character:
