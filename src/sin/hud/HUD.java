@@ -125,7 +125,7 @@ public class HUD {
             text.move(topLeft.getX(), topLeft.getY(), 2);
             bar.attachChild(text);
 
-            GameClient.getGUI().attachChild(bar);
+            node.attachChild(bar);
         }
         public void destroy(){
             //
@@ -188,6 +188,7 @@ public class HUD {
     public static final int AMMO_RIGHT = 3;
 
     // Instance Variables:
+    private Node node = new Node("GUI");      // Node used to attach/detach GUI and HUD elements.
     private float cx, cy;
     private Font font = new Font();
     private DynamicBar[] bar = new DynamicBar[4];
@@ -200,10 +201,10 @@ public class HUD {
     }
 
     private void createCrosshairs(float length, float offset, float width){
-        crosshair[0] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx-(length+offset), cy), T.v3f(cx-offset, cy), ColorRGBA.Red);
-        crosshair[1] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx, cy-(length+offset)), T.v3f(cx, cy-offset), ColorRGBA.Red);
-        crosshair[2] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx+(length+offset), cy), T.v3f(cx+offset, cy), ColorRGBA.Red);
-        crosshair[3] = World.CG.createLine(GameClient.getGUI(), "", width, T.v3f(cx, cy+(length+offset)), T.v3f(cx, cy+offset), ColorRGBA.Red);
+        crosshair[0] = World.CG.createLine(node, "", width, T.v3f(cx-(length+offset), cy), T.v3f(cx-offset, cy), ColorRGBA.Red);
+        crosshair[1] = World.CG.createLine(node, "", width, T.v3f(cx, cy-(length+offset)), T.v3f(cx, cy-offset), ColorRGBA.Red);
+        crosshair[2] = World.CG.createLine(node, "", width, T.v3f(cx+(length+offset), cy), T.v3f(cx+offset, cy), ColorRGBA.Red);
+        crosshair[3] = World.CG.createLine(node, "", width, T.v3f(cx, cy+(length+offset)), T.v3f(cx, cy+offset), ColorRGBA.Red);
     }
     private void updateCrosshairs(){
         float mod = GameClient.getRecoil().getSpreadMod();
@@ -242,8 +243,9 @@ public class HUD {
             updateCrosshairs();
         }
     }
-    public void initialize(GameClient app){
+    public void initialize(GameClient app, Node node){
         HUD.app = app;
+        node.attachChild(this.node);
         
         // Get the center coordinates for the screen:
         this.cx = app.getSettings().getWidth()/2;

@@ -86,20 +86,21 @@ public class GameClient extends Application{
     // Custom Variables:
     private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
     private static Networking network = new Networking();   // Class for controlling Networking.
-    private static Player[] player = new Player[16];        // Array of networked players.
-    private static Char character;                      // Character data for the current client.
+    //private static Player[] player = new Player[16];        // Array of networked players.
+    //private static Char character;                      // Character data for the current client.
     private static Recoil recoil = new Recoil();        // Class for controlling Camera movement (recoil/decoil).
-    private static HUD hud = new HUD();                 // Class for controlling User Interface & HUD.
-    private static Decals dcs = new Decals();           // Class for controlling Bullet Decals.
+    //private static HUD hud = new HUD();                 // Class for controlling User Interface & HUD.
+    //private static Decals dcs = new Decals();           // Class for controlling Bullet Decals.
     
+    // Getters for Nodes:
     public static Node getRoot(){
         return rootNode;
     }
-    public static Node getGUI(){
-        return guiNode;
-    }
     public static Node getWorld(){
         return gameplayState.getWorld();
+    }
+    public static Node getGUI(){
+        return guiNode;
     }
     public static Node getSingleNode(){
         return gameplayState.getSingleNode();
@@ -113,23 +114,32 @@ public class GameClient extends Application{
     public static Node getTracerNode(){
         return gameplayState.getTracerNode();
     }
+    
+    // Getters for States:
+    public static GameplayState getGameplayState(){
+        return gameplayState;
+    }
+    
+    public static HUD getHUD(){
+        return gameplayState.getHUD();
+    }
     public static Char getCharacter(){
-        return character;
+        return gameplayState.getCharacter();
     }
     public static Player getPlayer(int index){
-        return player[index];
-    }
-    public static HUD getHUD(){
-        return hud;
+        return gameplayState.getPlayer(index);
     }
     public static Decals getDCS(){
-        return dcs;
+        return gameplayState.getDCS();
     }
     public static Recoil getRecoil(){
         return recoil;
     }
     public static Networking getNetwork(){
         return network;
+    }
+    public static InputHandler getInputHandler(){
+        return input;
     }
     public AppSettings getSettings(){
         return settings;
@@ -139,6 +149,10 @@ public class GameClient extends Application{
     }
     public static Logger getLogger(){
         return logger;
+    }
+    
+    public void meow(){
+        logger.info("meow");
     }
     
     // Main:
@@ -185,18 +199,13 @@ public class GameClient extends Application{
         input.initialize(app, context);
         
         // Initialize new HUD & remove debug HUD elements:
-        World.initialize(app);
         Networking.initialize(app);
         Recoil.initialize(app);
         Weapons.initialize(app);
         Player.initialize(app);
         Char.initialize(app);
-        hud.initialize(app);
-        dcs.initialize();
-        rootNode.attachChild(dcs.getNode());
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
-        //setDisplayFps(false);
         
         // Initialize App States:
         bulletAppState = new BulletAppState();  
@@ -209,18 +218,6 @@ public class GameClient extends Application{
         stateManager.attach(menuState);
         
         bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
-        
-        // Create the player character:
-        character = new Char(
-                new M4A1(true), new LaserPistol(false),
-                new Raygun(true), new AK47(false), 100, 100);
-        
-        // Create all the player characters.
-        int i = 0;
-        while(i < 16){
-            player[i] = new Player(i, T.v3f(0, 10, 0));
-            i++;
-        }
     }
     
     // Update:

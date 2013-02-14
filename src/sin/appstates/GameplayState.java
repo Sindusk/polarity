@@ -5,7 +5,16 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.hud.HUD;
 import sin.network.Networking;
+import sin.player.Char;
+import sin.player.Player;
+import sin.tools.T;
+import sin.weapons.Weapons.RangedWeapon.AK47;
+import sin.weapons.Weapons.RangedWeapon.LaserPistol;
+import sin.weapons.Weapons.RangedWeapon.M4A1;
+import sin.weapons.Weapons.RangedWeapon.Raygun;
+import sin.world.Decals;
 import sin.world.World;
 
 /**
@@ -13,13 +22,23 @@ import sin.world.World;
  * @author SinisteRing
  */
 public class GameplayState extends AbstractAppState {
-    private GameClient app;
+    private static GameClient app;
     
     private static boolean CLIENT_KEYS_CLEARED = false; // Boolean for stupid keys.
-    private Node root = new Node("Root_Gameplay");      // Root Node for Gameplay.
+    
+    // Classes used for logic:
+    private Char character;                     // Used for character (user) control.
+    private Decals dcs = new Decals();          // Used for decals on the world.
+    private HUD hud = new HUD();                // Used for GUI and HUD elements.
+    private Player[] player = new Player[16];   // Used for networked player data.
+    
+    // All nodes used for use in the Gameplay:
+    private Node root = new Node("Gameplay_Root");      // Root Node.
+    private Node world = new Node("Gameplay_World");    // Node for 3D world.
+    private Node gui = new Node("Gameplay_GUI");        // Node for 2D GUI.
     private Node collisionNode = new Node();     // Node encompassing anything able to be shot [single, world, player].
     private Node singleNode = new Node();        // Node encompassing single player testing (Static).
-    private Node worldNode = new Node();         // Node encompassing terrain and environment (Static).
+    //private Node worldNode = new Node();         // Node encompassing terrain and environment (Static).
     private Node playerNode = new Node();        // Node encompassing player models (Kinematic).
     private Node tracerNode = new Node();        // Node encompassing tracers, mainly for testing.
     
@@ -30,14 +49,14 @@ public class GameplayState extends AbstractAppState {
     public Node getRoot(){
         return root;
     }
+    public Node getWorld(){
+        return world;
+    }
     public Node getCollisionNode(){
         return collisionNode;
     }
     public Node getSingleNode(){
         return singleNode;
-    }
-    public Node getWorld(){
-        return worldNode;
     }
     public Node getPlayerNode(){
         return playerNode;
@@ -46,16 +65,50 @@ public class GameplayState extends AbstractAppState {
         return tracerNode;
     }
     
+    public Char getCharacter(){
+        return character;
+    }
+    public Decals getDCS(){
+        return dcs;
+    }
+    public HUD getHUD(){
+        return hud;
+    }
+    public Player getPlayer(int index){
+        return player[index];
+    }
+    
     @Override
     public void initialize(AppStateManager stateManager, Application app){
+        // Basic initialization:
         super.initialize(stateManager, app);
-        this.app = (GameClient) app;
+        GameplayState.app = (GameClient) app;
+        
+        // Attach GUI and Root nodes:
         GameClient.getRoot().attachChild(root);
+        root.attachChild(world);
+        root.attachChild(gui);
+        
+        // Initialize HUD & World:
+        World.initialize(GameplayState.app);
         World.createSinglePlayerArea(singleNode);
+        hud.initialize(GameplayState.app, gui);
+        dcs.initialize();
+        world.attachChild(dcs.getNode());
+        
+        character = new Char(
+                new M4A1(true), new LaserPistol(false),
+                new Raygun(true), new AK47(false), 100, 100);
+        
+        int i = 0;
+        while(i < 16){
+            player[i] = new Player(i, T.v3f(0, 10, 0));
+            i++;
+        }
+        
         collisionNode.attachChild(singleNode);
-        collisionNode.attachChild(worldNode);
         collisionNode.attachChild(playerNode);
-        root.attachChild(collisionNode);
+        world.attachChild(collisionNode);
     }
     
     @Override
@@ -79,7 +132,7 @@ public class GameplayState extends AbstractAppState {
         
         // Update character location & hud:
         GameClient.getCharacter().update(tpf);
-        GameClient.getHUD().update(tpf);
+        hud.update(tpf);
         
         // Update network if connected:
         if(Networking.isConnected()) {
