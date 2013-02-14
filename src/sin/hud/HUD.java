@@ -270,7 +270,7 @@ public class HUD {
         ping.setSize(16);
         ping.setLocalTranslation(T.v3f(20, cy*2-20));
         ping.setText("Not Connected");
-        GameClient.getGUI().attachChild(ping);
+        node.attachChild(ping);
 
         // Initialize floating texts:
         int i = 0;

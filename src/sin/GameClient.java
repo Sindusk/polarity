@@ -3,7 +3,6 @@ package sin;
 import com.jme3.app.Application;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
@@ -20,16 +19,9 @@ import sin.input.InputHandler;
 import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
-import sin.tools.T;
 import sin.weapons.Recoil;
 import sin.weapons.Weapons;
-import sin.weapons.Weapons.RangedWeapon.AK47;
-import sin.weapons.Weapons.RangedWeapon.LaserPistol;
-import sin.weapons.Weapons.RangedWeapon.M4A1;
-import sin.weapons.Weapons.RangedWeapon.Raygun;
 import sin.world.Decals;
-import sin.world.World;
-
 
 /**
 Copyright (c) 2003-2011 jMonkeyEngine
@@ -80,17 +72,13 @@ public class GameClient extends Application{
     private static MenuState menuState;             // Main Menu State.
     
     // Nodes:
-    private static Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     private static Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
+    private static Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     
     // Custom Variables:
     private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
     private static Networking network = new Networking();   // Class for controlling Networking.
-    //private static Player[] player = new Player[16];        // Array of networked players.
-    //private static Char character;                      // Character data for the current client.
-    private static Recoil recoil = new Recoil();        // Class for controlling Camera movement (recoil/decoil).
-    //private static HUD hud = new HUD();                 // Class for controlling User Interface & HUD.
-    //private static Decals dcs = new Decals();           // Class for controlling Bullet Decals.
+    private static Recoil recoil = new Recoil();            // Class for controlling Camera movement (recoil/decoil).
     
     // Getters for Nodes:
     public static Node getRoot(){
@@ -151,10 +139,6 @@ public class GameClient extends Application{
         return logger;
     }
     
-    public void meow(){
-        logger.info("meow");
-    }
-    
     // Main:
     @Override
     public void start() {
@@ -209,12 +193,10 @@ public class GameClient extends Application{
         
         // Initialize App States:
         bulletAppState = new BulletAppState();  
-        stateManager.attach(bulletAppState);
-        
         gameplayState = new GameplayState();
-        //stateManager.attach(gameplayState);
-        
         menuState = new MenuState();
+        // Attach App States:
+        stateManager.attach(bulletAppState);
         stateManager.attach(menuState);
         
         bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
@@ -232,28 +214,15 @@ public class GameClient extends Application{
         // update states
         stateManager.update(tpf);
         
-        // Update audio listeners:
-        /*listener.setLocation(cam.getLocation());
-        listener.setRotation(cam.getRotation());
-        
-        // Update character location & hud:
-        character.update(tpf);
-        hud.update(tpf);
-        
-        // Update network if connected:
-        if(Networking.isConnected()) {
-            Networking.update(tpf);
-        }*/
+        // Update logical and geometric states:
         rootNode.updateLogicalState(tpf);
         guiNode.updateLogicalState(tpf);
         rootNode.updateGeometricState();
         guiNode.updateGeometricState();
 
-        // render states
+        // Render display:
         stateManager.render(renderManager);
         renderManager.render(tpf, context.isRenderable());
-            // Render:
-        
         stateManager.postRender();
     }
     

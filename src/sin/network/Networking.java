@@ -82,7 +82,7 @@ public class Networking {
     public void connect(){
         if(client == null){
             try {
-                client = Network.connectToServer("5.216.174.196", 6143);
+                client = Network.connectToServer("localhost", 6143);
             } catch (IOException ex) {
                 GameClient.getLogger().log(Level.SEVERE, null, ex);
             }

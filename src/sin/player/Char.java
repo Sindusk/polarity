@@ -12,7 +12,8 @@ import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.hud.HUD;
 import sin.tools.T;
-import sin.weapons.Weapons;
+import sin.weapons.Weapons.RangedWeapon.RangedReloadWeapon;
+import sin.weapons.Weapons.Weapon;
 
 /**
  *
@@ -76,7 +77,7 @@ public class Char {
     private static final float CROUCH_PENALTY = 0.6f;
 
     // Instance Variables:
-    private Weapons.Weapon[][] weapons = new Weapons.Weapon[2][2];
+    private Weapon[][] weapons = new Weapon[2][2];
     private int set = 0;
     private CharStats charStats;
     private CharacterControl player;
@@ -93,16 +94,13 @@ public class Char {
         player.setPhysicsLocation(new Vector3f(0, 110, 0));
         GameClient.getBulletAppState().getPhysicsSpace().add(player);
     }
-    public Char(Weapons.Weapon a, Weapons.Weapon b, Weapons.Weapon c, Weapons.Weapon d, float health, float shields){
+    public Char(Weapon a, Weapon b, Weapon c, Weapon d, float health, float shields){
         weapons[0][0] = a;
         weapons[0][1] = b;
         weapons[1][0] = c;
         weapons[1][1] = d;
         weapons[0][0].enable(charNode);
         weapons[0][1].enable(charNode);
-        //charNode.attachChild(weapons[2].model);
-        //charNode.attachChild(weapons[3].model);
-        GameClient.getRoot().attachChild(charNode);
         charStats = new CharStats(health, shields);
         this.create();
     }
@@ -123,6 +121,13 @@ public class Char {
     }
     public Node getNode(){
         return charNode;
+    }
+    public Weapon getWeapon(boolean left){
+        if(left){
+            return weapons[set][0];
+        }else{
+            return weapons[set][1];
+        }
     }
 
     public void damage(float damage){
@@ -198,12 +203,12 @@ public class Char {
         //UpdateWeaponUI();
     }
     public void reload(){
-        if(weapons[set][0] instanceof Weapons.RangedWeapon.RangedReloadWeapon){
-            Weapons.RangedWeapon.RangedReloadWeapon e = (Weapons.RangedWeapon.RangedReloadWeapon) weapons[set][0];
+        if(weapons[set][0] instanceof RangedReloadWeapon){
+            RangedReloadWeapon e = (RangedReloadWeapon) weapons[set][0];
             e.reload();
         }
-        if(weapons[set][1] instanceof Weapons.RangedWeapon.RangedReloadWeapon){
-            Weapons.RangedWeapon.RangedReloadWeapon e = (Weapons.RangedWeapon.RangedReloadWeapon) weapons[set][1];
+        if(weapons[set][1] instanceof RangedReloadWeapon){
+            RangedReloadWeapon e = (RangedReloadWeapon) weapons[set][1];
             e.reload();
         }
     }

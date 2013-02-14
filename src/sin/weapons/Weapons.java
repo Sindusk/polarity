@@ -279,18 +279,16 @@ public class Weapons{
             muzzle = new WeaponMuzzle(model);
         }
 
-        public void setArchetype(Archetype archetype){
-            this.archetype = archetype;
-        }
-        public void setClassification(Classification classification){
-            this.classification = classification;
-        }
         public Archetype getArchetype(){
             return archetype;
         }
         public Classification getClassification(){
             return classification;
         }
+        public Node getModel(){
+            return model;
+        }
+        
         public void setFiring(boolean firing){
             this.firing = firing;
         }

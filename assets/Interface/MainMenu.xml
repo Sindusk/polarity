@@ -5,26 +5,30 @@
     <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <screen id="start" controller="sin.appstates.MenuState">
         <layer id="background" backgroundColor="#000f" childLayout="vertical">
-            <panel id="space1" height="25%"></panel>
+            <panel height="25%"></panel>
             <panel id="menu.start" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
                 <effect>
-                    <onStartScreen name="move" mode="in" direction="top" length="300" startDelay="0" inherit="true"/>
-                    <onEndScreen name="move" mode="out" direction="bottom" length="300" startDelay="0" inherit="true"/>
-                    <onHover name="pulsate" scaleFactor="0.008" startColor="#f600" endColor="#ffff" post="true"/>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true"/>
                 </effect>
-                <text id="text" font="Interface/Fonts/OCRAStd.fnt" color="#000f" text="Start Game" align="center" valign="center" />
+                <text id="text" font="Interface/Fonts/Batman26.fnt" color="#000f" text="Start Game" />
                 <interact onClick="startGame()"/>
             </panel>
-            <panel id="space2" height="5%"></panel>
+            <panel height="5%"/>
+            <panel id="menu.multiplayer" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                <effect>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true"/>
+                </effect>
+                <text id="text" font="Interface/Fonts/Batman26.fnt" color="#000f" text="Multiplayer (NYI)" />
+            </panel>
+            <panel height="5%"/>
             <panel id="menu.quit" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
                 <effect>
-                    <onStartScreen name="move" mode="in" direction="top" length="300" startDelay="0" inherit="true"/>
-                    <onEndScreen name="move" mode="out" direction="bottom" length="300" startDelay="0" inherit="true"/>
-                    <onHover name="pulsate" scaleFactor="0.008" startColor="#f600" endColor="#ffff" post="true"/>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true"/>
                 </effect>
-                <text id="text" font="Interface/Fonts/OCRAStd.fnt" color="#000f" text="Quit" />
+                <text id="text" font="Interface/Fonts/Batman26.fnt" color="#000f" text="Quit" />
                 <interact onClick="quitGame()"/>
             </panel>
         </layer>
     </screen>
+    <screen id="empty"></screen>
 </nifty>

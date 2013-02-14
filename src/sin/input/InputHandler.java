@@ -15,7 +15,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.system.JmeContext;
 import sin.GameClient;
-import sin.network.Networking;
+import sin.appstates.MenuState;
 import sin.player.Char;
 import sin.tools.T;
 
@@ -23,90 +23,95 @@ import sin.tools.T;
  *
  * @author SinisteRing
  */
-public class InputHandler implements ActionListener, AnalogListener{
+public class InputHandler{// implements ActionListener, AnalogListener{
     private static GameClient app;
     
     // Constant Variables:
     public static final float MOUSE_SENSITIVITY = 1;
-    public void onAction(String bind, boolean down, float tpf) {
-        // Movement:
-        if(bind.equals("Move_Left")){
-            GameClient.getCharacter().movement[Char.MOVE_LEFT] = down;
-        }else if(bind.equals("Move_Right")){
-            GameClient.getCharacter().movement[Char.MOVE_RIGHT] = down;
-        }else if(bind.equals("Move_Forward")){
-            GameClient.getCharacter().movement[Char.MOVE_FORWARD] = down;
-        }else if(bind.equals("Move_Backward")){
-            GameClient.getCharacter().movement[Char.MOVE_BACKWARD] = down;
-        }else if(bind.equals("Move_Crouch")){
-            GameClient.getCharacter().movement[Char.MOVE_CROUCH] = down;
-        }else if(bind.equals("Move_Jump") && down){
-            GameClient.getCharacter().getPlayer().jump();
-        }
-        // Actions:
-        else if(bind.equals("Trigger_Right")){
-            GameClient.getCharacter().setFiring(false, down);
-        }else if(bind.equals("Trigger_Left")){
-            GameClient.getCharacter().setFiring(true, down);
-        }else if(bind.equals("Trigger_Reload")){
-            if(down) {
-                GameClient.getCharacter().reload();
+    
+    private ActionListener gameplayAction = new ActionListener(){
+        public void onAction(String bind, boolean down, float tpf){
+            // Movement:
+            if(bind.equals("Move_Left")){
+                GameClient.getCharacter().movement[Char.MOVE_LEFT] = down;
+            }else if(bind.equals("Move_Right")){
+                GameClient.getCharacter().movement[Char.MOVE_RIGHT] = down;
+            }else if(bind.equals("Move_Forward")){
+                GameClient.getCharacter().movement[Char.MOVE_FORWARD] = down;
+            }else if(bind.equals("Move_Backward")){
+                GameClient.getCharacter().movement[Char.MOVE_BACKWARD] = down;
+            }else if(bind.equals("Move_Crouch")){
+                GameClient.getCharacter().movement[Char.MOVE_CROUCH] = down;
+            }else if(bind.equals("Move_Jump") && down){
+                GameClient.getCharacter().getPlayer().jump();
             }
-        }
-        if(down){
-            // Weapon Swapping:
-            if(bind.equals("Swap_1")){
-                GameClient.getCharacter().swapGuns();
-            }
-            // Miscellaneous:
-            else if(bind.equals("Server_Connect")){
-                // Networking:
-                GameClient.getNetwork().connect();
-            }else if(bind.equals("Misc_Key_1")){
-                if(GameClient.getRoot().hasChild(GameClient.getTracerNode())) {
-                    GameClient.getRoot().detachChild(GameClient.getTracerNode());
+            // Actions:
+            else if(bind.equals("Trigger_Right")){
+                GameClient.getCharacter().setFiring(false, down);
+            }else if(bind.equals("Trigger_Left")){
+                GameClient.getCharacter().setFiring(true, down);
+            }else if(bind.equals("Trigger_Reload")){
+                if(down) {
+                    GameClient.getCharacter().reload();
                 }
-                else {
-                    GameClient.getRoot().attachChild(GameClient.getTracerNode());
+            }
+            if(down){
+                // Weapon Swapping:
+                if(bind.equals("Swap_1")){
+                    GameClient.getCharacter().swapGuns();
                 }
-            }else if(bind.equals("Misc_Key_2")){
-                GameClient.getTracerNode().detachAllChildren();
-                GameClient.getDCS().resetDecals();
-            }else if(bind.equals("Misc_Key_3")){
-                GameClient.getPlayer(4).create();
-                GameClient.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
-            }else if(bind.equals("Misc_Key_4")){
-                //hud.bar[0].update(30);
-            }else if(bind.equals("Exit")){
-                app.stop();
+                // Miscellaneous:
+                else if(bind.equals("Server_Connect")){
+                    // Networking:
+                    GameClient.getNetwork().connect();
+                }else if(bind.equals("Misc_Key_1")){
+                    if(GameClient.getRoot().hasChild(GameClient.getTracerNode())) {
+                        GameClient.getRoot().detachChild(GameClient.getTracerNode());
+                    }else{
+                        GameClient.getRoot().attachChild(GameClient.getTracerNode());
+                    }
+                }else if(bind.equals("Misc_Key_2")){
+                    GameClient.getTracerNode().detachAllChildren();
+                    GameClient.getDCS().resetDecals();
+                }else if(bind.equals("Misc_Key_3")){
+                    GameClient.getPlayer(4).create();
+                    GameClient.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
+                }else if(bind.equals("Misc_Key_4")){
+                    //hud.bar[0].update(30);
+                }else if(bind.equals("Exit")){
+                    //app.stop();
+                    app.getStateManager().detach(GameClient.getGameplayState());
+                    app.getStateManager().getState(MenuState.class).getNifty().gotoScreen("start");
+                }
             }
         }
-    }
-
-    public void onAnalog(String name, float value, float tpf) {
-        // Camera:
-        if (name.equals("Cam_Left")){
-            GameClient.getRecoil().rotateCamera(value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
-        }else if (name.equals("Cam_Right")){
-            GameClient.getRecoil().rotateCamera(-value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
-        }else if (name.equals("Cam_Up")){
-            GameClient.getRecoil().rotateCamera(-value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
-        }else if (name.equals("Cam_Down")){
-            GameClient.getRecoil().rotateCamera(value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
+    };
+    private AnalogListener gameplayAnalog = new AnalogListener(){
+        public void onAnalog(String name, float value, float tpf) {
+            // Camera:
+            if (name.equals("Cam_Left")){
+                GameClient.getRecoil().rotateCamera(value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
+            }else if (name.equals("Cam_Right")){
+                GameClient.getRecoil().rotateCamera(-value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
+            }else if (name.equals("Cam_Up")){
+                GameClient.getRecoil().rotateCamera(-value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
+            }else if (name.equals("Cam_Down")){
+                GameClient.getRecoil().rotateCamera(value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
+            }
         }
-    }
+    };
 
     private void createMapping(String name, KeyTrigger trigger){
         app.getInputManager().addMapping(name, trigger);
-        app.getInputManager().addListener(this, name);
+        app.getInputManager().addListener(gameplayAction, name);
     }
     private void createMapping(String name, MouseButtonTrigger trigger){
         app.getInputManager().addMapping(name, trigger);
-        app.getInputManager().addListener(this, name);
+        app.getInputManager().addListener(gameplayAction, name);
     }
     private void createMapping(String name, MouseAxisTrigger trigger){
         app.getInputManager().addMapping(name, trigger);
-        app.getInputManager().addListener(this, name);
+        app.getInputManager().addListener(gameplayAnalog, name);
     }
     public void initialize(GameClient app, JmeContext context){
         InputHandler.app = app;

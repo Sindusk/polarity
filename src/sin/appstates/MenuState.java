@@ -21,6 +21,10 @@ public class MenuState extends AbstractAppState implements ScreenController {
     private Nifty nifty;
     private Screen screen;
     
+    public Nifty getNifty(){
+        return nifty;
+    }
+    
     public MenuState(){
         //
     }
@@ -53,11 +57,11 @@ public class MenuState extends AbstractAppState implements ScreenController {
     
     public void startGame(){
         MenuState.app.getStateManager().attach(GameClient.getGameplayState());
-        nifty.exit();
+        //nifty.exit();
+        nifty.gotoScreen("empty");
     }
     
     public void quitGame(){
-        GameClient.getLogger().info("meow");
         MenuState.app.stop();
     }
 

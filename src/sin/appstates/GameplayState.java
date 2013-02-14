@@ -36,10 +36,11 @@ public class GameplayState extends AbstractAppState {
     private Node root = new Node("Gameplay_Root");      // Root Node.
     private Node world = new Node("Gameplay_World");    // Node for 3D world.
     private Node gui = new Node("Gameplay_GUI");        // Node for 2D GUI.
+    
     private Node collisionNode = new Node();     // Node encompassing anything able to be shot [single, world, player].
     private Node singleNode = new Node();        // Node encompassing single player testing (Static).
-    //private Node worldNode = new Node();         // Node encompassing terrain and environment (Static).
     private Node playerNode = new Node();        // Node encompassing player models (Kinematic).
+    private Node terrainNode = new Node();       // Node for all world terrain.
     private Node tracerNode = new Node();        // Node encompassing tracers, mainly for testing.
     
     public GameplayState(){
@@ -60,6 +61,9 @@ public class GameplayState extends AbstractAppState {
     }
     public Node getPlayerNode(){
         return playerNode;
+    }
+    public Node getTerrainNode(){
+        return terrainNode;
     }
     public Node getTracerNode(){
         return tracerNode;
@@ -84,10 +88,12 @@ public class GameplayState extends AbstractAppState {
         super.initialize(stateManager, app);
         GameplayState.app = (GameClient) app;
         
+        app.getInputManager().setCursorVisible(false);
+        
         // Attach GUI and Root nodes:
         GameClient.getRoot().attachChild(root);
         root.attachChild(world);
-        root.attachChild(gui);
+        GameClient.getGUI().attachChild(gui);
         
         // Initialize HUD & World:
         World.initialize(GameplayState.app);
@@ -99,6 +105,7 @@ public class GameplayState extends AbstractAppState {
         character = new Char(
                 new M4A1(true), new LaserPistol(false),
                 new Raygun(true), new AK47(false), 100, 100);
+        world.attachChild(character.getNode());
         
         int i = 0;
         while(i < 16){
@@ -115,6 +122,9 @@ public class GameplayState extends AbstractAppState {
     public void cleanup(){
         super.cleanup();
         GameClient.getRoot().detachChild(root);
+        GameClient.getGUI().detachChild(gui);
+        world.detachChild(character.getNode());
+        app.getInputManager().setCursorVisible(true);
     }
     
     @Override
