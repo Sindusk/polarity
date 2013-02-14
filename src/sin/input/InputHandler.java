@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package sin.input;
 
 import com.jme3.input.KeyInput;
@@ -26,11 +22,18 @@ import sin.tools.T;
 public class InputHandler{// implements ActionListener, AnalogListener{
     private static GameClient app;
     
+    public InputHandler(){
+        //
+    }
+    
     // Constant Variables:
     public static final float MOUSE_SENSITIVITY = 1;
     
     private ActionListener gameplayAction = new ActionListener(){
         public void onAction(String bind, boolean down, float tpf){
+            if(!app.getStateManager().hasState(GameClient.getGameplayState())){
+                return;
+            }
             // Movement:
             if(bind.equals("Move_Left")){
                 GameClient.getCharacter().movement[Char.MOVE_LEFT] = down;
@@ -79,15 +82,17 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                 }else if(bind.equals("Misc_Key_4")){
                     //hud.bar[0].update(30);
                 }else if(bind.equals("Exit")){
-                    //app.stop();
                     app.getStateManager().detach(GameClient.getGameplayState());
-                    app.getStateManager().getState(MenuState.class).getNifty().gotoScreen("start");
+                    app.getStateManager().getState(MenuState.class).getNifty().gotoScreen("menu");
                 }
             }
         }
     };
     private AnalogListener gameplayAnalog = new AnalogListener(){
         public void onAnalog(String name, float value, float tpf) {
+            if(!app.getStateManager().hasState(GameClient.getGameplayState())){
+                return;
+            }
             // Camera:
             if (name.equals("Cam_Left")){
                 GameClient.getRecoil().rotateCamera(value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);

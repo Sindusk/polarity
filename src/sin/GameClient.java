@@ -180,6 +180,7 @@ public class GameClient extends Application{
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         
         // Initialize keybinds.
+        input = new InputHandler();
         input.initialize(app, context);
         
         // Initialize new HUD & remove debug HUD elements:
