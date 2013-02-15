@@ -1,50 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
-    <!-- +++++++++++++++++++++++++++++++++++++++ -->
-    <!-- start screen -->
-    <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <useControls filename="nifty-default-controls.xml"/>
     <useStyles filename="nifty-default-styles.xml"/>
     <screen id="menu" controller="sin.appstates.MenuState">
         <layer id="background" backgroundColor="#000f" childLayout="vertical">
-            <panel height="20%"/>
-            <panel id="menu.start" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+            <panel height="8%" />
+            <text text="Project Polarity" font="Interface/Fonts/Batman26.fnt" height="5%" align="center" />
+            <panel height="12%"/>
+            <panel id="menu.start" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
-                <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Start Game" />
+                <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Single Player" />
                 <interact onClick="action(start)"/>
             </panel>
-            <panel height="5%"/>
-            <panel id="menu.multiplayer" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+            <panel height="3%"/>
+            <panel id="menu.multiplayer" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
-                <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Multiplayer (NYI)" />
+                <text font="Interface/Fonts/Batman26.fnt" text="Multiplayer (WIP)" />
+                <interact onClick="action(multiplayer)" />
             </panel>
-            <panel height="5%"/>
-            <panel id="menu.options" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+            <panel height="3%"/>
+            <panel id="menu.character" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
-                <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Options" />
+                <text font="Interface/Fonts/Batman26.fnt" text="Character (NYI)" />
+            </panel>
+            <panel height="3%"/>
+            <panel id="menu.options" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                <effect>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                </effect>
+                <text font="Interface/Fonts/Batman26.fnt" text="Options (WIP)" />
                 <interact onClick="action(options)"/>
             </panel>
-            <panel height="5%"/>
-            <panel id="menu.quit" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+            <panel height="3%"/>
+            <panel id="menu.quit" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
-                <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Quit Game" />
+                <text font="Interface/Fonts/Batman26.fnt" text="Quit Game" />
                 <interact onClick="action(quit)"/>
+            </panel>
+        </layer>
+    </screen>
+    <screen id="menu.multiplayer" controller="sin.appstates.MenuState">
+        <layer id="background" backgrounColor="#000f" childLayout="vertical">
+            <panel height="8%" />
+            <text text="Multiplayer" font="Interface/Fonts/Batman26.fnt" height="5%" align="center" />
+            <panel height="12%" />
+            <control id="multiplayer.serverlist" name="listBox" displayItems="10" width="80%" align="center" horizontal="off" vertical="optional" />
+            <panel height="5%" />
+            <control id="multiplayer.message" text="" name="label" height="5%" width="100%" align="center"/>
+            <panel height="5%" />
+            <panel childLayout="horizontal" height="7%" width="60%" align="center" >
+                <panel id="multiplayer.connect" height="100%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                    <effect>
+                        <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                    </effect>
+                    <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Connect" />
+                    <interact onClick="action(multiplayer.connect)"/>
+                </panel>
+                <panel width="5%"/>
+                <panel id="multiplayer.refresh" height="100%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                    <effect>
+                        <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                    </effect>
+                    <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Refresh" />
+                    <interact onClick="action(multiplayer.refresh)"/>
+                </panel>
+                <panel width="5%"/>
+                <panel id="multiplayer.back" height="100%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                    <effect>
+                        <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                    </effect>
+                    <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Back" />
+                    <interact onClick="action(multiplayer.back)"/>
+                </panel>
             </panel>
         </layer>
     </screen>
     <screen id="menu.options" controller="sin.appstates.MenuState">
         <layer id="background" backgroundColor="#000f" childLayout="vertical">
-            <panel height="5%" />
+            <panel height="8%" />
             <text text="Options" height="5%" font="Interface/Fonts/Batman26.fnt" color="#000f" align="center" />
-            <panel height="5%" />
+            <panel height="12%" />
             <panel height="7%" childLayout="horizontal">
                 <text text="Resolution: " font="Interface/Fonts/Batman26.fnt" width="300" align="right" />
                 <control id="options.resolution" name="dropDown" width="20%" visibleToMouse="true" />
@@ -58,7 +101,7 @@
                 <control id="options.verticalsync" name="checkbox" height="20" width="20" visibleToMouse="true" />
             </panel>
             <panel height="30%" />
-            <panel id="options.back" height="10%" width="40%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+            <panel id="options.back" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>

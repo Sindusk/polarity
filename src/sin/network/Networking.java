@@ -75,19 +75,22 @@ public class Networking {
         Serializer.registerClass(WorldData.class);
         client.addMessageListener(new ClientListener(), WorldData.class);
     }
-    public void connect(){
+    public boolean connect(String ip){
         if(client == null){
             try {
-                client = Network.connectToServer("localhost", 6143);
+                client = Network.connectToServer(ip, 6143);
             } catch (IOException ex) {
                 GameClient.getLogger().log(Level.SEVERE, null, ex);
+                return false;
             }
             this.registerSerials();
             client.start();
             client.send(new ConnectData(GameClient.CLIENT_VERSION));
             timers[PING] = 1;
             timers[MOVE] = 0;
+            return true;
         }
+        return false;
     }
     public static boolean isConnected(){
         return CLIENT_CONNECTED;

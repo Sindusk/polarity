@@ -6,10 +6,11 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.DropDown;
-import de.lessvoid.nifty.controls.dropdown.DropDownControl;
+import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import java.awt.GraphicsEnvironment;
+import de.lessvoid.nifty.tools.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
@@ -37,6 +38,7 @@ public class MenuState extends AbstractAppState implements ScreenController {
         super.initialize(stateManager, app);
         MenuState.app = (GameClient) app;
         
+        // Initialize nifty display:
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
                 MenuState.app.getAssetManager(), MenuState.app.getInputManager(),
                 MenuState.app.getAudioRenderer(), MenuState.app.getGuiViewPort());
@@ -65,10 +67,28 @@ public class MenuState extends AbstractAppState implements ScreenController {
         if(action.equals("start")){
             MenuState.app.getStateManager().attach(GameClient.getGameplayState());
             nifty.gotoScreen("empty");
+        }else if(action.equals("multiplayer")){
+            nifty.gotoScreen("menu.multiplayer");
         }else if(action.equals("options")){
             nifty.gotoScreen("menu.options");
         }else if(action.equals("quit")){
             MenuState.app.stop();
+        }
+        // Multiplayer Menu:
+        else if(action.equals("multiplayer.connect")){
+            ListBox<String> list = screen.findNiftyControl("multiplayer.serverlist", ListBox.class);
+            String s = list.getSelection().get(0);
+            String q = s.substring(1, s.indexOf(']'));
+            GameClient.getLogger().info(q);
+            if(GameClient.getNetwork().connect(q)){
+                action("start");
+            }
+        }else if(action.equals("multiplayer.refresh")){
+            Label label = screen.findNiftyControl("multiplayer.message", Label.class);
+            label.setColor(Color.BLACK);
+            label.setText("Not Yet Implemented!");
+        }else if(action.equals("multiplayer.back")){
+            nifty.gotoScreen("menu");
         }
         // Options Menu:
         else if(action.equals("options.back")){
@@ -79,10 +99,14 @@ public class MenuState extends AbstractAppState implements ScreenController {
     public void bind(Nifty nifty, Screen screen) {
         this.nifty = nifty;
         this.screen = screen;
-        if(screen.getScreenId().equals("menu.options")){
-            DropDown<String> res = screen.findNiftyControl("options.resolution", DropDown.class);
-            res.addItem("1024 x 720");
-            res.addItem("1680 x 1050");
+        if(screen.getScreenId().equals("menu.multiplayer")){
+            ListBox<String> list = screen.findNiftyControl("multiplayer.serverlist", ListBox.class);
+            list.addItem("[localhost] Local Server");
+            list.addItem("[25.216.174.196] Sinister Server");
+        }else if(screen.getScreenId().equals("menu.options")){
+            DropDown<String> dd = screen.findNiftyControl("options.resolution", DropDown.class);
+            dd.addItem("1024 x 720");
+            dd.addItem("1680 x 1050");
         }
         //throw new UnsupportedOperationException("Not supported yet.");
     }

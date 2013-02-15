@@ -66,7 +66,7 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                 // Miscellaneous:
                 else if(bind.equals("Server_Connect")){
                     // Networking:
-                    GameClient.getNetwork().connect();
+                    //GameClient.getNetwork().connect();
                 }else if(bind.equals("Misc_Key_1")){
                     if(GameClient.getRoot().hasChild(GameClient.getTracerNode())) {
                         GameClient.getRoot().detachChild(GameClient.getTracerNode());
@@ -146,8 +146,6 @@ public class InputHandler{// implements ActionListener, AnalogListener{
         createMapping("Misc_Key_3", new KeyTrigger(KeyInput.KEY_O));
         createMapping("Misc_Key_4", new KeyTrigger(KeyInput.KEY_I));
         // Menu/Swapping:
-        if(context.getType() == JmeContext.Type.Display){
-            createMapping("Exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
-        }
+        createMapping("Exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
     }
 }
