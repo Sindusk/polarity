@@ -10,10 +10,10 @@ import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
 import sin.tools.T;
-import sin.weapons.Weapons.RangedWeapon.AK47;
-import sin.weapons.Weapons.RangedWeapon.LaserPistol;
-import sin.weapons.Weapons.RangedWeapon.M4A1;
-import sin.weapons.Weapons.RangedWeapon.Raygun;
+import sin.weapons.Weapons.AK47;
+import sin.weapons.Weapons.LaserPistol;
+import sin.weapons.Weapons.M4A1;
+import sin.weapons.Weapons.Raygun;
 import sin.world.Decals;
 import sin.world.World;
 

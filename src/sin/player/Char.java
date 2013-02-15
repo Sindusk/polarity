@@ -12,7 +12,7 @@ import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.hud.HUD;
 import sin.tools.T;
-import sin.weapons.Weapons.RangedWeapon.RangedReloadWeapon;
+import sin.weapons.Weapons.RangedReloadWeapon;
 import sin.weapons.Weapons.Weapon;
 
 /**
@@ -220,8 +220,8 @@ public class Char {
         }else if(set == 1){
             set = 0;
         }
-        weapons[set][0].enable();
-        weapons[set][1].enable();
+        weapons[set][0].enable(charNode);
+        weapons[set][1].enable(charNode);
     }
 
     public void update(float tpf){

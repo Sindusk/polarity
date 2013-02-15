@@ -33,12 +33,10 @@ public class Weapons{
     
     // Functionality & Enums:
     private static class Ammo{
-        protected boolean reloadable = false;
         protected boolean reloading = false;
-        protected boolean recharges = false;
         protected int clip;
         protected int max;
-        private int barIndex;
+        public int barIndex;
 
         public Ammo(int max, boolean left){
             this.clip = max;
@@ -66,35 +64,36 @@ public class Weapons{
         public void recharge(float tpf){
             // Does nothing initially.
         }
-        private static class ReloadAmmo extends Ammo{
-            private float time;
+    }
+    private static class ReloadAmmo extends Ammo{
+        private float time;
 
-            public ReloadAmmo(int max, float time, boolean left){
-                super(max, left);
-                this.time = time;
-                reloadable = true;
-            }
-
-            @Override
-            public float reload(){
-                clip = max;
-                return time;
-            }
+        public ReloadAmmo(int max, float time, boolean left){
+            super(max, left);
+            this.time = time;
         }
-        private static class RechargeAmmo extends Ammo{
-            private float interval;
-            private float time = 0;
 
-            public RechargeAmmo(int max, float interval, boolean left){
-                super(max, left);
-                this.interval = interval;
-                recharges = true;
-            }
+        @Override
+        public float reload(){
+            reloading = true;
+            clip = max;
+            return time;
+        }
+    }
+    private static class RechargeAmmo extends Ammo{
+        private float interval;
+        private float time = 0;
 
-            @Override
-            public void recharge(float tpf){
+        public RechargeAmmo(int max, float interval, boolean left){
+            super(max, left);
+            this.interval = interval;
+        }
+
+        @Override
+        public void recharge(float tpf){
+            if(clip < max){
                 time += tpf;
-                if(clip < max && time >= interval){
+                if(time >= interval){
                     clip++;
                     updateBar();
                     time = 0;
@@ -255,7 +254,7 @@ public class Weapons{
         protected boolean left;
 
         // Helper Classes:
-        protected Ammo ammo;
+        //protected Ammo ammo;
         protected Damage damage;
         protected Recoils recoils;
         protected Spread spread;
@@ -271,7 +270,6 @@ public class Weapons{
         protected float cooling = 0;
 
         protected abstract void CreateModel();
-
         public Weapon(Archetype archetype, Classification classification, boolean left){
             this.archetype = archetype;
             this.classification = classification;
@@ -304,9 +302,6 @@ public class Weapons{
             }
             model.setLocalTranslation(loc);
             Quaternion rot = app.getCamera().getRotation().clone();
-            if(ammo.reloading){
-                rot.multLocal(new Quaternion().fromAngleAxis(FastMath.PI/16, Vector3f.UNIT_X));
-            }
             model.setLocalRotation(rot);
         }
         public void fire(){
@@ -314,7 +309,6 @@ public class Weapons{
             spread.apply(target);
             damage.handle(new Ray(app.getCamera().getLocation(), target));
             GameClient.getRecoil().recoil(recoils.up(), recoils.left());
-            ammo.shot();
             audio.fire();
             cooling += cooldown;
             muzzle.muzzle.emitAllParticles();
@@ -324,33 +318,19 @@ public class Weapons{
                 cooling -= tpf;
                 if(cooling < 0) {
                     cooling = 0;
-                    ammo.updateBar();
                 }
-            }
-            if(ammo.recharges) {
-                ammo.recharge(tpf);
             }
             this.updateModel();
         }
         public void tick(float tpf){
-            //if(!firing) return;
-            if(firing && cooling == 0 && ammo.clip > 0){
+            if(firing && cooling == 0){
                 fire();
-            }else if(ammo.clip == 0 && ammo.reloadable){
-                ammo.reload();
             }
             this.cool(tpf);
         }
 
-        public void enable(){
-            GameClient.getCharacter().getNode().attachChild(model);
-            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
-            ammo.updateBar();
-        }
         public void enable(Node node){
             node.attachChild(model);
-            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
-            ammo.updateBar();
         }
         public void disable(){
             GameClient.getCharacter().getNode().detachChild(model);
@@ -365,85 +345,152 @@ public class Weapons{
         }
     }
     public static abstract class RangedWeapon extends Weapon{
+        // Helper Classes:
+        
         protected abstract void CreateModel();
         public RangedWeapon(Archetype archetype, Classification classification, boolean left){
             super(archetype, classification, left);
         }
-        public static abstract class RangedReloadWeapon extends RangedWeapon{
-            protected abstract void CreateModel();
-            public RangedReloadWeapon(Archetype archetype, Classification classification, boolean left){
-                super(archetype, classification, left);
+    }
+    public static abstract class RangedReloadWeapon extends RangedWeapon{
+        // Helper Classes:
+        protected ReloadAmmo ammo;
+        
+        protected abstract void CreateModel();
+        public RangedReloadWeapon(Archetype archetype, Classification classification, boolean left){
+            super(archetype, classification, left);
+        }
+        
+        @Override
+        public void updateModel(){
+            super.updateModel();
+            Quaternion rot = app.getCamera().getRotation().clone();
+            if(ammo.reloading){
+                rot.multLocal(new Quaternion().fromAngleAxis(FastMath.PI/16, Vector3f.UNIT_X));
             }
-            public void reload(){
-                if(ammo.reloadable && cooling == 0) {
-                    cooling += ammo.reload();
-                }
+            model.setLocalRotation(rot);
+        }
+        @Override
+        public void cool(float tpf){
+            super.cool(tpf);
+            this.updateModel();
+        }
+        @Override
+        public void enable(Node node){
+            super.enable(node);
+            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
+            ammo.updateBar();
+        }
+        @Override
+        public void fire(){
+            super.fire();
+            ammo.shot();
+        }
+        public void reload(){
+            if(!ammo.reloading) {
+                cooling += ammo.reload();
             }
         }
-        public static abstract class RangedEnergyWeapon extends RangedWeapon{
-            protected abstract void CreateModel();
-            public RangedEnergyWeapon(Archetype archetype, Classification classification, boolean left){
-                super(archetype, classification, left);
+        @Override
+        public void tick(float tpf){
+            if(cooling == 0 && ammo.reloading){
+                ammo.reloading = false;
+                ammo.updateBar();
+            }else if(ammo.clip == 0 && !ammo.reloading){
+                ammo.reload();
+                return;
             }
+            if(firing && cooling == 0){
+                this.fire();
+            }
+            this.cool(tpf);
         }
-        // Weapons:
-        public static class M4A1 extends RangedReloadWeapon{
-            protected final void CreateModel(){
-                model.setLocalScale(.6f, .6f, .6f);
-                World.CG.createCylinder(model, "", .15f, 2f, T.v3f(0, 0, 3.2f), "Textures/wall.png", T.v2f(1, 1));
-                World.CG.createBox(model, "", T.v3f(.25f, .25f, 2.5f), T.v3f(0, 0, 1f), "Textures/BC_Tex.png", T.v2f(1, 1));
-            }
-            public M4A1(boolean left){
-                super(Archetype.MODERN, Classification.ASSAULT, left);
-                name = "M4A1";
-                audio = new WeaponAudio(name, 1);
-                ammo = new Ammo.ReloadAmmo(30, 1.2f, left);
-                damage = new Damage(4.5f);
-                recoils = new Recoils(35, 65, -25, 25);
-                spread = new Spread(0, 15);
-                automatic = true;
-                cooldown = 0.09f;
-                CreateModel();
-            }
+    }
+    public static abstract class RangedRechargeWeapon extends RangedWeapon{
+        // Necessary Classes:
+        protected RechargeAmmo ammo;
+        
+        protected abstract void CreateModel();
+        public RangedRechargeWeapon(Archetype archetype, Classification classification, boolean left){
+            super(archetype, classification, left);
         }
-        public static class AK47 extends RangedReloadWeapon{
-            protected final void CreateModel(){
-                model.setLocalScale(.6f, .6f, .6f);
-                World.CG.createBox(model, "", T.v3f(.2f, .2f, 1.7f), T.v3f(0f, 0f, 2f), "Textures/BC_Tex.png", T.v2f(1, 1));
-                World.CG.createBox(model, "", T.v3f(.15f, .2f, .3f), T.v3f(0f, .2f, 2f), "Textures/brick.png", T.v2f(1, 1));
-            }
-            public AK47(boolean left){
-                super(Archetype.MODERN, Classification.ASSAULT, left);
-                name = "AK47";
-                audio = new WeaponAudio(name, 1.3f);
-                ammo = new Ammo.ReloadAmmo(30, 1.7f, left);
-                damage = new Damage(5.5f);
-                recoils = new Recoils(50, 75, -19, 27);
-                spread = new Spread(0, 20);
-                automatic = true;
-                cooldown = 0.14f;
-                CreateModel();
-            }
+        
+        @Override
+        public void cool(float tpf){
+            super.cool(tpf);
+            ammo.recharge(tpf);
         }
-        public static class Raygun extends RangedEnergyWeapon{
-            protected final void CreateModel(){
-                model.setLocalScale(.6f, .6f, .6f);
-                World.CG.createCylinder(model, "", .2f, 3f, T.v3f(0, 0, 2.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
-            }
-            public Raygun(boolean left){
-                super(Archetype.ENERGY, Classification.LASER, left);
-                name = "Raygun";
-                audio = new WeaponAudio(name, 0.5f);
-                ammo = new Ammo.RechargeAmmo(100, 0.2f, left);
-                damage = new Damage(2.5f);
-                recoils = new Recoils(15, 30, -10, 10);
-                spread = new Spread(0, 5);
-                automatic = true;
-                cooldown = 0.06f;
-                CreateModel();
-            }
+        @Override
+        public void enable(Node node){
+            super.enable(node);
+            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
+            ammo.updateBar();
         }
-        public static class LaserPistol extends RangedEnergyWeapon{
+        @Override
+        public void fire(){
+            super.fire();
+            ammo.shot();
+        }
+    }
+    
+    // Ranged Weapons:
+    public static class M4A1 extends RangedReloadWeapon{
+        protected final void CreateModel(){
+            model.setLocalScale(.6f, .6f, .6f);
+            World.CG.createCylinder(model, "", .15f, 2f, T.v3f(0, 0, 3.2f), "Textures/wall.png", T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.25f, .25f, 2.5f), T.v3f(0, 0, 1f), "Textures/BC_Tex.png", T.v2f(1, 1));
+        }
+        public M4A1(boolean left){
+            super(Archetype.MODERN, Classification.ASSAULT, left);
+            name = "M4A1";
+            audio = new WeaponAudio(name, 1);
+            ammo = new ReloadAmmo(30, 1.2f, left);
+            damage = new Damage(4.5f);
+            recoils = new Recoils(35, 65, -25, 25);
+            spread = new Spread(0, 15);
+            automatic = true;
+            cooldown = 0.09f;
+            CreateModel();
+        }
+    }
+    public static class AK47 extends RangedReloadWeapon{
+        protected final void CreateModel(){
+            model.setLocalScale(.6f, .6f, .6f);
+            World.CG.createBox(model, "", T.v3f(.2f, .2f, 1.7f), T.v3f(0f, 0f, 2f), "Textures/BC_Tex.png", T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.15f, .2f, .3f), T.v3f(0f, .2f, 2f), "Textures/brick.png", T.v2f(1, 1));
+        }
+        public AK47(boolean left){
+            super(Archetype.MODERN, Classification.ASSAULT, left);
+            name = "AK47";
+            audio = new WeaponAudio(name, 1.3f);
+            ammo = new ReloadAmmo(30, 1.7f, left);
+            damage = new Damage(5.5f);
+            recoils = new Recoils(50, 75, -19, 27);
+            spread = new Spread(0, 20);
+            automatic = true;
+            cooldown = 0.14f;
+            CreateModel();
+        }
+    }
+    public static class Raygun extends RangedRechargeWeapon{
+        protected final void CreateModel(){
+            model.setLocalScale(.6f, .6f, .6f);
+            World.CG.createCylinder(model, "", .2f, 3f, T.v3f(0, 0, 2.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
+        }
+        public Raygun(boolean left){
+            super(Archetype.ENERGY, Classification.LASER, left);
+            name = "Raygun";
+            audio = new WeaponAudio(name, 0.5f);
+            ammo = new RechargeAmmo(100, 0.2f, left);
+            damage = new Damage(2.5f);
+            recoils = new Recoils(15, 30, -10, 10);
+            spread = new Spread(0, 5);
+            automatic = true;
+            cooldown = 0.06f;
+            CreateModel();
+        }
+    }
+    public static class LaserPistol extends RangedRechargeWeapon{
             protected final void CreateModel(){
                 model.setLocalScale(.6f, .6f, .6f);
                 World.CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
@@ -453,7 +500,7 @@ public class Weapons{
                 super(Archetype.ENERGY, Classification.PISTOL, left);
                 name = "LaserPistol";
                 audio = new WeaponAudio(name, 1.3f);
-                ammo = new Ammo.RechargeAmmo(20, 0.5f, left);
+                ammo = new RechargeAmmo(20, 0.5f, left);
                 damage = new Damage(6.8f);
                 recoils = new Recoils(40, 60, -15, 15);
                 spread = new Spread(0, 15);
@@ -462,7 +509,6 @@ public class Weapons{
                 CreateModel();
             }
         }
-    }
     
     public static void initialize(GameClient app){
         Weapons.app = app;
