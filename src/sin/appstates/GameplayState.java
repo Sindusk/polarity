@@ -37,14 +37,15 @@ public class GameplayState extends AbstractAppState {
     
     // All nodes used for use in the Gameplay:
     private Node root;      // Root Node.
-    private Node world;     // Node for 3D world.
     private Node gui;       // Node for 2D GUI.
+    private Node world;     // Node for 3D world.
     
     // Other nodes:
     private Node collisionNode = new Node();    // Node encompassing anything able to be shot [single, world, player].
     private Node miscNode = new Node();         // Node encompassing all miscellaneous geometry [floating text].
     private Node singleNode = new Node();       // Node encompassing single player testing (Static).
     private Node playerNode = new Node();       // Node encompassing player models (Kinematic).
+    private Node projectileNode = new Node();   // Node for all projectiles.
     private Node terrainNode = new Node();      // Node for all world terrain.
     private Node tracerNode = new Node();       // Node encompassing tracers, mainly for testing.
     
@@ -69,6 +70,9 @@ public class GameplayState extends AbstractAppState {
     }
     public Node getPlayerNode(){
         return playerNode;
+    }
+    public Node getProjectileNode(){
+        return projectileNode;
     }
     public Node getTerrainNode(){
         return terrainNode;
@@ -134,6 +138,7 @@ public class GameplayState extends AbstractAppState {
         world.attachChild(collisionNode);
         world.attachChild(dcs.getNode());
         world.attachChild(miscNode);
+        world.attachChild(projectileNode);
         root.attachChild(world);
     }
     

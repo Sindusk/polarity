@@ -11,11 +11,10 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import java.util.concurrent.Callable;
 import sin.GameClient;
-import sin.hud.BarManager.BarHandle;
-import sin.hud.HUD;
 import sin.tools.T;
+import sin.weapons.AmmoManager.RechargeAmmo;
+import sin.weapons.AmmoManager.ReloadAmmo;
 import sin.weapons.DamageManager.DamageAction;
 import sin.weapons.DamageManager.DamageTemplate;
 import sin.weapons.DamageManager.MeleeDamage;
@@ -30,76 +29,6 @@ import sin.world.World;
 public class Weapons{
     private static GameClient app;
     
-    // Ammos:
-    private static class Ammo{
-        protected boolean reloading = false;
-        protected int clip;
-        protected int max;
-        public BarHandle barIndex;
-
-        public Ammo(int max, boolean left){
-            this.clip = max;
-            this.max = max;
-            if(left){
-                this.barIndex = BarHandle.AMMO_LEFT;
-            }else{
-                this.barIndex = BarHandle.AMMO_RIGHT;
-            }
-            //app.hud.bar[barIndex].setMax(max);
-            GameClient.getHUD().setBarMax(barIndex, max);
-            GameClient.getHUD().updateBar(barIndex, clip);
-        }
-
-        public void updateBar(){
-            GameClient.getHUD().updateBar(barIndex, clip);
-        }
-        public void shot(){
-            clip--;
-            this.updateBar();
-        }
-        public float reload(){
-            return 0;
-        }
-        public void recharge(float tpf){
-            // Does nothing initially.
-        }
-    }
-    private static class ReloadAmmo extends Ammo{
-        private float time;
-
-        public ReloadAmmo(int max, float time, boolean left){
-            super(max, left);
-            this.time = time;
-        }
-
-        @Override
-        public float reload(){
-            reloading = true;
-            clip = max;
-            return time;
-        }
-    }
-    private static class RechargeAmmo extends Ammo{
-        private float interval;
-        private float time = 0;
-
-        public RechargeAmmo(int max, float interval, boolean left){
-            super(max, left);
-            this.interval = interval;
-        }
-
-        @Override
-        public void recharge(float tpf){
-            if(clip < max){
-                time += tpf;
-                if(time >= interval){
-                    clip++;
-                    updateBar();
-                    time = 0;
-                }
-            }
-        }
-    }
     // Recoils:
     private static class Recoils{
         private float up_min, up_max, left_min, left_max;
@@ -285,7 +214,8 @@ public class Weapons{
             firing = false;
         }
     }
-
+    
+    // Melee Classes:
     private static abstract class MeleeWeapon extends Weapon{
         protected abstract void CreateModel();
         public MeleeWeapon(Archetype archetype, Classification classification, boolean left){
@@ -293,27 +223,7 @@ public class Weapons{
         }
     }
     
-    // Melee Weapons:
-    public static class Sword extends MeleeWeapon{
-        protected final void CreateModel() {
-            model.setLocalScale(.5f, .5f, .5f);
-            Geometry geo = World.CG.createCylinder(model, "", .3f, .6f, T.v3f(0, -.5f, 4), ColorRGBA.Green, T.v2f(1, 1));
-            geo.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.PI/2, Vector3f.UNIT_X));
-            World.CG.createBox(model, "", T.v3f(.2f, 1.4f, .2f), T.v3f(0, 0.7f, 4), ColorRGBA.Orange);
-        }
-        public Sword(boolean left){
-            super(Archetype.ANCIENT, Classification.SLASHING, left);
-            name = "Sword";
-            audio = new WeaponAudio(name, 1);
-            damage = new MeleeDamage(6.4f, 5f);
-            recoils = new Recoils(0, 0, 0, 0);
-            spread = new Spread(0, 0);
-            automatic = true;
-            cooldown = 0.45f;
-            CreateModel();
-        }
-    }
-    
+    // Ranged Classes:
     public static abstract class RangedWeapon extends Weapon{
         protected abstract void CreateModel();
         public RangedWeapon(Archetype archetype, Classification classification, boolean left){
@@ -352,26 +262,29 @@ public class Weapons{
         @Override
         public void fire(){
             super.fire();
-            ammo.shot();
+            ammo.decClip();
+            ammo.updateBar();
         }
+        @Override
+        public void tick(float tpf){
+            if(cooling == 0){
+                if(ammo.reloading){
+                    ammo.reloading = false;
+                    ammo.updateBar();
+                }else if(ammo.getClip() == 0 && !ammo.reloading){
+                    this.reload();
+                    return;
+                }else if(firing){
+                    this.fire();
+                }
+            }
+            this.cool(tpf);
+        }
+        
         public void reload(){
             if(!ammo.reloading) {
                 cooling += ammo.reload();
             }
-        }
-        @Override
-        public void tick(float tpf){
-            if(cooling == 0 && ammo.reloading){
-                ammo.reloading = false;
-                ammo.updateBar();
-            }else if(ammo.clip == 0 && !ammo.reloading){
-                ammo.reload();
-                return;
-            }
-            if(firing && cooling == 0){
-                this.fire();
-            }
-            this.cool(tpf);
         }
     }
     public static abstract class RangedRechargeWeapon extends RangedWeapon{
@@ -397,7 +310,36 @@ public class Weapons{
         @Override
         public void fire(){
             super.fire();
-            ammo.shot();
+            ammo.decClip();
+            ammo.updateBar();
+        }
+        @Override
+        public void tick(float tpf){
+            if(cooling == 0 && firing && !(ammo.getClip() == 0)){
+                this.fire();
+            }
+            this.cool(tpf);
+        }
+    }
+    
+    // Melee Weapons:
+    public static class Sword extends MeleeWeapon{
+        protected final void CreateModel() {
+            model.setLocalScale(.5f, .5f, .5f);
+            Geometry geo = World.CG.createCylinder(model, "", .3f, .6f, T.v3f(0, -.5f, 4), ColorRGBA.Green, T.v2f(1, 1));
+            geo.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.PI/2, Vector3f.UNIT_X));
+            World.CG.createBox(model, "", T.v3f(.2f, 1.4f, .2f), T.v3f(0, 0.7f, 4), ColorRGBA.Orange);
+        }
+        public Sword(boolean left){
+            super(Archetype.ANCIENT, Classification.SLASHING, left);
+            name = "Sword";
+            audio = new WeaponAudio(name, 1);
+            damage = new MeleeDamage(6.4f, 5f);
+            recoils = new Recoils(0, 0, 0, 0);
+            spread = new Spread(0, 0);
+            automatic = true;
+            cooldown = 0.45f;
+            CreateModel();
         }
     }
     

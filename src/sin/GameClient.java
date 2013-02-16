@@ -85,16 +85,13 @@ public class GameClient extends Application{
     public Node getRoot(){
         return rootNode;
     }
-    public static Node getWorld(){
-        return gameplayState.getWorld();
-    }
     public Node getGUI(){
         return guiNode;
     }
     public static Node getCollisionNode(){
         return gameplayState.getCollisionNode();
     }
-    public static Node getMiscNode(){
+    public Node getMiscNode(){
         return gameplayState.getMiscNode();
     }
     public static Node getSingleNode(){
@@ -102,6 +99,9 @@ public class GameClient extends Application{
     }
     public static Node getPlayerNode(){
         return gameplayState.getPlayerNode();
+    }
+    public Node getProjectileNode(){
+        return gameplayState.getProjectileNode();
     }
     public static Node getTerrain(){
         return gameplayState.getTerrainNode();

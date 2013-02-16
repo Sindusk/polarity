@@ -72,7 +72,7 @@ public class ProjectileManager {
             this.func = func;
             if(!GameClient.getTerrain().hasChild(projectile)){
                 World.CG.createSphere(projectile, "", 0.4f, Vector3f.ZERO, ColorRGBA.Magenta);
-                GameClient.getTerrain().attachChild(projectile);
+                app.getProjectileNode().attachChild(projectile);
             }
             T.addv3f(location, direction);
             projectile.setLocalTranslation(location);

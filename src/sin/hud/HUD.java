@@ -1,22 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package sin.hud;
 
-import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.font.Rectangle;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.hud.BarManager.BarHandle;
-import sin.hud.BarManager.DynamicBar;
 import sin.tools.T;
 import sin.world.World;
 
@@ -44,7 +36,7 @@ public class HUD {
             text.setColor(ColorRGBA.Magenta);
             text.setSize(SIZE);
             text.setQueueBucket(RenderQueue.Bucket.Transparent);
-            GameClient.getMiscNode().attachChild(text);
+            app.getMiscNode().attachChild(text);
             used = false;
             timer = 0;
         }
