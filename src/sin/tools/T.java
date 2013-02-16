@@ -1,5 +1,6 @@
 package sin.tools;
 
+import com.jme3.font.BitmapFont;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import java.util.logging.Level;
@@ -11,7 +12,13 @@ import sin.GameClient;
  * @author SinisteRing
  */
 public class T {
+    public static GameClient app;
+    
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
+    
+    public static BitmapFont getFont(String fnt){
+        return app.getAssetManager().loadFont("Interface/Fonts/"+fnt+".fnt");
+    }
     
     public static Vector3f v3f(float x, float y, float z){
         return new Vector3f(x, y, z);
@@ -34,5 +41,9 @@ public class T {
     }
     public static void log(Throwable t){
         GameClient.getLogger().log(Level.SEVERE, "{0}", t);
+    }
+    
+    public static void initialize(GameClient app){
+        T.app = app;
     }
 }

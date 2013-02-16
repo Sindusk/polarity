@@ -19,6 +19,7 @@ import sin.input.InputHandler;
 import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
+import sin.tools.T;
 import sin.weapons.Recoil;
 import sin.weapons.Weapons;
 import sin.world.Decals;
@@ -73,7 +74,7 @@ public class GameClient extends Application{
     
     // Nodes:
     private Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
-    private static Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
+    private Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     
     // Custom Variables:
     private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
@@ -87,7 +88,7 @@ public class GameClient extends Application{
     public static Node getWorld(){
         return gameplayState.getWorld();
     }
-    public static Node getGUI(){
+    public Node getGUI(){
         return guiNode;
     }
     public static Node getCollisionNode(){
@@ -185,7 +186,8 @@ public class GameClient extends Application{
         // Tune logger down to warnings and worse:
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         
-        // Initialize keybinds.
+        // Initialize keybinds & Tools.
+        T.initialize(app);
         input = new InputHandler();
         input.initialize(app, context);
         

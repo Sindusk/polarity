@@ -6,6 +6,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.hud.BarManager.BarHandle;
 import sin.hud.HUD;
 import sin.tools.T;
 import sin.weapons.Weapons.RangedReloadWeapon;
@@ -34,15 +35,15 @@ public class Char {
                 this.health_max = health_max;
                 this.shields = shields_max;
                 this.shields_max = shields_max;
-                GameClient.getHUD().setBarMax(HUD.HEALTH, (int) health_max);
-                GameClient.getHUD().setBarMax(HUD.SHIELD, (int) shields_max);
-                GameClient.getHUD().updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
-                GameClient.getHUD().updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
+                GameClient.getHUD().setBarMax(BarHandle.HEALTH, (int) health_max);
+                GameClient.getHUD().setBarMax(BarHandle.SHIELDS, (int) shields_max);
+                GameClient.getHUD().updateBar(BarHandle.HEALTH, (int) FastMath.ceil(health));
+                GameClient.getHUD().updateBar(BarHandle.SHIELDS, (int) FastMath.ceil(shields));
             }
             
             public void update(){
-                GameClient.getHUD().updateBar(HUD.HEALTH, (int) FastMath.ceil(health));
-                GameClient.getHUD().updateBar(HUD.SHIELD, (int) FastMath.ceil(shields));
+                GameClient.getHUD().updateBar(BarHandle.HEALTH, (int) FastMath.ceil(health));
+                GameClient.getHUD().updateBar(BarHandle.SHIELDS, (int) FastMath.ceil(shields));
             }
             public void damage(float damage){
                 if(shields > 0){

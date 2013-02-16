@@ -13,6 +13,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import java.util.concurrent.Callable;
 import sin.GameClient;
+import sin.hud.BarManager.BarHandle;
 import sin.hud.HUD;
 import sin.tools.T;
 import sin.weapons.DamageManager.DamageAction;
@@ -34,15 +35,15 @@ public class Weapons{
         protected boolean reloading = false;
         protected int clip;
         protected int max;
-        public int barIndex;
+        public BarHandle barIndex;
 
         public Ammo(int max, boolean left){
             this.clip = max;
             this.max = max;
             if(left){
-                this.barIndex = HUD.AMMO_LEFT;
+                this.barIndex = BarHandle.AMMO_LEFT;
             }else{
-                this.barIndex = HUD.AMMO_RIGHT;
+                this.barIndex = BarHandle.AMMO_RIGHT;
             }
             //app.hud.bar[barIndex].setMax(max);
             GameClient.getHUD().setBarMax(barIndex, max);

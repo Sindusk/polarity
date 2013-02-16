@@ -217,8 +217,6 @@ public class World {
     
     public static void initialize(GameClient app){
         World.app = app;
-        //World.assetManager = assetManager;
-        //World.bulletAppState = bulletAppState;
     }
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);

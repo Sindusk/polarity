@@ -97,7 +97,7 @@ public class ProjectileManager {
             i++;
         }
     }
-    private static int findEmptyProjectileSlot(){
+    private static int findEmptyProjectile(){
         int i = 0;
         while(i < projectiles.length){
             if(projectiles[i] == null || !projectiles[i].isUsed()){
@@ -108,7 +108,7 @@ public class ProjectileManager {
         return -1;
     }
     public static void add(Vector3f location, Vector3f direction, float distance, float speed, DamageAction func){
-        int i = findEmptyProjectileSlot();
+        int i = findEmptyProjectile();
         if(i != -1){
             if(projectiles[i] == null){
                 projectiles[i] = new Projectile();

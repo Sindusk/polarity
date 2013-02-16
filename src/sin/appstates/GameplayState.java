@@ -14,7 +14,6 @@ import sin.weapons.DamageManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.TracerManager;
 import sin.weapons.Weapons.AK47;
-import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
 import sin.weapons.Weapons.Raygun;
 import sin.weapons.Weapons.Sword;
@@ -37,10 +36,11 @@ public class GameplayState extends AbstractAppState {
     private Player[] player = new Player[16];   // Used for networked player data.
     
     // All nodes used for use in the Gameplay:
-    private Node root = new Node("Gameplay_Root");      // Root Node.
-    private Node world = new Node("Gameplay_World");    // Node for 3D world.
-    private Node gui = new Node("Gameplay_GUI");        // Node for 2D GUI.
+    private Node root;      // Root Node.
+    private Node world;     // Node for 3D world.
+    private Node gui;       // Node for 2D GUI.
     
+    // Other nodes:
     private Node collisionNode = new Node();    // Node encompassing anything able to be shot [single, world, player].
     private Node miscNode = new Node();         // Node encompassing all miscellaneous geometry [floating text].
     private Node singleNode = new Node();       // Node encompassing single player testing (Static).
@@ -96,21 +96,25 @@ public class GameplayState extends AbstractAppState {
         super.initialize(stateManager, theApp);
         GameplayState.app = (GameClient) theApp;
         
-        app.getInputManager().setCursorVisible(false);
+        // Create nodes:
+        root = new Node("Gameplay_Root");
+        world = new Node("Gameplay_World");
+        gui = new Node("Gameplay_GUI");
         
         // Attach GUI and Root nodes:
-        GameplayState.app.getRoot().attachChild(root);
-        GameClient.getGUI().attachChild(gui);
+        app.getInputManager().setCursorVisible(false);
+        app.getRoot().attachChild(root);
+        app.getGUI().attachChild(gui);
         
         // Initialize Projectiles:
-        DamageManager.initialize(GameplayState.app);
-        ProjectileManager.initialize(GameplayState.app);
-        TracerManager.initialize(GameplayState.app);
+        DamageManager.initialize(app);
+        ProjectileManager.initialize(app);
+        TracerManager.initialize(app);
         
         // Initialize HUD & World:
-        World.initialize(GameplayState.app);
+        World.initialize(app);
         World.createSinglePlayerArea(singleNode);
-        hud.initialize(GameplayState.app, gui);
+        hud.initialize(app, gui);
         dcs.initialize();
         
         character = new Char(
@@ -137,8 +141,9 @@ public class GameplayState extends AbstractAppState {
     public void cleanup(){
         super.cleanup();
         app.getRoot().detachChild(root);
-        GameClient.getGUI().detachChild(gui);
-        world.detachChild(character.getNode());
+        app.getGUI().detachChild(gui);
+        gui.detachAllChildren();
+        //world.detachChild(character.getNode());
         app.getInputManager().setCursorVisible(true);
     }
     
