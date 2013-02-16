@@ -53,10 +53,10 @@ public class T {
     
     // Logging
     public static void log(String s){
-        GameClient.getLogger().info(s);
+        Logger.getLogger("polarity").info(s);
     }
     public static void log(Throwable t){
-        GameClient.getLogger().log(Level.SEVERE, "{0}", t);
+        Logger.getLogger("polarity").log(Level.SEVERE, "{0}", t);
     }
     
     public static void initialize(GameClient app){

@@ -119,7 +119,7 @@ public class World {
             RigidBodyControl rbc = new RigidBodyControl(cs, 0);
             rbc.setKinematic(true);
             g.addControl(rbc);
-            GameClient.getBulletAppState().getPhysicsSpace().add(rbc);
+            app.getBulletAppState().getPhysicsSpace().add(rbc);
             return g;
         }
         
@@ -154,7 +154,7 @@ public class World {
             RigidBodyControl rbc = new RigidBodyControl(cs, 0);
             rbc.setKinematic(true);
             g.addControl(rbc);
-            GameClient.getBulletAppState().getPhysicsSpace().add(rbc);
+            app.getBulletAppState().getPhysicsSpace().add(rbc);
             return g;
         }
         

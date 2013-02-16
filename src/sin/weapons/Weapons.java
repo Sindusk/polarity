@@ -62,7 +62,7 @@ public class Weapons{
         public void apply(Vector3f target){
             float spread_mult = s_base;
             spread_mult += s_recoil*(RecoilManager.getRecoil(RH.UP)+RecoilManager.getRecoil(RH.LEFT));
-            if(!GameClient.getCharacter().getPlayer().onGround()) {
+            if(!app.getCharacter().getPlayer().onGround()) {
                 spread_mult += s_base*SPREAD_INC*.05;
             }
             float spread_sub = spread_mult/2;
@@ -211,7 +211,7 @@ public class Weapons{
             node.attachChild(model);
         }
         public void disable(){
-            GameClient.getCharacter().getNode().detachChild(model);
+            app.getCharacter().getNode().detachChild(model);
             firing = false;
         }
     }

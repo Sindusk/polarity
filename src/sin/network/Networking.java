@@ -11,7 +11,6 @@ import com.jme3.network.Network;
 import com.jme3.network.serializing.Serializer;
 import java.io.IOException;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 import sin.GameClient;
 import sin.data.ConnectData;
 import sin.data.DecalData;
@@ -23,6 +22,7 @@ import sin.data.PingData;
 import sin.data.ShotData;
 import sin.data.SoundData;
 import sin.data.WorldData;
+import sin.tools.T;
 import sin.world.World;
 
 /**
@@ -80,12 +80,12 @@ public class Networking {
             try {
                 client = Network.connectToServer(ip, 6143);
             } catch (IOException ex) {
-                GameClient.getLogger().log(Level.SEVERE, null, ex);
+                T.log(ex);
                 return false;
             }
             this.registerSerials();
             client.start();
-            client.send(new ConnectData(GameClient.CLIENT_VERSION));
+            client.send(new ConnectData(app.getVersion()));
             timers[PING] = 1;
             timers[MOVE] = 0;
             return true;
@@ -119,7 +119,7 @@ public class Networking {
 
         // Send updated movement data:
         if(timers[MOVE] >= MOVE_INTERVAL){
-            client.send(new MoveData(CLIENT_ID, GameClient.getCharacter().getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
+            client.send(new MoveData(CLIENT_ID, app.getCharacter().getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
     }
@@ -129,10 +129,10 @@ public class Networking {
 
         private void ConnectMessage(ConnectData d){
             final int id = d.getID();
-            if(!GameClient.getPlayer(d.getID()).created){
+            if(!app.getPlayer(d.getID()).created){
                 app.enqueue(new Callable<Void>(){
                     public Void call() throws Exception{
-                        GameClient.getPlayer(id).create();
+                        app.getPlayer(id).create();
                         return null;
                     }
                 });
@@ -142,7 +142,7 @@ public class Networking {
             final Vector3f loc = d.getLocation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    GameClient.getDCS().createDecal(loc);
+                    app.getDCS().createDecal(loc);
                     return null;
                 }
             });
@@ -151,7 +151,7 @@ public class Networking {
             final int id = d.getID();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    GameClient.getPlayer(id).destroy();
+                    app.getPlayer(id).destroy();
                     return null;
                 }
             });
@@ -170,7 +170,7 @@ public class Networking {
             final Quaternion rot = d.getRotation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    GameClient.getPlayer(id).move(loc, rot);
+                    app.getPlayer(id).move(loc, rot);
                     return null;
                 }
             });
@@ -190,7 +190,7 @@ public class Networking {
                 final float damage = d.getDamage();
                 app.enqueue(new Callable<Void>(){
                     public Void call() throws Exception{
-                        GameClient.getCharacter().damage(damage);
+                        app.getCharacter().damage(damage);
                         return null;
                     }
                 });
@@ -201,7 +201,7 @@ public class Networking {
                 return;
             }
             final String s = d.getSound();
-            final Vector3f loc = GameClient.getPlayer(d.getID()).getLocation();
+            final Vector3f loc = app.getPlayer(d.getID()).getLocation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     AudioNode node = new AudioNode(app.getAssetManager(), s);
@@ -218,8 +218,8 @@ public class Networking {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     //worldNode.detachAllChildren();
-                    GameClient.getCharacter().kill();
-                    World.create(world, GameClient.getTerrain());
+                    app.getCharacter().kill();
+                    World.create(world, app.getTerrain());
                     return null;
                 }
             });

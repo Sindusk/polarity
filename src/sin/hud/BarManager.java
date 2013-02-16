@@ -14,7 +14,7 @@ import sin.tools.T;
 import sin.world.World;
 
 /**
- *
+ * HUD - Used for control over HUD and GUI elements while in game.
  * @author SinisteRing
  */
 public class BarManager {

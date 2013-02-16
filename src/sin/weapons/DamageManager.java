@@ -80,12 +80,12 @@ public class DamageManager {
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
-                        app.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
+                        app.getHUD().addFloatingText(app.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }
                     }else{
-                        GameClient.getDCS().createDecal(target.getContactPoint());
+                        app.getDCS().createDecal(target.getContactPoint());
                         if(Networking.isConnected()) {
                             Networking.client.send(new DecalData(target.getContactPoint()));
                         }
@@ -139,12 +139,12 @@ public class DamageManager {
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
-                        app.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
+                        app.getHUD().addFloatingText(app.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }
                     }else{
-                        GameClient.getDCS().createDecal(target.getContactPoint());
+                        app.getDCS().createDecal(target.getContactPoint());
                         if(Networking.isConnected()) {
                             Networking.client.send(new DecalData(target.getContactPoint()));
                         }

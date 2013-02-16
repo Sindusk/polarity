@@ -39,54 +39,44 @@ public class InputHandler{// implements ActionListener, AnalogListener{
             }
             // Movement:
             if(bind.equals("Move_Left")){
-                GameClient.getCharacter().movement[Char.MOVE_LEFT] = down;
+                app.getCharacter().movement[Char.MOVE_LEFT] = down;
             }else if(bind.equals("Move_Right")){
-                GameClient.getCharacter().movement[Char.MOVE_RIGHT] = down;
+                app.getCharacter().movement[Char.MOVE_RIGHT] = down;
             }else if(bind.equals("Move_Forward")){
-                GameClient.getCharacter().movement[Char.MOVE_FORWARD] = down;
+                app.getCharacter().movement[Char.MOVE_FORWARD] = down;
             }else if(bind.equals("Move_Backward")){
-                GameClient.getCharacter().movement[Char.MOVE_BACKWARD] = down;
+                app.getCharacter().movement[Char.MOVE_BACKWARD] = down;
             }else if(bind.equals("Move_Crouch")){
-                GameClient.getCharacter().movement[Char.MOVE_CROUCH] = down;
+                app.getCharacter().movement[Char.MOVE_CROUCH] = down;
             }else if(bind.equals("Move_Jump") && down){
-                GameClient.getCharacter().getPlayer().jump();
+                app.getCharacter().getPlayer().jump();
             }
             // Actions:
             else if(bind.equals("Trigger_Right")){
-                GameClient.getCharacter().setFiring(false, down);
+                app.getCharacter().setFiring(false, down);
             }else if(bind.equals("Trigger_Left")){
-                GameClient.getCharacter().setFiring(true, down);
-            }else if(bind.equals("Trigger_Reload")){
-                if(down) {
-                    GameClient.getCharacter().reload();
-                }
+                app.getCharacter().setFiring(true, down);
             }
             if(down){
                 // Weapon Swapping:
-                if(bind.equals("Swap_1")){
-                    GameClient.getCharacter().swapGuns();
+                if(bind.equals("Swap")){
+                    app.getCharacter().swapGuns();
+                }else if(bind.equals("Reload")){
+                    app.getCharacter().reload();
                 }
                 // Miscellaneous:
-                else if(bind.equals("Server_Connect")){
-                    // Networking:
-                    //GameClient.getNetwork().connect();
-                }else if(bind.equals("Misc_Key_1")){
-                    /*if(app.getRoot().hasChild(GameClient.getTracerNode())) {
-                        app.getRoot().detachChild(GameClient.getTracerNode());
-                    }else{
-                        GameClient.getRoot().attachChild(GameClient.getTracerNode());
-                    }*/
+                else if(bind.equals("Misc_Key_1")){
                     TracerManager.toggle();
                 }else if(bind.equals("Misc_Key_2")){
                     //GameClient.getTracerNode().detachAllChildren();
                     TracerManager.clear();
-                    GameClient.getDCS().resetDecals();
+                    app.getDCS().resetDecals();
                 }else if(bind.equals("Misc_Key_3")){
-                    GameClient.getPlayer(4).create();
-                    GameClient.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
+                    app.getPlayer(4).create();
+                    app.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
                 }else if(bind.equals("Misc_Key_4")){
                     //hud.bar[0].update(30);
-                }else if(bind.equals("Exit")){
+                }else if(bind.equals("Game_Menu")){
                     app.getStateManager().detach(GameClient.getGameplayState());
                     app.getStateManager().getState(MenuState.class).getNifty().gotoScreen("menu");
                     Networking.disconnect();
@@ -138,20 +128,17 @@ public class InputHandler{// implements ActionListener, AnalogListener{
         createMapping("Move_Backward", new KeyTrigger(KeyInput.KEY_S));
         createMapping("Move_Crouch", new KeyTrigger(KeyInput.KEY_LCONTROL));
         createMapping("Move_Jump", new KeyTrigger(KeyInput.KEY_SPACE));
-        // Actions:
+        // Attacks:
         createMapping("Trigger_Left", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         createMapping("Trigger_Right", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        createMapping("Trigger_Reload", new KeyTrigger(KeyInput.KEY_R));
-        // Weapon Swapping:
-        createMapping("Swap_1", new KeyTrigger(KeyInput.KEY_Q));
+        // Actions:
+        createMapping("Reload", new KeyTrigger(KeyInput.KEY_R));
+        createMapping("Swap", new KeyTrigger(KeyInput.KEY_Q));
         // Miscellaneous:
-        createMapping("Server_Connect", new KeyTrigger(KeyInput.KEY_C));
         createMapping("Game_Menu", new KeyTrigger(KeyInput.KEY_ESCAPE));
         createMapping("Misc_Key_1", new KeyTrigger(KeyInput.KEY_V));
         createMapping("Misc_Key_2", new KeyTrigger(KeyInput.KEY_B));
         createMapping("Misc_Key_3", new KeyTrigger(KeyInput.KEY_O));
         createMapping("Misc_Key_4", new KeyTrigger(KeyInput.KEY_I));
-        // Menu/Swapping:
-        createMapping("Exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
     }
 }

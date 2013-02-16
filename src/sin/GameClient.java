@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 public class GameClient extends Application{
     // --- Global Constant Variables --- //
     private static final boolean MODE_DEBUG = false;            // Debug Mode
-    public static final String CLIENT_VERSION = "ALPHA 0.05";   // Client Version (Important for client-server connections)
+    private static final String CLIENT_VERSION = "ALPHA 0.05";   // Client Version (Important for client-server connections)
     
     // Important System Variables:
     private static final Logger logger = Logger.getLogger(GameClient.class.getName());
@@ -77,8 +77,8 @@ public class GameClient extends Application{
     private Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     
     // Custom Variables:
-    private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
-    private static Networking network = new Networking();   // Class for controlling Networking.
+    private InputHandler input = new InputHandler(); // Class for handling all forms of input.
+    private Networking network = new Networking();   // Class for controlling Networking.
     
     // Getters for Nodes:
     public Node getRoot(){
@@ -93,19 +93,19 @@ public class GameClient extends Application{
     public Node getMiscNode(){
         return gameplayState.getMiscNode();
     }
-    public static Node getSingleNode(){
+    public Node getSingleNode(){
         return gameplayState.getSingleNode();
     }
-    public static Node getPlayerNode(){
+    public Node getPlayerNode(){
         return gameplayState.getPlayerNode();
     }
     public Node getProjectileNode(){
         return gameplayState.getProjectileNode();
     }
-    public static Node getTerrain(){
+    public Node getTerrain(){
         return gameplayState.getTerrainNode();
     }
-    public static Node getTracerNode(){
+    public Node getTracerNode(){
         return gameplayState.getTracerNode();
     }
     
@@ -113,33 +113,34 @@ public class GameClient extends Application{
     public static GameplayState getGameplayState(){
         return gameplayState;
     }
+    public BulletAppState getBulletAppState(){
+        return bulletAppState;
+    }
     
+    // Getters for helper classes:
     public HUD getHUD(){
         return gameplayState.getHUD();
     }
-    public static Char getCharacter(){
+    public Char getCharacter(){
         return gameplayState.getCharacter();
     }
-    public static Player getPlayer(int index){
+    public Player getPlayer(int index){
         return gameplayState.getPlayer(index);
     }
-    public static Decals getDCS(){
+    public Decals getDCS(){
         return gameplayState.getDCS();
     }
-    public static Networking getNetwork(){
+    public Networking getNetwork(){
         return network;
     }
-    public static InputHandler getInputHandler(){
+    public InputHandler getInputHandler(){
         return input;
     }
     public AppSettings getSettings(){
         return settings;
     }
-    public static BulletAppState getBulletAppState(){
-        return bulletAppState;
-    }
-    public static Logger getLogger(){
-        return logger;
+    public String getVersion(){
+        return CLIENT_VERSION;
     }
     
     // Main:

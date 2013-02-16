@@ -24,7 +24,7 @@ public class ProjectileManager {
         private Node projectile = new Node();
         private Vector3f location;
         private Vector3f direction;
-        private DamageAction func;
+        private DamageAction damage;
         private boolean inUse = false;
         private float speed;
         private float distance = 0;
@@ -40,11 +40,7 @@ public class ProjectileManager {
         private void collide(CollisionResult target){
             if(target.getContactPoint().distance(location) < 0.2){
                 this.destroy();
-                try {
-                    func.action();
-                } catch (Exception ex) {
-                    T.log(ex);
-                }
+                damage.action();
             }
         }
         public void move(float tpf){
@@ -61,13 +57,13 @@ public class ProjectileManager {
                 this.destroy();
             }
         }
-        public void create(Vector3f location, Vector3f direction, float speed, float distance, DamageAction func){
+        public void create(Vector3f location, Vector3f direction, float speed, float distance, DamageAction damage){
             this.location = location;
             this.direction = direction;
             this.speed = speed;
             this.maxDistance = distance;
-            this.func = func;
-            if(!GameClient.getTerrain().hasChild(projectile)){
+            this.damage = damage;
+            if(!app.getTerrain().hasChild(projectile)){
                 World.CG.createSphere(projectile, "", 0.4f, Vector3f.ZERO, ColorRGBA.Magenta);
                 app.getProjectileNode().attachChild(projectile);
             }
@@ -104,13 +100,13 @@ public class ProjectileManager {
         }
         return -1;
     }
-    public static void add(Vector3f location, Vector3f direction, float distance, float speed, DamageAction func){
+    public static void add(Vector3f location, Vector3f direction, float distance, float speed, DamageAction damage){
         int i = findEmptyProjectile();
         if(i != -1){
             if(projectiles[i] == null){
                 projectiles[i] = new Projectile();
             }
-            projectiles[i].create(location, direction, speed, distance, func);
+            projectiles[i].create(location, direction, speed, distance, damage);
         }
     }
     

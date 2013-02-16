@@ -52,13 +52,13 @@ public class Char {
                         health += shields;
                         shields = 0;
                         if(health <= 0){
-                            GameClient.getCharacter().kill();
+                            app.getCharacter().kill();
                         }
                     }
                 }else{
                     health -= damage;
                     if(health <= 0){
-                        GameClient.getCharacter().kill();
+                        app.getCharacter().kill();
                     }
                 }
                 update();
@@ -89,7 +89,7 @@ public class Char {
         player.setFallSpeed(30);
         player.setGravity(70);
         player.setPhysicsLocation(new Vector3f(0, 110, 0));
-        GameClient.getBulletAppState().getPhysicsSpace().add(player);
+        app.getBulletAppState().getPhysicsSpace().add(player);
     }
     public Char(Weapon a, Weapon b, Weapon c, Weapon d, float health, float shields){
         weapons[0][0] = a;

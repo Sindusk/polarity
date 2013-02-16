@@ -141,12 +141,12 @@ public class Player{
             node.addControl(rbc);
             //bulletAppState.getPhysicsSpace().add(rbc);
             node.setLocalTranslation(loc);
-            GameClient.getPlayerNode().attachChild(node);
+            app.getPlayerNode().attachChild(node);
         }
         public void destroy(){
             node.removeControl(rbc);
-            GameClient.getBulletAppState().getPhysicsSpace().remove(rbc);
-            GameClient.getPlayerNode().detachChild(node);
+            app.getBulletAppState().getPhysicsSpace().remove(rbc);
+            app.getPlayerNode().detachChild(node);
         }
     }
     public int id;

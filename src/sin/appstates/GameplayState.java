@@ -170,7 +170,7 @@ public class GameplayState extends AbstractAppState {
         app.getListener().setRotation(app.getCamera().getRotation());
         
         // Update character location & hud:
-        GameClient.getCharacter().update(tpf);
+        character.update(tpf);
         hud.update(tpf);
         ProjectileManager.update(tpf);
         
