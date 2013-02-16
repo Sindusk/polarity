@@ -6,6 +6,8 @@ package sin.tools;
 
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import java.util.logging.Logger;
+import sin.GameClient;
 
 /**
  *
@@ -21,5 +23,8 @@ public class T {
     }
     public static Vector2f v2f(float x, float y){
         return new Vector2f(x, y);
+    }
+    public static void log(String s){
+        GameClient.getLogger().info(s);
     }
 }

@@ -211,7 +211,7 @@ public class Networking {
                 public Void call() throws Exception{
                     //worldNode.detachAllChildren();
                     GameClient.getCharacter().kill();
-                    World.create(world, GameClient.getWorld());
+                    World.create(world, GameClient.getTerrain());
                     return null;
                 }
             });

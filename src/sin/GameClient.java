@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 public class GameClient extends Application{
     // --- Global Constant Variables --- //
     private static final boolean MODE_DEBUG = false;            // Debug Mode
-    public static final String CLIENT_VERSION = "ALPHA 0.04";   // Client Version (Important for client-server connections)
+    public static final String CLIENT_VERSION = "ALPHA 0.05";   // Client Version (Important for client-server connections)
     
     // Important System Variables:
     private static final Logger logger = Logger.getLogger(GameClient.class.getName());
@@ -98,6 +98,9 @@ public class GameClient extends Application{
     }
     public static Node getCollisionNode(){
         return gameplayState.getCollisionNode();
+    }
+    public static Node getTerrain(){
+        return gameplayState.getTerrainNode();
     }
     public static Node getTracerNode(){
         return gameplayState.getTracerNode();

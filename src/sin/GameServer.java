@@ -63,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class GameServer extends SimpleApplication implements ConnectionListener {
     
-    private static final String SERVER_VERSION = "ALPHA 0.04";
+    private static final String SERVER_VERSION = "ALPHA 0.05";
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     private Player[] players = new Player[16];
     private int[][] world;

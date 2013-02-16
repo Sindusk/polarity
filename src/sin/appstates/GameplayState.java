@@ -10,10 +10,13 @@ import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
 import sin.tools.T;
+import sin.weapons.DamageManager;
+import sin.weapons.ProjectileManager;
 import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
 import sin.weapons.Weapons.Raygun;
+import sin.weapons.Weapons.Sword;
 import sin.world.Decals;
 import sin.world.World;
 
@@ -95,6 +98,12 @@ public class GameplayState extends AbstractAppState {
         root.attachChild(world);
         GameClient.getGUI().attachChild(gui);
         
+        // Initialize Projectiles:
+        ProjectileManager.initialize(GameplayState.app);
+        
+        // Initialize Damage:
+        DamageManager.initialize(GameplayState.app);
+        
         // Initialize HUD & World:
         World.initialize(GameplayState.app);
         World.createSinglePlayerArea(singleNode);
@@ -103,7 +112,7 @@ public class GameplayState extends AbstractAppState {
         world.attachChild(dcs.getNode());
         
         character = new Char(
-                new M4A1(true), new LaserPistol(false),
+                new M4A1(true), new Sword(false),
                 new Raygun(true), new AK47(false), 100, 100);
         world.attachChild(character.getNode());
         
@@ -115,6 +124,7 @@ public class GameplayState extends AbstractAppState {
         
         collisionNode.attachChild(singleNode);
         collisionNode.attachChild(playerNode);
+        collisionNode.attachChild(terrainNode);
         world.attachChild(collisionNode);
     }
     
@@ -143,6 +153,7 @@ public class GameplayState extends AbstractAppState {
         // Update character location & hud:
         GameClient.getCharacter().update(tpf);
         hud.update(tpf);
+        ProjectileManager.update(tpf);
         
         // Update network if connected:
         if(Networking.isConnected()) {

@@ -1,12 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package sin.weapons;
 
 import com.jme3.audio.AudioNode;
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.material.Material;
@@ -15,13 +9,15 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.data.DecalData;
-import sin.data.ShotData;
 import sin.hud.HUD;
-import sin.network.Networking;
 import sin.tools.T;
+import sin.weapons.DamageManager.DamageTemplate;
+import sin.weapons.DamageManager.MeleeDamage;
+import sin.weapons.DamageManager.RangedBulletDamage;
+import sin.weapons.DamageManager.RangedLaserDamage;
 import sin.world.World;
 
 /**
@@ -31,7 +27,7 @@ import sin.world.World;
 public class Weapons{
     private static GameClient app;
     
-    // Functionality & Enums:
+    // Ammos:
     private static class Ammo{
         protected boolean reloading = false;
         protected int clip;
@@ -101,59 +97,7 @@ public class Weapons{
             }
         }
     }
-    private static class Damage{
-        private float base;
-
-        public Damage(float base){
-            this.base = base;
-        }
-
-        public float getBase(){
-            return base;
-        }
-        private float calculate(int part){
-            float dmg = base;
-            if(part == 0) {
-                dmg *= 1.5f;
-            }
-            return dmg;
-        }
-        private int hitPlayer(String name){
-            if(name.contains("head")) {
-                return 0;
-            }else if(name.contains("torso")) {
-                return 1;
-            }else if(name.contains("arm")) {
-                return 2;
-            }else if(name.contains("leg")) {
-                return 3;
-            }
-            return -1;
-        }
-        private void handle(Ray ray){
-            CollisionResults results = new CollisionResults();
-            GameClient.getCollisionNode().collideWith(ray, results);
-            if(results.size() > 0){
-                CollisionResult closest = results.getClosestCollision();
-                //createTracer(cam.getLocation(), closest.getContactPoint());
-                World.CG.createLine(GameClient.getTracerNode(), "tracer", 3, app.getCamera().getLocation(), closest.getContactPoint(), ColorRGBA.Blue);
-                int part = hitPlayer(closest.getGeometry().getName());
-                if(part >= 0){
-                    int player = Integer.parseInt(closest.getGeometry().getName().substring(0, 2));
-                    float dmg = calculate(part);
-                    GameClient.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
-                    if(Networking.isConnected()) {
-                        Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
-                    }
-                }else{
-                    GameClient.getDCS().createDecal(closest.getContactPoint());
-                    if(Networking.isConnected()) {
-                        Networking.client.send(new DecalData(closest.getContactPoint()));
-                    }
-                }
-            }
-        }
-    }
+    // Recoils:
     private static class Recoils{
         private float up_min, up_max, left_min, left_max;
 
@@ -171,6 +115,7 @@ public class Weapons{
             return left_min+(FastMath.nextRandomFloat()*(left_max-left_min));
         }
     }
+    // Spreads:
     private static class Spread{
         private static final float SPREAD_INC = 0.04f;
         private float s_base;
@@ -195,6 +140,7 @@ public class Weapons{
             target.addLocal(offset);
         }
     }
+    // Audio & Models:
     private static class WeaponAudio{
         private AudioNode fireNode;
 
@@ -243,7 +189,7 @@ public class Weapons{
         ANCIENT, MODERN, ENERGY, EXPLOSIVE, ELEMENTAL
     }
     private enum Classification{
-        MELEE, PISTOL, ASSAULT, SNIPER, LAUNCHER, LASER
+        SLASHING, PISTOL, ASSAULT, SNIPER, LAUNCHER, LASER
     }
 
     // Weapon Template:
@@ -254,8 +200,7 @@ public class Weapons{
         protected boolean left;
 
         // Helper Classes:
-        //protected Ammo ammo;
-        protected Damage damage;
+        protected DamageTemplate damage;
         protected Recoils recoils;
         protected Spread spread;
         protected WeaponAudio audio;
@@ -307,7 +252,7 @@ public class Weapons{
         public void fire(){
             Vector3f target = app.getCamera().getDirection().clone();
             spread.apply(target);
-            damage.handle(new Ray(app.getCamera().getLocation(), target));
+            damage.attack(new Ray(app.getCamera().getLocation(), target));
             GameClient.getRecoil().recoil(recoils.up(), recoils.left());
             audio.fire();
             cooling += cooldown;
@@ -344,9 +289,29 @@ public class Weapons{
             super(archetype, classification, left);
         }
     }
+    
+    // Melee Weapons:
+    public static class Sword extends MeleeWeapon{
+        protected final void CreateModel() {
+            model.setLocalScale(.5f, .5f, .5f);
+            Geometry geo = World.CG.createCylinder(model, "", .3f, .6f, T.v3f(0, -.5f, 4), ColorRGBA.Green, T.v2f(1, 1));
+            geo.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.PI/2, Vector3f.UNIT_X));
+            World.CG.createBox(model, "", T.v3f(.2f, 1.4f, .2f), T.v3f(0, 0.7f, 4), ColorRGBA.Orange);
+        }
+        public Sword(boolean left){
+            super(Archetype.ANCIENT, Classification.SLASHING, left);
+            name = "Sword";
+            audio = new WeaponAudio(name, 1);
+            damage = new MeleeDamage(6.4f, 5f);
+            recoils = new Recoils(0, 0, 0, 0);
+            spread = new Spread(0, 0);
+            automatic = true;
+            cooldown = 0.45f;
+            CreateModel();
+        }
+    }
+    
     public static abstract class RangedWeapon extends Weapon{
-        // Helper Classes:
-        
         protected abstract void CreateModel();
         public RangedWeapon(Archetype archetype, Classification classification, boolean left){
             super(archetype, classification, left);
@@ -445,7 +410,7 @@ public class Weapons{
             name = "M4A1";
             audio = new WeaponAudio(name, 1);
             ammo = new ReloadAmmo(30, 1.2f, left);
-            damage = new Damage(4.5f);
+            damage = new RangedBulletDamage(4.5f, 20f);
             recoils = new Recoils(35, 65, -25, 25);
             spread = new Spread(0, 15);
             automatic = true;
@@ -464,7 +429,7 @@ public class Weapons{
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            damage = new Damage(5.5f);
+            damage = new RangedBulletDamage(5.5f, 25f);
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;
@@ -482,7 +447,7 @@ public class Weapons{
             name = "Raygun";
             audio = new WeaponAudio(name, 0.5f);
             ammo = new RechargeAmmo(100, 0.2f, left);
-            damage = new Damage(2.5f);
+            damage = new RangedLaserDamage(2.5f, 20f);
             recoils = new Recoils(15, 30, -10, 10);
             spread = new Spread(0, 5);
             automatic = true;
@@ -491,24 +456,24 @@ public class Weapons{
         }
     }
     public static class LaserPistol extends RangedRechargeWeapon{
-            protected final void CreateModel(){
-                model.setLocalScale(.6f, .6f, .6f);
-                World.CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
-                World.CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), "Textures/wall.png", T.v2f(1, 1));
-            }
-            public LaserPistol(boolean left){
-                super(Archetype.ENERGY, Classification.PISTOL, left);
-                name = "LaserPistol";
-                audio = new WeaponAudio(name, 1.3f);
-                ammo = new RechargeAmmo(20, 0.5f, left);
-                damage = new Damage(6.8f);
-                recoils = new Recoils(40, 60, -15, 15);
-                spread = new Spread(0, 15);
-                automatic = false;
-                cooldown = 0.2f;
-                CreateModel();
-            }
+        protected final void CreateModel(){
+            model.setLocalScale(.6f, .6f, .6f);
+            World.CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), "Textures/wall.png", T.v2f(1, 1));
         }
+        public LaserPistol(boolean left){
+            super(Archetype.ENERGY, Classification.PISTOL, left);
+            name = "LaserPistol";
+            audio = new WeaponAudio(name, 1.3f);
+            ammo = new RechargeAmmo(20, 0.5f, left);
+            damage = new RangedLaserDamage(6.8f, 15f);
+            recoils = new Recoils(40, 60, -15, 15);
+            spread = new Spread(0, 15);
+            automatic = false;
+            cooldown = 0.2f;
+            CreateModel();
+        }
+    }
     
     public static void initialize(GameClient app){
         Weapons.app = app;
