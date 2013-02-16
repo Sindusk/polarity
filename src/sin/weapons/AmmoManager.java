@@ -2,29 +2,32 @@ package sin.weapons;
 
 import sin.GameClient;
 import sin.hud.BarManager;
+import sin.hud.BarManager.BH;
 
 /**
  * Ammo Manager - Used for everything ammo.
  * @author SinisteRing
  */
 public class AmmoManager {
+    private static GameClient app;
+    
     public static class Ammo{
         protected boolean reloading = false;
         private int clip;
         protected int max;
-        public BarManager.BarHandle barIndex;
+        public BH barIndex;
 
         public Ammo(int max, boolean left){
             this.clip = max;
             this.max = max;
             if(left){
-                this.barIndex = BarManager.BarHandle.AMMO_LEFT;
+                this.barIndex = BH.AMMO_LEFT;
             }else{
-                this.barIndex = BarManager.BarHandle.AMMO_RIGHT;
+                this.barIndex = BH.AMMO_RIGHT;
             }
             //app.hud.bar[barIndex].setMax(max);
-            GameClient.getHUD().setBarMax(barIndex, max);
-            GameClient.getHUD().updateBar(barIndex, clip);
+            app.getHUD().setBarMax(barIndex, max);
+            app.getHUD().updateBar(barIndex, clip);
         }
         
         public void incClip(){
@@ -41,7 +44,7 @@ public class AmmoManager {
         }
 
         public void updateBar(){
-            GameClient.getHUD().updateBar(barIndex, clip);
+            app.getHUD().updateBar(barIndex, clip);
         }
         public float reload(){
             return 0;
@@ -85,5 +88,9 @@ public class AmmoManager {
                 }
             }
         }
+    }
+    
+    public static void initialize(GameClient app){
+        AmmoManager.app = app;
     }
 }

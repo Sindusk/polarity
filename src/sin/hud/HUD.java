@@ -8,8 +8,9 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.hud.BarManager.BarHandle;
+import sin.hud.BarManager.BH;
 import sin.tools.T;
+import sin.weapons.RecoilManager;
 import sin.world.World;
 
 /**
@@ -69,18 +70,11 @@ public class HUD {
     private static final float CROSSHAIR_WIDTH = 3.2f;
     private static final int FTEXT_NUM = 50;
 
-    // Index Holders:
-    public static final int HEALTH = 0;
-    public static final int SHIELD = 1;
-    public static final int AMMO_LEFT = 2;
-    public static final int AMMO_RIGHT = 3;
-
     // Instance Variables:
     private static Node node = new Node("GUI");      // Node used to attach/detach GUI and HUD elements.
     private float cx, cy;
-    //private DynamicBar[] bar = new DynamicBar[4];
     private FloatingText[] texts = new FloatingText[FTEXT_NUM];
-    public BitmapText ping;
+    private BitmapText ping;
     private Geometry[] crosshair = new Geometry[4];
 
     public HUD(){
@@ -90,14 +84,18 @@ public class HUD {
     public static Node getGUI(){
         return node;
     }
+    public BitmapText getPing(){
+        return ping;
+    }
+    
     private void createCrosshairs(float length, float offset, float width){
         crosshair[0] = World.CG.createLine(node, "", width, T.v3f(cx-(length+offset), cy), T.v3f(cx-offset, cy), ColorRGBA.Red);
         crosshair[1] = World.CG.createLine(node, "", width, T.v3f(cx, cy-(length+offset)), T.v3f(cx, cy-offset), ColorRGBA.Red);
         crosshair[2] = World.CG.createLine(node, "", width, T.v3f(cx+(length+offset), cy), T.v3f(cx+offset, cy), ColorRGBA.Red);
         crosshair[3] = World.CG.createLine(node, "", width, T.v3f(cx, cy+(length+offset)), T.v3f(cx, cy+offset), ColorRGBA.Red);
     }
-    private void updateCrosshairs(){
-        float mod = GameClient.getRecoil().getSpreadMod();
+    public void updateCrosshairs(){
+        float mod = RecoilManager.getSpreadMod();
         crosshair[0].setLocalTranslation(T.v3f(-mod, 0));
         crosshair[1].setLocalTranslation(T.v3f(0, -mod));
         crosshair[2].setLocalTranslation(T.v3f(mod, 0));
@@ -114,10 +112,10 @@ public class HUD {
         }
     }
 
-    public void setBarMax(BarHandle handle, int value){
+    public void setBarMax(BH handle, int value){
         BarManager.setBarMax(handle, value);
     }
-    public void updateBar(BarHandle handle, int value){
+    public void updateBar(BH handle, int value){
         BarManager.updateBar(handle, value);
     }
 
@@ -129,9 +127,7 @@ public class HUD {
             }
             i++;
         }
-        if(GameClient.getRecoil().getSpreadMod() != 0){
-            updateCrosshairs();
-        }
+        RecoilManager.updateCrosshairs();
     }
     public void initialize(GameClient app, Node root){
         HUD.app = app;
@@ -152,10 +148,10 @@ public class HUD {
         //bar[AMMO_LEFT] = new DynamicBar(1, T.v2f(cx-130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
         //bar[AMMO_LEFT].create(node);
         //bar[AMMO_RIGHT] = new DynamicBar(1, T.v2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
-        BarManager.add(node, BarHandle.HEALTH, 0, T.v2f(cx, 30), 200, 40, 25, ColorRGBA.Red, 100, true);
-        BarManager.add(node, BarHandle.SHIELDS, 0, T.v2f(cx, 90), 200, 40, 25, ColorRGBA.Blue, 100, true);
-        BarManager.add(node, BarHandle.AMMO_LEFT, 1, T.v2f(cx-130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
-        BarManager.add(node, BarHandle.AMMO_RIGHT, 1, T.v2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
+        BarManager.add(node, BH.HEALTH, 0, T.v2f(cx, 30), 200, 40, 25, ColorRGBA.Red, 100, true);
+        BarManager.add(node, BH.SHIELDS, 0, T.v2f(cx, 90), 200, 40, 25, ColorRGBA.Blue, 100, true);
+        BarManager.add(node, BH.AMMO_LEFT, 1, T.v2f(cx-130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
+        BarManager.add(node, BH.AMMO_RIGHT, 1, T.v2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
         //bar[AMMO_RIGHT].create(node);
 
         // Initialize ping display:

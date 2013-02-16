@@ -20,6 +20,7 @@ import sin.weapons.DamageManager.DamageTemplate;
 import sin.weapons.DamageManager.MeleeDamage;
 import sin.weapons.DamageManager.RangedBulletDamage;
 import sin.weapons.DamageManager.RangedLaserDamage;
+import sin.weapons.RecoilManager.RH;
 import sin.world.World;
 
 /**
@@ -60,7 +61,7 @@ public class Weapons{
 
         public void apply(Vector3f target){
             float spread_mult = s_base;
-            spread_mult += s_recoil*(GameClient.getRecoil().getRecoil(true)+GameClient.getRecoil().getRecoil(false));
+            spread_mult += s_recoil*(RecoilManager.getRecoil(RH.UP)+RecoilManager.getRecoil(RH.LEFT));
             if(!GameClient.getCharacter().getPlayer().onGround()) {
                 spread_mult += s_base*SPREAD_INC*.05;
             }
@@ -185,7 +186,7 @@ public class Weapons{
             Vector3f target = app.getCamera().getDirection().clone();
             spread.apply(target);
             damage.attack(new Ray(app.getCamera().getLocation(), target));
-            GameClient.getRecoil().recoil(recoils.up(), recoils.left());
+            RecoilManager.recoil(recoils.up(), recoils.left());
             audio.fire();
             cooling += cooldown;
             muzzle.muzzle.emitAllParticles();
@@ -256,7 +257,7 @@ public class Weapons{
         @Override
         public void enable(Node node){
             super.enable(node);
-            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
+            app.getHUD().setBarMax(ammo.barIndex, ammo.max);
             ammo.updateBar();
         }
         @Override
@@ -304,7 +305,7 @@ public class Weapons{
         @Override
         public void enable(Node node){
             super.enable(node);
-            GameClient.getHUD().setBarMax(ammo.barIndex, ammo.max);
+            app.getHUD().setBarMax(ammo.barIndex, ammo.max);
             ammo.updateBar();
         }
         @Override

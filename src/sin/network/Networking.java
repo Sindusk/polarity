@@ -179,7 +179,7 @@ public class Networking {
             final float pingTime = app.getTimer().getTimeInSeconds() - time;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    GameClient.getHUD().ping.setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
+                    app.getHUD().getPing().setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
                     return null;
                 }
             });

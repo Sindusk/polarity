@@ -21,9 +21,9 @@ public class BarManager {
     private static GameClient app;
     
     private static DynamicBar[] bars = new DynamicBar[5];
-    private static HashMap<BarHandle, Integer> handles = new HashMap();
+    private static HashMap<BH, Integer> handles = new HashMap();
     
-    public static enum BarHandle{
+    public static enum BH{
         HEALTH, SHIELDS, AMMO_LEFT, AMMO_RIGHT
     }
     public static class DynamicBar{
@@ -33,7 +33,6 @@ public class BarManager {
         // Instance Variables:
         private boolean used = false;
         private int type;
-        private BarHandle handle;
         private Vector2f loc;
         private Vector3f fillLoc;
         private float width, height;
@@ -75,10 +74,9 @@ public class BarManager {
                 text.setText(Integer.toString(value));
             }
         }
-        public void create(Node node, BarHandle handle, int type, Vector2f loc, float width, float height, float textSize,
+        public void create(Node node, int type, Vector2f loc, float width, float height, float textSize,
                 ColorRGBA color, int max, boolean showMax){
             this.type = type;
-            this.handle = handle;
             this.loc = loc;
             this.width = width;
             this.height = height;
@@ -133,13 +131,13 @@ public class BarManager {
         }
     }
     
-    public static DynamicBar getBar(BarHandle handle){
+    public static DynamicBar getBar(BH handle){
         return bars[handles.get(handle)];
     }
-    public static void setBarMax(BarHandle handle, int value){
+    public static void setBarMax(BH handle, int value){
         bars[handles.get(handle)].setMax(value);
     }
-    public static void updateBar(BarHandle handle, int value){
+    public static void updateBar(BH handle, int value){
         bars[handles.get(handle)].update(value);
     }
     
@@ -153,14 +151,14 @@ public class BarManager {
         }
         return -1;
     }
-    public static void add(Node node, BarHandle handle, int type, Vector2f loc, float width, float height, float textSize,
+    public static void add(Node node, BH handle, int type, Vector2f loc, float width, float height, float textSize,
                 ColorRGBA color, int max, boolean showMax){
         int i = findEmptyBar();
         if(i != -1){
             if(bars[i] == null){
                 bars[i] = new DynamicBar();
             }
-            bars[i].create(node, handle, type, loc, width, height, textSize, color, max, showMax);
+            bars[i].create(node, type, loc, width, height, textSize, color, max, showMax);
             handles.put(handle, i);
         }
     }

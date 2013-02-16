@@ -6,9 +6,9 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.hud.BarManager.BarHandle;
-import sin.hud.HUD;
+import sin.hud.BarManager.BH;
 import sin.tools.T;
+import sin.weapons.RecoilManager;
 import sin.weapons.Weapons.RangedReloadWeapon;
 import sin.weapons.Weapons.Weapon;
 
@@ -35,15 +35,15 @@ public class Char {
                 this.health_max = health_max;
                 this.shields = shields_max;
                 this.shields_max = shields_max;
-                GameClient.getHUD().setBarMax(BarHandle.HEALTH, (int) health_max);
-                GameClient.getHUD().setBarMax(BarHandle.SHIELDS, (int) shields_max);
-                GameClient.getHUD().updateBar(BarHandle.HEALTH, (int) FastMath.ceil(health));
-                GameClient.getHUD().updateBar(BarHandle.SHIELDS, (int) FastMath.ceil(shields));
+                app.getHUD().setBarMax(BH.HEALTH, (int) health_max);
+                app.getHUD().setBarMax(BH.SHIELDS, (int) shields_max);
+                app.getHUD().updateBar(BH.HEALTH, (int) FastMath.ceil(health));
+                app.getHUD().updateBar(BH.SHIELDS, (int) FastMath.ceil(shields));
             }
             
             public void update(){
-                GameClient.getHUD().updateBar(BarHandle.HEALTH, (int) FastMath.ceil(health));
-                GameClient.getHUD().updateBar(BarHandle.SHIELDS, (int) FastMath.ceil(shields));
+                app.getHUD().updateBar(BH.HEALTH, (int) FastMath.ceil(health));
+                app.getHUD().updateBar(BH.SHIELDS, (int) FastMath.ceil(shields));
             }
             public void damage(float damage){
                 if(shields > 0){
@@ -225,7 +225,7 @@ public class Char {
         this.move();
         weapons[set][0].tick(tpf);
         weapons[set][1].tick(tpf);
-        GameClient.getRecoil().decoil(tpf);
+        RecoilManager.decoil(tpf);
     }
     
     public static void initialize(GameClient app){

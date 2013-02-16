@@ -10,8 +10,10 @@ import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
 import sin.tools.T;
+import sin.weapons.AmmoManager;
 import sin.weapons.DamageManager;
 import sin.weapons.ProjectileManager;
+import sin.weapons.RecoilManager;
 import sin.weapons.TracerManager;
 import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.M4A1;
@@ -111,8 +113,10 @@ public class GameplayState extends AbstractAppState {
         app.getGUI().attachChild(gui);
         
         // Initialize Projectiles:
+        AmmoManager.initialize(app);
         DamageManager.initialize(app);
         ProjectileManager.initialize(app);
+        RecoilManager.initialize(app);
         TracerManager.initialize(app);
         
         // Initialize HUD & World:

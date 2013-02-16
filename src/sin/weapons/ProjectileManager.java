@@ -1,7 +1,6 @@
 package sin.weapons;
 
 import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
@@ -38,8 +37,7 @@ public class ProjectileManager {
         public boolean isUsed(){
             return inUse;
         }
-        private void collide(CollisionResults results){
-            CollisionResult target = results.getClosestCollision();
+        private void collide(CollisionResult target){
             if(target.getContactPoint().distance(location) < 0.2){
                 this.destroy();
                 try {
@@ -54,10 +52,9 @@ public class ProjectileManager {
             float dist = movement.distance(Vector3f.ZERO);
             T.addv3f(location, movement);
             projectile.setLocalTranslation(location);
-            CollisionResults results = new CollisionResults();
-            GameClient.getCollisionNode().collideWith(new Ray(location, direction), results);
-            if(results.size() > 0){
-                this.collide(results);
+            CollisionResult target = T.getClosestCollision(new Ray(location, direction));
+            if(target != null){
+                this.collide(target);
             }
             distance += dist;
             if(distance > maxDistance){

@@ -20,7 +20,7 @@ import sin.network.Networking;
 import sin.player.Char;
 import sin.player.Player;
 import sin.tools.T;
-import sin.weapons.Recoil;
+import sin.weapons.RecoilManager;
 import sin.weapons.Weapons;
 import sin.world.Decals;
 
@@ -79,7 +79,6 @@ public class GameClient extends Application{
     // Custom Variables:
     private static InputHandler input = new InputHandler(); // Class for handling all forms of input.
     private static Networking network = new Networking();   // Class for controlling Networking.
-    private static Recoil recoil = new Recoil();            // Class for controlling Camera movement (recoil/decoil).
     
     // Getters for Nodes:
     public Node getRoot(){
@@ -88,7 +87,7 @@ public class GameClient extends Application{
     public Node getGUI(){
         return guiNode;
     }
-    public static Node getCollisionNode(){
+    public Node getCollisionNode(){
         return gameplayState.getCollisionNode();
     }
     public Node getMiscNode(){
@@ -115,7 +114,7 @@ public class GameClient extends Application{
         return gameplayState;
     }
     
-    public static HUD getHUD(){
+    public HUD getHUD(){
         return gameplayState.getHUD();
     }
     public static Char getCharacter(){
@@ -126,9 +125,6 @@ public class GameClient extends Application{
     }
     public static Decals getDCS(){
         return gameplayState.getDCS();
-    }
-    public static Recoil getRecoil(){
-        return recoil;
     }
     public static Networking getNetwork(){
         return network;
@@ -193,7 +189,7 @@ public class GameClient extends Application{
         
         // Initialize new HUD & remove debug HUD elements:
         Networking.initialize(app);
-        Recoil.initialize(app);
+        RecoilManager.initialize(app);
         Weapons.initialize(app);
         Player.initialize(app);
         Char.initialize(app);

@@ -15,6 +15,7 @@ import sin.appstates.MenuState;
 import sin.network.Networking;
 import sin.player.Char;
 import sin.tools.T;
+import sin.weapons.RecoilManager;
 import sin.weapons.TracerManager;
 
 /**
@@ -100,13 +101,13 @@ public class InputHandler{// implements ActionListener, AnalogListener{
             }
             // Camera:
             if (name.equals("Cam_Left")){
-                GameClient.getRecoil().rotateCamera(value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
+                RecoilManager.rotateCamera(value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
             }else if (name.equals("Cam_Right")){
-                GameClient.getRecoil().rotateCamera(-value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
+                RecoilManager.rotateCamera(-value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
             }else if (name.equals("Cam_Up")){
-                GameClient.getRecoil().rotateCamera(-value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
+                RecoilManager.rotateCamera(-value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
             }else if (name.equals("Cam_Down")){
-                GameClient.getRecoil().rotateCamera(value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
+                RecoilManager.rotateCamera(value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
             }
         }
     };

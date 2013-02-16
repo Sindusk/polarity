@@ -1,17 +1,13 @@
 package sin.weapons;
 
 import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
-import java.util.concurrent.Callable;
 import sin.GameClient;
 import sin.data.DecalData;
 import sin.data.ShotData;
 import sin.network.Networking;
 import sin.tools.T;
-import sin.world.World;
 
 /**
  * Damage - Used for aiding the damage functions for weaponry.
@@ -31,15 +27,6 @@ public class DamageManager {
         //
     }
     
-    public static CollisionResult getClosestCollision(Ray ray){
-        CollisionResults results = new CollisionResults();
-        GameClient.getCollisionNode().collideWith(ray, results);
-        if(results.size() > 0){
-            return results.getClosestCollision();
-        }else{
-            return null;
-        }
-    }
     public static float getDistance(Vector3f player, Vector3f target){
         return target.distance(player);
     }
@@ -85,15 +72,15 @@ public class DamageManager {
         }
         
         public void attack(Ray ray){
-            CollisionResult target = getClosestCollision(ray);
-            if(getClosestCollision(ray) != null){
+            CollisionResult target = T.getClosestCollision(ray);
+            if(target != null){
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
                     int part = getHitbox(target.getGeometry().getName());
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
-                        GameClient.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
+                        app.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }
@@ -143,17 +130,16 @@ public class DamageManager {
             super(base, range);
         }
         public void attack(Ray ray){
-            CollisionResult target = getClosestCollision(ray);
-            if(getClosestCollision(ray) != null){
+            CollisionResult target = T.getClosestCollision(ray);
+            if(target != null){
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
                     TracerManager.add(ray.getOrigin(), target.getContactPoint());
-                    //World.CG.createLine(GameClient.getTracerNode(), "tracer", 3, app.getCamera().getLocation(), target.getContactPoint(), ColorRGBA.Blue);
                     int part = getHitbox(target.getGeometry().getName());
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
-                        GameClient.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
+                        app.getHUD().addFloatingText(GameClient.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), GameClient.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }
