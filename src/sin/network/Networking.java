@@ -34,7 +34,7 @@ public class Networking {
     public static Client client = null;  // For SpiderMonkey connectivity.
     
     // Networking Variables:
-    public static boolean CLIENT_CONNECTED = false;
+    private static boolean CLIENT_CONNECTED = false;
     public static int     CLIENT_ID = -1;
     // Constant Variables:
     private static final float PING_INTERVAL = 1;
@@ -92,6 +92,14 @@ public class Networking {
         }
         return false;
     }
+    public static void disconnect(){
+        if(!CLIENT_CONNECTED){
+            return;
+        }
+        CLIENT_ID = -1;
+        CLIENT_CONNECTED = false;
+        client.close();
+    }
     public static boolean isConnected(){
         return CLIENT_CONNECTED;
     }
@@ -116,7 +124,7 @@ public class Networking {
         }
     }
 
-    private class ClientListener implements MessageListener<Client> {
+    private static class ClientListener implements MessageListener<Client> {
         private Client client;
 
         private void ConnectMessage(ConnectData d){

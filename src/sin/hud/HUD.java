@@ -148,7 +148,7 @@ public class HUD {
             text.setColor(ColorRGBA.Magenta);
             text.setSize(SIZE);
             text.setQueueBucket(RenderQueue.Bucket.Transparent);
-            GameClient.getRoot().attachChild(text);
+            GameClient.getMiscNode().attachChild(text);
             used = false;
             timer = 0;
         }

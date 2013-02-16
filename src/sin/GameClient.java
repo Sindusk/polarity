@@ -72,7 +72,7 @@ public class GameClient extends Application{
     private static MenuState menuState;             // Main Menu State.
     
     // Nodes:
-    private static Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
+    private Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
     private static Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     
     // Custom Variables:
@@ -81,7 +81,7 @@ public class GameClient extends Application{
     private static Recoil recoil = new Recoil();            // Class for controlling Camera movement (recoil/decoil).
     
     // Getters for Nodes:
-    public static Node getRoot(){
+    public Node getRoot(){
         return rootNode;
     }
     public static Node getWorld(){
@@ -90,14 +90,17 @@ public class GameClient extends Application{
     public static Node getGUI(){
         return guiNode;
     }
+    public static Node getCollisionNode(){
+        return gameplayState.getCollisionNode();
+    }
+    public static Node getMiscNode(){
+        return gameplayState.getMiscNode();
+    }
     public static Node getSingleNode(){
         return gameplayState.getSingleNode();
     }
     public static Node getPlayerNode(){
         return gameplayState.getPlayerNode();
-    }
-    public static Node getCollisionNode(){
-        return gameplayState.getCollisionNode();
     }
     public static Node getTerrain(){
         return gameplayState.getTerrainNode();

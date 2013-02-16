@@ -11,9 +11,11 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import java.util.concurrent.Callable;
 import sin.GameClient;
 import sin.hud.HUD;
 import sin.tools.T;
+import sin.weapons.DamageManager.DamageAction;
 import sin.weapons.DamageManager.DamageTemplate;
 import sin.weapons.DamageManager.MeleeDamage;
 import sin.weapons.DamageManager.RangedBulletDamage;
@@ -410,7 +412,13 @@ public class Weapons{
             name = "M4A1";
             audio = new WeaponAudio(name, 1);
             ammo = new ReloadAmmo(30, 1.2f, left);
-            damage = new RangedBulletDamage(4.5f, 20f);
+            DamageAction func = new DamageAction(){
+                @Override
+                public void action(){
+                    DamageManager.damage(4.5f);
+                }
+            };
+            damage = new RangedBulletDamage(4.5f, 100f, 50f, func);
             recoils = new Recoils(35, 65, -25, 25);
             spread = new Spread(0, 15);
             automatic = true;
@@ -429,7 +437,13 @@ public class Weapons{
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            damage = new RangedBulletDamage(5.5f, 25f);
+            DamageAction func = new DamageAction(){
+                @Override
+                public void action(){
+                    DamageManager.damage(5.5f);
+                }
+            };
+            damage = new RangedBulletDamage(5.5f, 135f, 42f, func);
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;
@@ -447,7 +461,7 @@ public class Weapons{
             name = "Raygun";
             audio = new WeaponAudio(name, 0.5f);
             ammo = new RechargeAmmo(100, 0.2f, left);
-            damage = new RangedLaserDamage(2.5f, 20f);
+            damage = new RangedLaserDamage(2.5f, 85f);
             recoils = new Recoils(15, 30, -10, 10);
             spread = new Spread(0, 5);
             automatic = true;
@@ -466,7 +480,7 @@ public class Weapons{
             name = "LaserPistol";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new RechargeAmmo(20, 0.5f, left);
-            damage = new RangedLaserDamage(6.8f, 15f);
+            damage = new RangedLaserDamage(6.8f, 65f);
             recoils = new Recoils(40, 60, -15, 15);
             spread = new Spread(0, 15);
             automatic = false;

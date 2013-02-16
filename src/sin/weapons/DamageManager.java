@@ -5,12 +5,12 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
+import java.util.concurrent.Callable;
 import sin.GameClient;
 import sin.data.DecalData;
 import sin.data.ShotData;
 import sin.network.Networking;
 import sin.tools.T;
-import sin.weapons.ProjectileManager.Projectile;
 import sin.world.World;
 
 /**
@@ -27,6 +27,10 @@ public class DamageManager {
         }
         return dmg;
     }
+    public static void damage(float damage){
+        //
+    }
+    
     public static CollisionResult getClosestCollision(Ray ray){
         CollisionResults results = new CollisionResults();
         GameClient.getCollisionNode().collideWith(ray, results);
@@ -50,6 +54,10 @@ public class DamageManager {
             return 3;
         }
         return -1;
+    }
+    
+    public static abstract class DamageAction{
+        public abstract void action();
     }
     
     public static abstract class DamageTemplate{
@@ -114,11 +122,20 @@ public class DamageManager {
         public abstract void attack(Ray ray);
     }
     public static class RangedBulletDamage extends RangedDamage{
-        public RangedBulletDamage(float base, float range){
+        private float speed;
+        private DamageAction func;
+        
+        public float getSpeed(){
+            return speed;
+        }
+        
+        public RangedBulletDamage(float base, float range, float speed, DamageAction func){
             super(base, range);
+            this.speed = speed;
+            this.func = func;
         }
         public void attack(Ray ray){
-            ProjectileManager.add(ray.getOrigin(), ray.getDirection(), 25f, 50f);
+            ProjectileManager.add(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), func);
         }
     }
     public static class RangedLaserDamage extends RangedDamage{
@@ -130,7 +147,8 @@ public class DamageManager {
             if(getClosestCollision(ray) != null){
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
-                    World.CG.createLine(GameClient.getTracerNode(), "tracer", 3, app.getCamera().getLocation(), target.getContactPoint(), ColorRGBA.Blue);
+                    TracerManager.add(ray.getOrigin(), target.getContactPoint());
+                    //World.CG.createLine(GameClient.getTracerNode(), "tracer", 3, app.getCamera().getLocation(), target.getContactPoint(), ColorRGBA.Blue);
                     int part = getHitbox(target.getGeometry().getName());
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
@@ -145,7 +163,11 @@ public class DamageManager {
                             Networking.client.send(new DecalData(target.getContactPoint()));
                         }
                     }
+                }else{
+                    TracerManager.add(ray, this.getRange());
                 }
+            }else{
+                TracerManager.add(ray, this.getRange());
             }
         }
     }

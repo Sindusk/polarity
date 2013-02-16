@@ -12,8 +12,10 @@ import com.jme3.math.Vector3f;
 import com.jme3.system.JmeContext;
 import sin.GameClient;
 import sin.appstates.MenuState;
+import sin.network.Networking;
 import sin.player.Char;
 import sin.tools.T;
+import sin.weapons.TracerManager;
 
 /**
  *
@@ -68,13 +70,15 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                     // Networking:
                     //GameClient.getNetwork().connect();
                 }else if(bind.equals("Misc_Key_1")){
-                    if(GameClient.getRoot().hasChild(GameClient.getTracerNode())) {
-                        GameClient.getRoot().detachChild(GameClient.getTracerNode());
+                    /*if(app.getRoot().hasChild(GameClient.getTracerNode())) {
+                        app.getRoot().detachChild(GameClient.getTracerNode());
                     }else{
                         GameClient.getRoot().attachChild(GameClient.getTracerNode());
-                    }
+                    }*/
+                    TracerManager.toggle();
                 }else if(bind.equals("Misc_Key_2")){
-                    GameClient.getTracerNode().detachAllChildren();
+                    //GameClient.getTracerNode().detachAllChildren();
+                    TracerManager.clear();
                     GameClient.getDCS().resetDecals();
                 }else if(bind.equals("Misc_Key_3")){
                     GameClient.getPlayer(4).create();
@@ -84,6 +88,7 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                 }else if(bind.equals("Exit")){
                     app.getStateManager().detach(GameClient.getGameplayState());
                     app.getStateManager().getState(MenuState.class).getNifty().gotoScreen("menu");
+                    Networking.disconnect();
                 }
             }
         }

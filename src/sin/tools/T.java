@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package sin.tools;
 
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
 
@@ -15,16 +12,27 @@ import sin.GameClient;
  */
 public class T {
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
+    
     public static Vector3f v3f(float x, float y, float z){
         return new Vector3f(x, y, z);
     }
     public static Vector3f v3f(float x, float y){
         return new Vector3f(x, y, 0);
     }
+    public static void addv3f(Vector3f source, Vector3f additive){
+        source.setX(source.getX() + additive.getX());
+        source.setY(source.getY() + additive.getY());
+        source.setZ(source.getZ() + additive.getZ());
+    }
+    
     public static Vector2f v2f(float x, float y){
         return new Vector2f(x, y);
     }
+    
     public static void log(String s){
         GameClient.getLogger().info(s);
+    }
+    public static void log(Throwable t){
+        GameClient.getLogger().log(Level.SEVERE, "{0}", t);
     }
 }

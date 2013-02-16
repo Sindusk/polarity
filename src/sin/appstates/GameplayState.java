@@ -12,6 +12,7 @@ import sin.player.Player;
 import sin.tools.T;
 import sin.weapons.DamageManager;
 import sin.weapons.ProjectileManager;
+import sin.weapons.TracerManager;
 import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
@@ -40,11 +41,12 @@ public class GameplayState extends AbstractAppState {
     private Node world = new Node("Gameplay_World");    // Node for 3D world.
     private Node gui = new Node("Gameplay_GUI");        // Node for 2D GUI.
     
-    private Node collisionNode = new Node();     // Node encompassing anything able to be shot [single, world, player].
-    private Node singleNode = new Node();        // Node encompassing single player testing (Static).
-    private Node playerNode = new Node();        // Node encompassing player models (Kinematic).
-    private Node terrainNode = new Node();       // Node for all world terrain.
-    private Node tracerNode = new Node();        // Node encompassing tracers, mainly for testing.
+    private Node collisionNode = new Node();    // Node encompassing anything able to be shot [single, world, player].
+    private Node miscNode = new Node();         // Node encompassing all miscellaneous geometry [floating text].
+    private Node singleNode = new Node();       // Node encompassing single player testing (Static).
+    private Node playerNode = new Node();       // Node encompassing player models (Kinematic).
+    private Node terrainNode = new Node();      // Node for all world terrain.
+    private Node tracerNode = new Node();       // Node encompassing tracers, mainly for testing.
     
     public GameplayState(){
         //
@@ -58,6 +60,9 @@ public class GameplayState extends AbstractAppState {
     }
     public Node getCollisionNode(){
         return collisionNode;
+    }
+    public Node getMiscNode(){
+        return miscNode;
     }
     public Node getSingleNode(){
         return singleNode;
@@ -86,30 +91,27 @@ public class GameplayState extends AbstractAppState {
     }
     
     @Override
-    public void initialize(AppStateManager stateManager, Application app){
+    public void initialize(AppStateManager stateManager, Application theApp){
         // Basic initialization:
-        super.initialize(stateManager, app);
-        GameplayState.app = (GameClient) app;
+        super.initialize(stateManager, theApp);
+        GameplayState.app = (GameClient) theApp;
         
         app.getInputManager().setCursorVisible(false);
         
         // Attach GUI and Root nodes:
-        GameClient.getRoot().attachChild(root);
-        root.attachChild(world);
+        GameplayState.app.getRoot().attachChild(root);
         GameClient.getGUI().attachChild(gui);
         
         // Initialize Projectiles:
-        ProjectileManager.initialize(GameplayState.app);
-        
-        // Initialize Damage:
         DamageManager.initialize(GameplayState.app);
+        ProjectileManager.initialize(GameplayState.app);
+        TracerManager.initialize(GameplayState.app);
         
         // Initialize HUD & World:
         World.initialize(GameplayState.app);
         World.createSinglePlayerArea(singleNode);
         hud.initialize(GameplayState.app, gui);
         dcs.initialize();
-        world.attachChild(dcs.getNode());
         
         character = new Char(
                 new M4A1(true), new Sword(false),
@@ -126,12 +128,15 @@ public class GameplayState extends AbstractAppState {
         collisionNode.attachChild(playerNode);
         collisionNode.attachChild(terrainNode);
         world.attachChild(collisionNode);
+        world.attachChild(dcs.getNode());
+        world.attachChild(miscNode);
+        root.attachChild(world);
     }
     
     @Override
     public void cleanup(){
         super.cleanup();
-        GameClient.getRoot().detachChild(root);
+        app.getRoot().detachChild(root);
         GameClient.getGUI().detachChild(gui);
         world.detachChild(character.getNode());
         app.getInputManager().setCursorVisible(true);
