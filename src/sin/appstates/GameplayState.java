@@ -7,7 +7,8 @@ import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.hud.HUD;
 import sin.network.Networking;
-import sin.player.Char;
+import sin.player.Character;
+import sin.player.MovementManager;
 import sin.player.Player;
 import sin.tools.T;
 import sin.weapons.AmmoManager;
@@ -32,7 +33,7 @@ public class GameplayState extends AbstractAppState {
     private static boolean CLIENT_KEYS_CLEARED = false; // Boolean for stupid keys.
     
     // Classes used for logic:
-    private Char character;                     // Used for character (user) control.
+    private Character character;                     // Used for character (user) control.
     private Decals dcs = new Decals();          // Used for decals on the world.
     private HUD hud = new HUD();                // Used for GUI and HUD elements.
     private Player[] player = new Player[16];   // Used for networked player data.
@@ -83,7 +84,7 @@ public class GameplayState extends AbstractAppState {
         return tracerNode;
     }
     
-    public Char getCharacter(){
+    public Character getCharacter(){
         return character;
     }
     public Decals getDCS(){
@@ -115,6 +116,7 @@ public class GameplayState extends AbstractAppState {
         // Initialize Projectiles:
         AmmoManager.initialize(app);
         DamageManager.initialize(app);
+        MovementManager.initialize(app);
         ProjectileManager.initialize(app);
         RecoilManager.initialize(app);
         TracerManager.initialize(app);
@@ -125,7 +127,7 @@ public class GameplayState extends AbstractAppState {
         hud.initialize(app, gui);
         dcs.initialize();
         
-        character = new Char(
+        character = new Character(
                 new M4A1(true), new Sword(false),
                 new Raygun(true), new AK47(false), 100, 100);
         world.attachChild(character.getNode());

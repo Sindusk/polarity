@@ -17,7 +17,7 @@ import sin.appstates.MenuState;
 import sin.hud.HUD;
 import sin.input.InputHandler;
 import sin.network.Networking;
-import sin.player.Char;
+import sin.player.Character;
 import sin.player.Player;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
@@ -110,7 +110,7 @@ public class GameClient extends Application{
     }
     
     // Getters for States:
-    public static GameplayState getGameplayState(){
+    public GameplayState getGameplayState(){
         return gameplayState;
     }
     public BulletAppState getBulletAppState(){
@@ -121,7 +121,7 @@ public class GameClient extends Application{
     public HUD getHUD(){
         return gameplayState.getHUD();
     }
-    public Char getCharacter(){
+    public Character getCharacter(){
         return gameplayState.getCharacter();
     }
     public Player getPlayer(int index){
@@ -193,7 +193,7 @@ public class GameClient extends Application{
         RecoilManager.initialize(app);
         Weapons.initialize(app);
         Player.initialize(app);
-        Char.initialize(app);
+        Character.initialize(app);
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
         

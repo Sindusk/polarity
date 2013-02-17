@@ -65,7 +65,7 @@ public class MenuState extends AbstractAppState implements ScreenController {
     public void action(String action){
         // Main Menu:
         if(action.equals("start")){
-            MenuState.app.getStateManager().attach(GameClient.getGameplayState());
+            app.getStateManager().attach(app.getGameplayState());
             nifty.gotoScreen("empty");
         }else if(action.equals("multiplayer")){
             nifty.gotoScreen("menu.multiplayer");

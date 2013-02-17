@@ -13,7 +13,9 @@ import com.jme3.system.JmeContext;
 import sin.GameClient;
 import sin.appstates.MenuState;
 import sin.network.Networking;
-import sin.player.Char;
+import sin.player.Character;
+import sin.player.MovementManager;
+import sin.player.MovementManager.MH;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.weapons.TracerManager;
@@ -34,20 +36,25 @@ public class InputHandler{// implements ActionListener, AnalogListener{
     
     private ActionListener gameplayAction = new ActionListener(){
         public void onAction(String bind, boolean down, float tpf){
-            if(!app.getStateManager().hasState(GameClient.getGameplayState())){
+            if(!app.getStateManager().hasState(app.getGameplayState())){
                 return;
             }
             // Movement:
             if(bind.equals("Move_Left")){
-                app.getCharacter().movement[Char.MOVE_LEFT] = down;
+                MovementManager.setMove(MH.LEFT, down);
+                //app.getCharacter().movement[Character.MOVE_LEFT] = down;
             }else if(bind.equals("Move_Right")){
-                app.getCharacter().movement[Char.MOVE_RIGHT] = down;
+                MovementManager.setMove(MH.RIGHT, down);
+                //app.getCharacter().movement[Character.MOVE_RIGHT] = down;
             }else if(bind.equals("Move_Forward")){
-                app.getCharacter().movement[Char.MOVE_FORWARD] = down;
+                MovementManager.setMove(MH.FORWARD, down);
+                //app.getCharacter().movement[Character.MOVE_FORWARD] = down;
             }else if(bind.equals("Move_Backward")){
-                app.getCharacter().movement[Char.MOVE_BACKWARD] = down;
+                MovementManager.setMove(MH.BACKWARD, down);
+                //app.getCharacter().movement[Character.MOVE_BACKWARD] = down;
             }else if(bind.equals("Move_Crouch")){
-                app.getCharacter().movement[Char.MOVE_CROUCH] = down;
+                MovementManager.setMove(MH.CROUCH, down);
+                //app.getCharacter().movement[Character.MOVE_CROUCH] = down;
             }else if(bind.equals("Move_Jump") && down){
                 app.getCharacter().getPlayer().jump();
             }
@@ -77,7 +84,7 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                 }else if(bind.equals("Misc_Key_4")){
                     //hud.bar[0].update(30);
                 }else if(bind.equals("Game_Menu")){
-                    app.getStateManager().detach(GameClient.getGameplayState());
+                    app.getStateManager().detach(app.getGameplayState());
                     app.getStateManager().getState(MenuState.class).getNifty().gotoScreen("menu");
                     Networking.disconnect();
                 }
@@ -86,7 +93,7 @@ public class InputHandler{// implements ActionListener, AnalogListener{
     };
     private AnalogListener gameplayAnalog = new AnalogListener(){
         public void onAnalog(String name, float value, float tpf) {
-            if(!app.getStateManager().hasState(GameClient.getGameplayState())){
+            if(!app.getStateManager().hasState(app.getGameplayState())){
                 return;
             }
             // Camera:
