@@ -53,7 +53,9 @@ public class T {
     
     // Logging
     public static void log(String s){
-        Logger.getLogger("polarity").info(s);
+        //String ss = "[POLARITY] "+s;
+        //Logger.getLogger("polarity").info(ss);
+        System.out.println("[POLARITY] "+s);
     }
     public static void log(Throwable t){
         Logger.getLogger("polarity").log(Level.SEVERE, "{0}", t);

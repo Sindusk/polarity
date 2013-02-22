@@ -7,7 +7,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.tools.T;
-import sin.weapons.DamageManager.DamageAction;
 import sin.world.World;
 
 /**
@@ -20,11 +19,15 @@ public class ProjectileManager {
     // Array for handling all projectiles:
     private static Projectile[] projectiles = new Projectile[50];
     
+    public static abstract class CollisionAction{
+        public abstract void action(CollisionResult target);
+    }
+    
     public static class Projectile{
         private Node projectile = new Node();
         private Vector3f location;
         private Vector3f direction;
-        private DamageAction damage;
+        private CollisionAction action;
         private boolean inUse = false;
         private float speed;
         private float distance = 0;
@@ -40,7 +43,7 @@ public class ProjectileManager {
         private void collide(CollisionResult target){
             if(target.getContactPoint().distance(location) < 0.2){
                 this.destroy();
-                damage.action();
+                action.action(target);
             }
         }
         public void move(float tpf){
@@ -57,12 +60,12 @@ public class ProjectileManager {
                 this.destroy();
             }
         }
-        public void create(Vector3f location, Vector3f direction, float speed, float distance, DamageAction damage){
+        public void create(Vector3f location, Vector3f direction, float speed, float distance, CollisionAction action){
             this.location = location;
             this.direction = direction;
             this.speed = speed;
             this.maxDistance = distance;
-            this.damage = damage;
+            this.action = action;
             if(!app.getTerrain().hasChild(projectile)){
                 World.CG.createSphere(projectile, "", 0.4f, Vector3f.ZERO, ColorRGBA.Magenta);
                 app.getProjectileNode().attachChild(projectile);
@@ -100,13 +103,13 @@ public class ProjectileManager {
         }
         return -1;
     }
-    public static void add(Vector3f location, Vector3f direction, float distance, float speed, DamageAction damage){
+    public static void add(Vector3f location, Vector3f direction, float distance, float speed, CollisionAction action){
         int i = findEmptyProjectile();
         if(i != -1){
             if(projectiles[i] == null){
                 projectiles[i] = new Projectile();
             }
-            projectiles[i].create(location, direction, speed, distance, damage);
+            projectiles[i].create(location, direction, speed, distance, action);
         }
     }
     

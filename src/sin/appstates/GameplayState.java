@@ -9,8 +9,7 @@ import sin.hud.HUD;
 import sin.network.Networking;
 import sin.player.Character;
 import sin.player.MovementManager;
-import sin.player.Player;
-import sin.tools.T;
+import sin.player.PlayerManager;
 import sin.weapons.AmmoManager;
 import sin.weapons.DamageManager;
 import sin.weapons.ProjectileManager;
@@ -36,7 +35,7 @@ public class GameplayState extends AbstractAppState {
     private Character character;                     // Used for character (user) control.
     private Decals dcs = new Decals();          // Used for decals on the world.
     private HUD hud = new HUD();                // Used for GUI and HUD elements.
-    private Player[] player = new Player[16];   // Used for networked player data.
+    private PlayerManager[] player = new PlayerManager[16];   // Used for networked player data.
     
     // All nodes used for use in the Gameplay:
     private Node root;      // Root Node.
@@ -93,7 +92,7 @@ public class GameplayState extends AbstractAppState {
     public HUD getHUD(){
         return hud;
     }
-    public Player getPlayer(int index){
+    public PlayerManager getPlayer(int index){
         return player[index];
     }
     
@@ -132,11 +131,11 @@ public class GameplayState extends AbstractAppState {
                 new Raygun(true), new AK47(false), 100, 100);
         world.attachChild(character.getNode());
         
-        int i = 0;
+        /*int i = 0;
         while(i < 16){
             player[i] = new Player(i, T.v3f(0, 10, 0));
             i++;
-        }
+        }*/
         
         collisionNode.attachChild(singleNode);
         collisionNode.attachChild(playerNode);

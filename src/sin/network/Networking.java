@@ -22,6 +22,7 @@ import sin.data.PingData;
 import sin.data.ShotData;
 import sin.data.SoundData;
 import sin.data.WorldData;
+import sin.player.PlayerManager;
 import sin.tools.T;
 import sin.world.World;
 
@@ -89,6 +90,10 @@ public class Networking {
             timers[PING] = 1;
             timers[MOVE] = 0;
             return true;
+        }else if(client != null && !client.isConnected()){
+            client.start();
+            client.send(new ConnectData(app.getVersion()));
+            return true;
         }
         return false;
     }
@@ -129,14 +134,17 @@ public class Networking {
 
         private void ConnectMessage(ConnectData d){
             final int id = d.getID();
-            if(!app.getPlayer(d.getID()).created){
-                app.enqueue(new Callable<Void>(){
-                    public Void call() throws Exception{
-                        app.getPlayer(id).create();
-                        return null;
+            //if(!PlayerManager.getPlayer(d.getID()).isUsed()){
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    //app.getPlayer(id).create();
+                    if(!PlayerManager.add(id, Vector3f.ZERO)){
+                        T.log("Player already connected.");
                     }
-                });
-            }
+                    return null;
+                }
+            });
+            //}
         }
         private void DecalMessage(DecalData d){
             final Vector3f loc = d.getLocation();
@@ -151,7 +159,8 @@ public class Networking {
             final int id = d.getID();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    app.getPlayer(id).destroy();
+                    //app.getPlayer(id).destroy();
+                    PlayerManager.remove(id);
                     return null;
                 }
             });
@@ -170,7 +179,8 @@ public class Networking {
             final Quaternion rot = d.getRotation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    app.getPlayer(id).move(loc, rot);
+                    //app.getPlayer(id).move(loc, rot);
+                    PlayerManager.update(id, loc, rot);
                     return null;
                 }
             });
@@ -201,7 +211,8 @@ public class Networking {
                 return;
             }
             final String s = d.getSound();
-            final Vector3f loc = app.getPlayer(d.getID()).getLocation();
+            //final Vector3f loc = app.getPlayer(d.getID()).getLocation();
+            final Vector3f loc = PlayerManager.getPlayer(d.getID()).getLocation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     AudioNode node = new AudioNode(app.getAssetManager(), s);

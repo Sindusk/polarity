@@ -79,8 +79,8 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                     TracerManager.clear();
                     app.getDCS().resetDecals();
                 }else if(bind.equals("Misc_Key_3")){
-                    app.getPlayer(4).create();
-                    app.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
+                    //app.getPlayer(4).create();
+                    //app.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
                 }else if(bind.equals("Misc_Key_4")){
                     //hud.bar[0].update(30);
                 }else if(bind.equals("Game_Menu")){

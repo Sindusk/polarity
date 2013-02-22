@@ -1,5 +1,6 @@
 package sin.world;
 
+import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
@@ -18,6 +19,7 @@ import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture.WrapMode;
 import sin.GameClient;
+import sin.tools.T;
 
 /**
 Copyright (c) 2003-2011 jMonkeyEngine
@@ -63,13 +65,6 @@ public class World {
     
     //private static AssetManager assetManager;
     //private static BulletAppState bulletAppState;
-    
-    private static Vector3f v3f(float x, float y, float z){
-        return new Vector3f(x, y, z);
-    }
-    private static Vector2f v2f(float x, float y){
-        return new Vector2f(x, y);
-    }
     
     // Create Geometry class:
     public static class CG{
@@ -197,19 +192,23 @@ public class World {
         }
     }
     
+    public static BulletAppState getBulletAppState(){
+        return app.getBulletAppState();
+    }
+    
     public static Node genZone(int var, int x, int z){
         Node node = new Node();
         Geometry geo;
         float geoSize = ZONE_SIZE/2;
         if(var == 0){
-            CG.createPhyBox(node, "floor", v3f(geoSize, .1f, geoSize), v3f(0, 0, 0), "Textures/wall.png", v2f(1, 1));
-            geo = CG.createPhyCylinder(node, "pillar", geoSize/5, geoSize, v3f(0, geoSize/2, 0), "Textures/wall.png", v2f(1, 1));
+            CG.createPhyBox(node, "floor", T.v3f(geoSize, .1f, geoSize), T.v3f(0, 0, 0), "Textures/wall.png", T.v2f(1, 1));
+            geo = CG.createPhyCylinder(node, "pillar", geoSize/5, geoSize, T.v3f(0, geoSize/2, 0), "Textures/wall.png", T.v2f(1, 1));
             geo.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.PI/2, Vector3f.UNIT_X));
         }else if(var == 1){
-            CG.createPhyBox(node, "floor", v3f(geoSize, .1f, geoSize), v3f(0, 0, 0), "Textures/brick.png", v2f(1, 1));
-            CG.createPhyBox(node, "flybox", v3f(geoSize/4, geoSize/4, geoSize/4), v3f(0, geoSize, 0), "Textures/brick.png", v2f(1, 1));
+            CG.createPhyBox(node, "floor", T.v3f(geoSize, .1f, geoSize), T.v3f(0, 0, 0), "Textures/brick.png", T.v2f(1, 1));
+            CG.createPhyBox(node, "flybox", T.v3f(geoSize/4, geoSize/4, geoSize/4), T.v3f(0, geoSize, 0), "Textures/brick.png", T.v2f(1, 1));
         }else if(var == 2){
-            CG.createPhyBox(node, "floor", v3f(geoSize, .1f, geoSize), v3f(0, 0, 0), "Textures/BC_Tex.png", v2f(1, 1));
+            CG.createPhyBox(node, "floor", T.v3f(geoSize, .1f, geoSize), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
         }
         node.setLocalTranslation(x*ZONE_SIZE, 0, z*ZONE_SIZE);
         return node;
@@ -220,8 +219,8 @@ public class World {
     }
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
-        CG.createPhyBox(node, "floor", v3f(50, 0.1f, 50), v3f(0, 0, 0), "Textures/BC_Tex.png", v2f(5, 5));
-        CG.createPhyBox(node, "wall", v3f(50, 20, 0.1f), v3f(0, 20, -50), "Textures/brick.png", v2f(50, 20));
+        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(5, 5));
+        CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), "Textures/brick.png", T.v2f(50, 20));
     }
     public static void create(int[][] world, Node node){
         int x = 0;
@@ -232,7 +231,7 @@ public class World {
                 if(!(x == world.length/2 && z == world[x].length/2)) {
                     node.attachChild(genZone(world[x][z], x-(world.length/2), z-(world[x].length/2)));
                 }else{
-                    CG.createPhyBox(node, "Start", v3f(World.ZONE_SIZE/2, 5, World.ZONE_SIZE/2), v3f(0, 0, 0), "Textures/BC_Tex.png", v2f(1, 1));
+                    CG.createPhyBox(node, "Start", T.v3f(World.ZONE_SIZE/2, 5, World.ZONE_SIZE/2), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
                 }
                 z++;
             }

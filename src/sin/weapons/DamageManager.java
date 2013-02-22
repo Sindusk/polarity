@@ -7,7 +7,9 @@ import sin.GameClient;
 import sin.data.DecalData;
 import sin.data.ShotData;
 import sin.network.Networking;
+import sin.player.PlayerManager;
 import sin.tools.T;
+import sin.weapons.ProjectileManager.CollisionAction;
 
 /**
  * Damage - Used for aiding the damage functions for weaponry.
@@ -23,8 +25,21 @@ public class DamageManager {
         }
         return dmg;
     }
-    public static void damage(float damage){
-        //
+    public static void damage(CollisionResult target, float damage){
+        int part = getHitbox(target.getGeometry().getName());
+        if(part >= 0){
+            int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
+            float dmg = calculate(part, damage);
+            app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
+            if(Networking.isConnected()) {
+                Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
+            }
+        }else{
+            app.getDCS().createDecal(target.getContactPoint());
+            if(Networking.isConnected()) {
+                Networking.client.send(new DecalData(target.getContactPoint()));
+            }
+        }
     }
     
     public static float getDistance(Vector3f player, Vector3f target){
@@ -41,10 +56,6 @@ public class DamageManager {
             return 3;
         }
         return -1;
-    }
-    
-    public static abstract class DamageAction{
-        public abstract void action();
     }
     
     public static abstract class DamageTemplate{
@@ -80,7 +91,7 @@ public class DamageManager {
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
-                        app.getHUD().addFloatingText(app.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
+                        app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }
@@ -110,19 +121,19 @@ public class DamageManager {
     }
     public static class RangedBulletDamage extends RangedDamage{
         private float speed;
-        private DamageAction func;
+        private CollisionAction action;
         
         public float getSpeed(){
             return speed;
         }
         
-        public RangedBulletDamage(float base, float range, float speed, DamageAction func){
+        public RangedBulletDamage(float base, float range, float speed, CollisionAction action){
             super(base, range);
             this.speed = speed;
-            this.func = func;
+            this.action = action;
         }
         public void attack(Ray ray){
-            ProjectileManager.add(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), func);
+            ProjectileManager.add(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), action);
         }
     }
     public static class RangedLaserDamage extends RangedDamage{
@@ -139,7 +150,7 @@ public class DamageManager {
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
-                        app.getHUD().addFloatingText(app.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
+                        app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }

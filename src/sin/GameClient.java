@@ -18,7 +18,7 @@ import sin.hud.HUD;
 import sin.input.InputHandler;
 import sin.network.Networking;
 import sin.player.Character;
-import sin.player.Player;
+import sin.player.PlayerManager;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.weapons.Weapons;
@@ -124,9 +124,6 @@ public class GameClient extends Application{
     public Character getCharacter(){
         return gameplayState.getCharacter();
     }
-    public Player getPlayer(int index){
-        return gameplayState.getPlayer(index);
-    }
     public Decals getDCS(){
         return gameplayState.getDCS();
     }
@@ -192,7 +189,7 @@ public class GameClient extends Application{
         Networking.initialize(app);
         RecoilManager.initialize(app);
         Weapons.initialize(app);
-        Player.initialize(app);
+        PlayerManager.initialize(app);
         Character.initialize(app);
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);

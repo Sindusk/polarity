@@ -72,7 +72,6 @@ public class Character {
     private CharStats charStats;
     private CharacterControl player;
     private Node charNode = new Node();
-    // Move: 0 = forward, 1 = backward, 2 = left, 3 = right, 4 = crouch
 
     public final void create(){
         CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 10f, 1);
