@@ -10,6 +10,7 @@ import sin.network.Networking;
 import sin.player.Character;
 import sin.player.MovementManager;
 import sin.player.PlayerManager;
+import sin.player.StatsManager;
 import sin.weapons.AmmoManager;
 import sin.weapons.DamageManager;
 import sin.weapons.ProjectileManager;
@@ -118,6 +119,7 @@ public class GameplayState extends AbstractAppState {
         MovementManager.initialize(app);
         ProjectileManager.initialize(app);
         RecoilManager.initialize(app);
+        StatsManager.initialize(app);
         TracerManager.initialize(app);
         
         // Initialize HUD & World:

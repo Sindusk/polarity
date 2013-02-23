@@ -2,11 +2,9 @@ package sin.player;
 
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.control.CharacterControl;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.hud.BarManager.BH;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.weapons.Weapons.RangedReloadWeapon;
@@ -19,57 +17,10 @@ import sin.weapons.Weapons.Weapon;
 public class Character {
     private static GameClient app;
     
-    private class CharStats{
-            // Instance Variables:
-            private float health;
-            private float health_max;
-            private float shields;
-            private float shields_max;
-            
-            public CharStats(float health_max, float shields_max){
-                this.health = health_max;
-                this.health_max = health_max;
-                this.shields = shields_max;
-                this.shields_max = shields_max;
-                app.getHUD().setBarMax(BH.HEALTH, (int) health_max);
-                app.getHUD().setBarMax(BH.SHIELDS, (int) shields_max);
-                app.getHUD().updateBar(BH.HEALTH, (int) FastMath.ceil(health));
-                app.getHUD().updateBar(BH.SHIELDS, (int) FastMath.ceil(shields));
-            }
-            
-            public void update(){
-                app.getHUD().updateBar(BH.HEALTH, (int) FastMath.ceil(health));
-                app.getHUD().updateBar(BH.SHIELDS, (int) FastMath.ceil(shields));
-            }
-            public void damage(float damage){
-                if(shields > 0){
-                    shields -= damage;
-                    if(shields <= 0){
-                        health += shields;
-                        shields = 0;
-                        if(health <= 0){
-                            app.getCharacter().kill();
-                        }
-                    }
-                }else{
-                    health -= damage;
-                    if(health <= 0){
-                        app.getCharacter().kill();
-                    }
-                }
-                update();
-            }
-            public void refresh(){
-                health = health_max;
-                shields = shields_max;
-                update();
-            }
-        }
-
     // Instance Variables:
     private Weapon[][] weapons = new Weapon[2][2];
     private int set = 0;
-    private CharStats charStats;
+    //private Stats charStats;
     private CharacterControl player;
     private Node charNode = new Node();
 
@@ -89,7 +40,8 @@ public class Character {
         weapons[1][1] = d;
         weapons[0][0].enable(charNode);
         weapons[0][1].enable(charNode);
-        charStats = new CharStats(health, shields);
+        StatsManager.createCharacter(health, shields);
+        //charStats = new Stats(health, shields);
         this.create();
     }
 
@@ -119,10 +71,10 @@ public class Character {
     }
 
     public void damage(float damage){
-        charStats.damage(damage);
+        StatsManager.damage(damage);
     }
     public void kill(){
-        charStats.refresh();
+        StatsManager.refreshCharacter();
         player.setPhysicsLocation(T.v3f(0, 10, 0));
     }
     public void reload(){
