@@ -70,6 +70,8 @@ public class MenuState extends AbstractAppState implements ScreenController {
             nifty.gotoScreen("empty");
         }else if(action.equals("multiplayer")){
             nifty.gotoScreen("menu.multiplayer");
+        }else if(action.equals("character")){
+            nifty.gotoScreen("menu.character");
         }else if(action.equals("options")){
             nifty.gotoScreen("menu.options");
         }else if(action.equals("quit")){
@@ -90,9 +92,18 @@ public class MenuState extends AbstractAppState implements ScreenController {
         }else if(action.equals("multiplayer.back")){
             nifty.gotoScreen("menu");
         }
+        // Character Menu:
+        else if(action.equals("character.back")){
+            nifty.gotoScreen("menu");
+        }
         // Options Menu:
         else if(action.equals("options.back")){
             nifty.gotoScreen("menu");
+        }
+        // Game Menu:
+        else if(action.equals("game.return")){
+            nifty.gotoScreen("empty");
+            app.getInputManager().setCursorVisible(false);
         }
     }
     

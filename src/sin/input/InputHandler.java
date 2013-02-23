@@ -25,34 +25,29 @@ import sin.world.DecalManager;
 public class InputHandler{// implements ActionListener, AnalogListener{
     private static GameClient app;
     
-    public InputHandler(){
-        //
-    }
-    
     // Constant Variables:
     public static final float MOUSE_SENSITIVITY = 1;
     
+    private static boolean inGameplay(){
+        return app.getStateManager().hasState(app.getGameplayState()) && app.getMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
+    }
+    
     private ActionListener gameplayAction = new ActionListener(){
         public void onAction(String bind, boolean down, float tpf){
-            if(!app.getStateManager().hasState(app.getGameplayState())){
+            if(!inGameplay()){
                 return;
             }
             // Movement:
             if(bind.equals("Move_Left")){
                 MovementManager.setMove(MH.LEFT, down);
-                //app.getCharacter().movement[Character.MOVE_LEFT] = down;
             }else if(bind.equals("Move_Right")){
                 MovementManager.setMove(MH.RIGHT, down);
-                //app.getCharacter().movement[Character.MOVE_RIGHT] = down;
             }else if(bind.equals("Move_Forward")){
                 MovementManager.setMove(MH.FORWARD, down);
-                //app.getCharacter().movement[Character.MOVE_FORWARD] = down;
             }else if(bind.equals("Move_Backward")){
                 MovementManager.setMove(MH.BACKWARD, down);
-                //app.getCharacter().movement[Character.MOVE_BACKWARD] = down;
             }else if(bind.equals("Move_Crouch")){
                 MovementManager.setMove(MH.CROUCH, down);
-                //app.getCharacter().movement[Character.MOVE_CROUCH] = down;
             }else if(bind.equals("Move_Jump") && down){
                 app.getCharacter().getPlayer().jump();
             }
@@ -73,17 +68,16 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                 else if(bind.equals("Misc_Key_1")){
                     TracerManager.toggle();
                 }else if(bind.equals("Misc_Key_2")){
-                    //GameClient.getTracerNode().detachAllChildren();
                     TracerManager.clear();
                     DecalManager.resetDecals();
                 }else if(bind.equals("Misc_Key_3")){
-                    //app.getPlayer(4).create();
-                    //app.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);
+                    //
                 }else if(bind.equals("Misc_Key_4")){
-                    //hud.bar[0].update(30);
+                    //
                 }else if(bind.equals("Game_Menu")){
-                    app.getStateManager().detach(app.getGameplayState());
-                    app.getStateManager().getState(MenuState.class).getNifty().gotoScreen("menu");
+                    //app.getStateManager().detach(app.getGameplayState());
+                    app.getMenuState().getNifty().gotoScreen("game.menu");
+                    app.getInputManager().setCursorVisible(true);
                     Networking.disconnect();
                 }
             }
@@ -91,7 +85,7 @@ public class InputHandler{// implements ActionListener, AnalogListener{
     };
     private AnalogListener gameplayAnalog = new AnalogListener(){
         public void onAnalog(String name, float value, float tpf) {
-            if(!app.getStateManager().hasState(app.getGameplayState())){
+            if(!inGameplay()){
                 return;
             }
             // Camera:

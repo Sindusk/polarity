@@ -9,6 +9,8 @@ import com.jme3.math.Vector3f;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
+import sin.weapons.DamageManager;
+import sin.weapons.ProjectileManager.Projectile;
 
 /**
  *
@@ -18,6 +20,32 @@ public class T {
     public static GameClient app;
     
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
+    
+    // Projectile Action Parsing:
+    private static float ParseValue(String s){
+        return Float.parseFloat(s);
+    }
+    public static void ParseUpdate(Projectile p){
+        //String[] actions = p.getUpdate().split(":");
+    }
+    public static void ParseCollision(String collision, CollisionResult target){
+        String[] actions = collision.split(":");
+        int i = 0;
+        while(i < actions.length){
+            if(actions[i].contains("damage")){
+                int begin = actions[i].indexOf("(")+1;
+                int end = actions[i].indexOf(")");
+                DamageManager.damage(target, ParseValue(actions[i].substring(begin, end)));
+            }
+            i++;
+        }
+    }
+    public static void ParseCollision(Projectile p, CollisionResult target){
+        ParseCollision(p.getCollision(), target);
+        if(p.getCollision().contains("destroy")){
+            p.destroy();
+        }
+    }
     
     // HUD, Font, UI:
     public static BitmapFont getFont(String fnt){

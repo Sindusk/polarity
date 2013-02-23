@@ -111,6 +111,9 @@ public class GameClient extends Application{
     public GameplayState getGameplayState(){
         return gameplayState;
     }
+    public MenuState getMenuState(){
+        return menuState;
+    }
     public BulletAppState getBulletAppState(){
         return bulletAppState;
     }

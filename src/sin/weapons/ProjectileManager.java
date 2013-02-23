@@ -4,9 +4,7 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
-import com.jme3.network.serializing.Serializable;
 import com.jme3.scene.Node;
-import java.util.concurrent.Callable;
 import sin.GameClient;
 import sin.data.ProjectileData;
 import sin.network.Networking;
@@ -52,7 +50,7 @@ public class ProjectileManager {
             if(target.getContactPoint().distance(location) < 0.2){
                 this.destroy();
                 //action.action(target);
-                ActionParser.ParseCollision(this, target);
+                T.ParseCollision(this, target);
             }
         }
         public void update(float tpf){
@@ -68,7 +66,7 @@ public class ProjectileManager {
             if(distance > maxDistance){
                 this.destroy();
             }
-            ActionParser.ParseUpdate(this);
+            T.ParseUpdate(this);
         }
         public void create(Vector3f location, Vector3f direction, float speed, float distance, String update, String collision){
             this.location = location;

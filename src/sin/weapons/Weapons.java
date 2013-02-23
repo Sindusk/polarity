@@ -335,7 +335,7 @@ public class Weapons{
             super(Archetype.ANCIENT, Classification.SLASHING, left);
             name = "Sword";
             audio = new WeaponAudio(name, 1);
-            damage = new MeleeDamage(6.4f, 5f);
+            damage = new MeleeDamage(14f, "damage(6.5)");
             recoils = new Recoils(0, 0, 0, 0);
             spread = new Spread(0, 0);
             automatic = true;
@@ -356,7 +356,7 @@ public class Weapons{
             name = "M4A1";
             audio = new WeaponAudio(name, 1);
             ammo = new ReloadAmmo(30, 1.2f, left);
-            damage = new RangedBulletDamage(4.5f, 100f, 100f, "", "damage(4.5):destroy");
+            damage = new RangedBulletDamage(100f, 100f, "", "damage(4.5):destroy");
             recoils = new Recoils(35, 65, -25, 25);
             spread = new Spread(0, 15);
             automatic = true;
@@ -375,7 +375,7 @@ public class Weapons{
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            damage = new RangedBulletDamage(5.5f, 135f, 85f, "", "damage(5.5):destroy");
+            damage = new RangedBulletDamage(135f, 85f, "", "damage(5.5):destroy");
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;
@@ -393,7 +393,7 @@ public class Weapons{
             name = "Raygun";
             audio = new WeaponAudio(name, 0.5f);
             ammo = new RechargeAmmo(100, 0.2f, left);
-            damage = new RangedLaserDamage(2.5f, 85f);
+            damage = new RangedLaserDamage(85f, "damage(2.5)");
             recoils = new Recoils(15, 30, -10, 10);
             spread = new Spread(0, 5);
             automatic = true;
@@ -412,7 +412,7 @@ public class Weapons{
             name = "LaserPistol";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new RechargeAmmo(20, 0.5f, left);
-            damage = new RangedLaserDamage(6.8f, 65f);
+            damage = new RangedLaserDamage(65f, "damage(6.8)");
             recoils = new Recoils(40, 60, -15, 15);
             spread = new Spread(0, 15);
             automatic = false;

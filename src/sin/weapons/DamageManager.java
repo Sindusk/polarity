@@ -59,22 +59,22 @@ public class DamageManager {
     }
     
     public static abstract class DamageTemplate{
-        private float base;
-
-        public DamageTemplate(float base){
-            this.base = base;
+        private String collision;
+        
+        public DamageTemplate(String collision){
+            this.collision = collision;
         }
-
-        public float getBase(){
-            return base;
+        protected String getCollision(){
+            return collision;
         }
+        
         public abstract void attack(Ray ray);
     }
     public static class MeleeDamage extends DamageTemplate{
         private float range;
         
-        public MeleeDamage(float base, float range){
-            super(base);
+        public MeleeDamage(float range, String collision){
+            super(collision);
             this.range = range;
         }
         
@@ -87,21 +87,7 @@ public class DamageManager {
             if(target != null){
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
-                    damage(target, this.getBase());
-                    /*int part = getHitbox(target.getGeometry().getName());
-                    if(part >= 0){
-                        int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
-                        float dmg = calculate(part, this.getBase());
-                        app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
-                        if(Networking.isConnected()) {
-                            Networking.send(new ShotData(Networking.getID(), player, dmg));
-                        }
-                    }else{
-                        DecalManager.create(target.getContactPoint());
-                        if(Networking.isConnected()) {
-                            Networking.send(new DecalData(target.getContactPoint()));
-                        }
-                    }*/
+                    T.ParseCollision(this.getCollision(), target);
                 }
             }
         }
@@ -109,8 +95,8 @@ public class DamageManager {
     public static abstract class RangedDamage extends DamageTemplate{
         private float range;
         
-        public RangedDamage(float base, float range){
-            super(base);
+        public RangedDamage(float range, String collision){
+            super(collision);
             this.range = range;
         }
         
@@ -123,25 +109,23 @@ public class DamageManager {
     public static class RangedBulletDamage extends RangedDamage{
         private float speed;
         private String update;
-        private String collision;
         
         public float getSpeed(){
             return speed;
         }
         
-        public RangedBulletDamage(float base, float range, float speed, String update, String collision){
-            super(base, range);
+        public RangedBulletDamage(float range, float speed, String update, String collision){
+            super(range, collision);
             this.speed = speed;
             this.update = update;
-            this.collision = collision;
         }
         public void attack(Ray ray){
-            ProjectileManager.addNew(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), update, collision);
+            ProjectileManager.addNew(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), update, this.getCollision());
         }
     }
     public static class RangedLaserDamage extends RangedDamage{
-        public RangedLaserDamage(float base, float range){
-            super(base, range);
+        public RangedLaserDamage(float range, String collision){
+            super(range, collision);
         }
         public void attack(Ray ray){
             CollisionResult target = T.getClosestCollision(ray);
@@ -149,21 +133,7 @@ public class DamageManager {
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
                     TracerManager.add(ray.getOrigin(), target.getContactPoint());
-                    damage(target, this.getBase());
-                    /*int part = getHitbox(target.getGeometry().getName());
-                    if(part >= 0){
-                        int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
-                        float dmg = calculate(part, this.getBase());
-                        app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
-                        if(Networking.isConnected()) {
-                            Networking.send(new ShotData(Networking.getID(), player, dmg));
-                        }
-                    }else{
-                        DecalManager.create(target.getContactPoint());
-                        if(Networking.isConnected()) {
-                            Networking.send(new DecalData(target.getContactPoint()));
-                        }
-                    }*/
+                    T.ParseCollision(this.getCollision(), target);
                 }else{
                     TracerManager.add(ray, this.getRange());
                 }
