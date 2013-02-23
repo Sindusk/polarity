@@ -9,7 +9,6 @@ import sin.hud.HUD;
 import sin.network.Networking;
 import sin.player.Character;
 import sin.player.MovementManager;
-import sin.player.PlayerManager;
 import sin.player.StatsManager;
 import sin.weapons.AmmoManager;
 import sin.weapons.DamageManager;
@@ -20,7 +19,7 @@ import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.M4A1;
 import sin.weapons.Weapons.Raygun;
 import sin.weapons.Weapons.Sword;
-import sin.world.Decals;
+import sin.world.DecalManager;
 import sin.world.World;
 
 /**
@@ -33,10 +32,8 @@ public class GameplayState extends AbstractAppState {
     private static boolean CLIENT_KEYS_CLEARED = false; // Boolean for stupid keys.
     
     // Classes used for logic:
-    private Character character;                     // Used for character (user) control.
-    private Decals dcs = new Decals();          // Used for decals on the world.
-    private HUD hud = new HUD();                // Used for GUI and HUD elements.
-    private PlayerManager[] player = new PlayerManager[16];   // Used for networked player data.
+    private Character character;    // Used for character (user) control.
+    private HUD hud = new HUD();    // Used for GUI and HUD elements.
     
     // All nodes used for use in the Gameplay:
     private Node root;      // Root Node.
@@ -87,14 +84,8 @@ public class GameplayState extends AbstractAppState {
     public Character getCharacter(){
         return character;
     }
-    public Decals getDCS(){
-        return dcs;
-    }
     public HUD getHUD(){
         return hud;
-    }
-    public PlayerManager getPlayer(int index){
-        return player[index];
     }
     
     @Override
@@ -116,6 +107,7 @@ public class GameplayState extends AbstractAppState {
         // Initialize Projectiles:
         AmmoManager.initialize(app);
         DamageManager.initialize(app);
+        DecalManager.initialize(app);
         MovementManager.initialize(app);
         ProjectileManager.initialize(app);
         RecoilManager.initialize(app);
@@ -126,24 +118,18 @@ public class GameplayState extends AbstractAppState {
         World.initialize(app);
         World.createSinglePlayerArea(singleNode);
         hud.initialize(app, gui);
-        dcs.initialize();
+        //dcs.initialize();
         
         character = new Character(
                 new M4A1(true), new Sword(false),
                 new Raygun(true), new AK47(false), 100, 100);
         world.attachChild(character.getNode());
         
-        /*int i = 0;
-        while(i < 16){
-            player[i] = new Player(i, T.v3f(0, 10, 0));
-            i++;
-        }*/
-        
         collisionNode.attachChild(singleNode);
         collisionNode.attachChild(playerNode);
         collisionNode.attachChild(terrainNode);
         world.attachChild(collisionNode);
-        world.attachChild(dcs.getNode());
+        world.attachChild(DecalManager.getNode());
         world.attachChild(miscNode);
         world.attachChild(projectileNode);
         root.attachChild(world);

@@ -22,7 +22,6 @@ import sin.player.PlayerManager;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.weapons.Weapons;
-import sin.world.Decals;
 
 /**
 Copyright (c) 2003-2011 jMonkeyEngine
@@ -123,9 +122,6 @@ public class GameClient extends Application{
     }
     public Character getCharacter(){
         return gameplayState.getCharacter();
-    }
-    public Decals getDCS(){
-        return gameplayState.getDCS();
     }
     public Networking getNetwork(){
         return network;

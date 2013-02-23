@@ -40,9 +40,7 @@ public class TracerManager {
             tracer = CG.createLine(node, "", TRACER_WIDTH, start, end, ColorRGBA.Blue);
         }
         public void destroy(){
-            if(tracer != null && node.hasChild(tracer)){
-                node.detachChild(tracer);
-            }
+            node.detachChild(tracer);
         }
     }
     

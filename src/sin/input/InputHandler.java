@@ -7,18 +7,16 @@ import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.system.JmeContext;
 import sin.GameClient;
 import sin.appstates.MenuState;
 import sin.network.Networking;
-import sin.player.Character;
 import sin.player.MovementManager;
 import sin.player.MovementManager.MH;
-import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.weapons.TracerManager;
+import sin.world.DecalManager;
 
 /**
  *
@@ -77,7 +75,7 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                 }else if(bind.equals("Misc_Key_2")){
                     //GameClient.getTracerNode().detachAllChildren();
                     TracerManager.clear();
-                    app.getDCS().resetDecals();
+                    DecalManager.resetDecals();
                 }else if(bind.equals("Misc_Key_3")){
                     //app.getPlayer(4).create();
                     //app.getPlayer(4).move(T.v3f(0, 105, -45), Quaternion.ZERO);

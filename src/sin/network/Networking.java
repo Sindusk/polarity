@@ -24,6 +24,7 @@ import sin.data.SoundData;
 import sin.data.WorldData;
 import sin.player.PlayerManager;
 import sin.tools.T;
+import sin.world.DecalManager;
 import sin.world.World;
 
 /**
@@ -150,7 +151,7 @@ public class Networking {
             final Vector3f loc = d.getLocation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    app.getDCS().createDecal(loc);
+                    DecalManager.create(loc);
                     return null;
                 }
             });

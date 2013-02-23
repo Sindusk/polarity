@@ -10,6 +10,7 @@ import sin.network.Networking;
 import sin.player.PlayerManager;
 import sin.tools.T;
 import sin.weapons.ProjectileManager.CollisionAction;
+import sin.world.DecalManager;
 
 /**
  * Damage - Used for aiding the damage functions for weaponry.
@@ -35,7 +36,7 @@ public class DamageManager {
                 Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
             }
         }else{
-            app.getDCS().createDecal(target.getContactPoint());
+            DecalManager.create(target.getContactPoint());
             if(Networking.isConnected()) {
                 Networking.client.send(new DecalData(target.getContactPoint()));
             }
@@ -96,7 +97,7 @@ public class DamageManager {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }
                     }else{
-                        app.getDCS().createDecal(target.getContactPoint());
+                        DecalManager.create(target.getContactPoint());
                         if(Networking.isConnected()) {
                             Networking.client.send(new DecalData(target.getContactPoint()));
                         }
@@ -155,7 +156,7 @@ public class DamageManager {
                             Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
                         }
                     }else{
-                        app.getDCS().createDecal(target.getContactPoint());
+                        DecalManager.create(target.getContactPoint());
                         if(Networking.isConnected()) {
                             Networking.client.send(new DecalData(target.getContactPoint()));
                         }
