@@ -19,11 +19,13 @@ import sin.data.ErrorData;
 import sin.data.IDData;
 import sin.data.MoveData;
 import sin.data.PingData;
+import sin.data.ProjectileData;
 import sin.data.ShotData;
 import sin.data.SoundData;
 import sin.data.WorldData;
 import sin.player.PlayerManager;
 import sin.tools.T;
+import sin.weapons.ProjectileManager;
 import sin.world.DecalManager;
 import sin.world.World;
 
@@ -33,11 +35,11 @@ import sin.world.World;
  */
 public class Networking {
     private static GameClient app;
-    public static Client client = null;  // For SpiderMonkey connectivity.
+    private static Client client = null;  // For SpiderMonkey connectivity.
     
     // Networking Variables:
     private static boolean CLIENT_CONNECTED = false;
-    public static int     CLIENT_ID = -1;
+    private static int     CLIENT_ID = -1;
     // Constant Variables:
     private static final float PING_INTERVAL = 1;
     private static final float MOVE_INTERVAL = 0.2f;
@@ -47,15 +49,19 @@ public class Networking {
     private static final int MOVE = 1;
 
     // Instance Variables:
-    public static boolean pinging = false;
+    private static boolean pinging = false;
     private static float[] timers = new float[2];
     private static float time;
 
     public Networking(){
         //
     }
+    
+    public static int getID(){
+        return CLIENT_ID;
+    }
 
-    private void registerSerials(){
+    private static void registerSerials(){
         Serializer.registerClass(ConnectData.class);
         client.addMessageListener(new ClientListener(), ConnectData.class);
         Serializer.registerClass(DecalData.class);
@@ -70,6 +76,8 @@ public class Networking {
         client.addMessageListener(new ClientListener(), MoveData.class);
         Serializer.registerClass(PingData.class);
         client.addMessageListener(new ClientListener(), PingData.class);
+        Serializer.registerClass(ProjectileData.class);
+        client.addMessageListener(new ClientListener(), ProjectileData.class);
         Serializer.registerClass(ShotData.class);
         client.addMessageListener(new ClientListener(), ShotData.class);
         Serializer.registerClass(SoundData.class);
@@ -77,7 +85,7 @@ public class Networking {
         Serializer.registerClass(WorldData.class);
         client.addMessageListener(new ClientListener(), WorldData.class);
     }
-    public boolean connect(String ip){
+    public static boolean connect(String ip){
         if(client == null){
             try {
                 client = Network.connectToServer(ip, 6143);
@@ -85,7 +93,7 @@ public class Networking {
                 T.log(ex);
                 return false;
             }
-            this.registerSerials();
+            Networking.registerSerials();
             client.start();
             client.send(new ConnectData(app.getVersion()));
             timers[PING] = 1;
@@ -104,6 +112,12 @@ public class Networking {
         }
         CLIENT_ID = -1;
         CLIENT_CONNECTED = false;
+        client.close();
+    }
+    public static void send(Message message){
+        client.send(message);
+    }
+    public static void close(){
         client.close();
     }
     public static boolean isConnected(){
@@ -167,7 +181,7 @@ public class Networking {
             });
         }
         private void ErrorMessage(ErrorData d){
-            //players[d.getID()].change = true;
+            T.log(d.getError());
         }
         private void IDMessage(IDData d){
             CLIENT_CONNECTED = true;
@@ -186,11 +200,25 @@ public class Networking {
                 }
             });
         }
-        private void PingMessage(PingData d){
+        private void PingMessage(){
             final float pingTime = app.getTimer().getTimeInSeconds() - time;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     app.getHUD().getPing().setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
+                    return null;
+                }
+            });
+        }
+        private void ProjectileMessage(ProjectileData d){
+            final Vector3f loc = d.getLocation();
+            final Vector3f dir = d.getDirection();
+            final float dist = d.getDistance();
+            final float speed = d.getSpeed();
+            final String update = d.getUpdate();
+            final String collision = d.getCollision();
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    ProjectileManager.add(loc, dir, dist, speed, update, collision);
                     return null;
                 }
             });
@@ -252,7 +280,9 @@ public class Networking {
             }else if(m instanceof MoveData){
                 MoveMessage((MoveData) m);
             }else if(m instanceof PingData){
-                PingMessage((PingData) m);
+                PingMessage();
+            }else if(m instanceof ProjectileData){
+                ProjectileMessage((ProjectileData) m);
             }else if(m instanceof ShotData){
                 ShotMessage((ShotData) m);
             }else if(m instanceof SoundData){

@@ -20,7 +20,6 @@ import sin.weapons.DamageManager.DamageTemplate;
 import sin.weapons.DamageManager.MeleeDamage;
 import sin.weapons.DamageManager.RangedBulletDamage;
 import sin.weapons.DamageManager.RangedLaserDamage;
-import sin.weapons.ProjectileManager.CollisionAction;
 import sin.weapons.RecoilManager.RH;
 import sin.world.World;
 
@@ -357,13 +356,7 @@ public class Weapons{
             name = "M4A1";
             audio = new WeaponAudio(name, 1);
             ammo = new ReloadAmmo(30, 1.2f, left);
-            CollisionAction action = new CollisionAction(){
-                @Override
-                public void action(CollisionResult target){
-                    DamageManager.damage(target, 4.5f);
-                }
-            };
-            damage = new RangedBulletDamage(4.5f, 100f, 100f, action);
+            damage = new RangedBulletDamage(4.5f, 100f, 100f, "", "damage(4.5):destroy");
             recoils = new Recoils(35, 65, -25, 25);
             spread = new Spread(0, 15);
             automatic = true;
@@ -382,13 +375,7 @@ public class Weapons{
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            CollisionAction action = new CollisionAction(){
-                @Override
-                public void action(CollisionResult target){
-                    DamageManager.damage(target, 5.5f);
-                }
-            };
-            damage = new RangedBulletDamage(5.5f, 135f, 85f, action);
+            damage = new RangedBulletDamage(5.5f, 135f, 85f, "", "damage(5.5):destroy");
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;

@@ -18,9 +18,7 @@ public class ShotData extends AbstractMessage {
     private int id;
     private int player;
     private float damage;
-    public ShotData(){
-        
-    }
+    public ShotData(){}
     public ShotData(int id, int player, float damage){
         this.id = id;
         this.player = player;

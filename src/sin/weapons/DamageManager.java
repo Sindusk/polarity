@@ -9,7 +9,6 @@ import sin.data.ShotData;
 import sin.network.Networking;
 import sin.player.PlayerManager;
 import sin.tools.T;
-import sin.weapons.ProjectileManager.CollisionAction;
 import sin.world.DecalManager;
 
 /**
@@ -33,12 +32,12 @@ public class DamageManager {
             float dmg = calculate(part, damage);
             app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
             if(Networking.isConnected()) {
-                Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
+                Networking.send(new ShotData(Networking.getID(), player, dmg));
             }
         }else{
             DecalManager.create(target.getContactPoint());
             if(Networking.isConnected()) {
-                Networking.client.send(new DecalData(target.getContactPoint()));
+                Networking.send(new DecalData(target.getContactPoint()));
             }
         }
     }
@@ -88,20 +87,21 @@ public class DamageManager {
             if(target != null){
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
-                    int part = getHitbox(target.getGeometry().getName());
+                    damage(target, this.getBase());
+                    /*int part = getHitbox(target.getGeometry().getName());
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
                         app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
-                            Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
+                            Networking.send(new ShotData(Networking.getID(), player, dmg));
                         }
                     }else{
                         DecalManager.create(target.getContactPoint());
                         if(Networking.isConnected()) {
-                            Networking.client.send(new DecalData(target.getContactPoint()));
+                            Networking.send(new DecalData(target.getContactPoint()));
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -122,19 +122,21 @@ public class DamageManager {
     }
     public static class RangedBulletDamage extends RangedDamage{
         private float speed;
-        private CollisionAction action;
+        private String update;
+        private String collision;
         
         public float getSpeed(){
             return speed;
         }
         
-        public RangedBulletDamage(float base, float range, float speed, CollisionAction action){
+        public RangedBulletDamage(float base, float range, float speed, String update, String collision){
             super(base, range);
             this.speed = speed;
-            this.action = action;
+            this.update = update;
+            this.collision = collision;
         }
         public void attack(Ray ray){
-            ProjectileManager.add(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), action);
+            ProjectileManager.addNew(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), update, collision);
         }
     }
     public static class RangedLaserDamage extends RangedDamage{
@@ -147,20 +149,21 @@ public class DamageManager {
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
                     TracerManager.add(ray.getOrigin(), target.getContactPoint());
-                    int part = getHitbox(target.getGeometry().getName());
+                    damage(target, this.getBase());
+                    /*int part = getHitbox(target.getGeometry().getName());
                     if(part >= 0){
                         int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
                         float dmg = calculate(part, this.getBase());
                         app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
                         if(Networking.isConnected()) {
-                            Networking.client.send(new ShotData(Networking.CLIENT_ID, player, dmg));
+                            Networking.send(new ShotData(Networking.getID(), player, dmg));
                         }
                     }else{
                         DecalManager.create(target.getContactPoint());
                         if(Networking.isConnected()) {
-                            Networking.client.send(new DecalData(target.getContactPoint()));
+                            Networking.send(new DecalData(target.getContactPoint()));
                         }
-                    }
+                    }*/
                 }else{
                     TracerManager.add(ray, this.getRange());
                 }

@@ -23,6 +23,7 @@ import sin.data.ErrorData;
 import sin.data.IDData;
 import sin.data.MoveData;
 import sin.data.PingData;
+import sin.data.ProjectileData;
 import sin.data.ShotData;
 import sin.data.SoundData;
 import sin.data.WorldData;
@@ -67,7 +68,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     private Player[] players = new Player[16];
     private int[][] world;
-    private Server myServer = null;
+    private Server server = null;
     
     private Vector3f v3f(float x, float y, float z){
         return new Vector3f(x, y, z);
@@ -100,25 +101,27 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     
     private void RegisterSerials(){
         Serializer.registerClass(ConnectData.class);
-        myServer.addMessageListener(new ServerListener(), ConnectData.class);
+        server.addMessageListener(new ServerListener(), ConnectData.class);
         Serializer.registerClass(DecalData.class);
-        myServer.addMessageListener(new ServerListener(), DecalData.class);
+        server.addMessageListener(new ServerListener(), DecalData.class);
         Serializer.registerClass(DisconnectData.class);
-        myServer.addMessageListener(new ServerListener(), DisconnectData.class);
+        server.addMessageListener(new ServerListener(), DisconnectData.class);
         Serializer.registerClass(ErrorData.class);
-        myServer.addMessageListener(new ServerListener(), ErrorData.class);
+        server.addMessageListener(new ServerListener(), ErrorData.class);
         Serializer.registerClass(IDData.class);
-        myServer.addMessageListener(new ServerListener(), IDData.class);
+        server.addMessageListener(new ServerListener(), IDData.class);
         Serializer.registerClass(MoveData.class);
-        myServer.addMessageListener(new ServerListener(), MoveData.class);
+        server.addMessageListener(new ServerListener(), MoveData.class);
         Serializer.registerClass(PingData.class);
-        myServer.addMessageListener(new ServerListener(), PingData.class);
+        server.addMessageListener(new ServerListener(), PingData.class);
+        Serializer.registerClass(ProjectileData.class);
+        server.addMessageListener(new ServerListener(), ProjectileData.class);
         Serializer.registerClass(ShotData.class);
-        myServer.addMessageListener(new ServerListener(), ShotData.class);
+        server.addMessageListener(new ServerListener(), ShotData.class);
         Serializer.registerClass(SoundData.class);
-        myServer.addMessageListener(new ServerListener(), SoundData.class);
+        server.addMessageListener(new ServerListener(), SoundData.class);
         Serializer.registerClass(WorldData.class);
-        myServer.addMessageListener(new ServerListener(), WorldData.class);
+        server.addMessageListener(new ServerListener(), WorldData.class);
     }
     
     private class ServerListener implements MessageListener<HostedConnection>{
@@ -182,6 +185,9 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
         private void PingMessage(PingData d){
             connection.send(d);
         }
+        private void ProjectileMessage(ProjectileData d){
+            server.broadcast(Filters.notEqualTo(connection), d);
+        }
         private void ShotMessage(ShotData d){
             //System.out.println("Handling ShotData from client "+d.getID()+"...");
             System.out.println("Player "+d.getID()+" shot Player "+d.getPlayer()+" for "+d.getDamage()+" damage.");
@@ -207,6 +213,8 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
                 MoveMessage((MoveData) m);
             }else if(m instanceof PingData){
                 PingMessage((PingData) m);
+            }else if(m instanceof ProjectileData){
+                ProjectileMessage((ProjectileData) m);
             }else if(m instanceof ShotData){
                 ShotMessage((ShotData) m);
             }else if(m instanceof SoundData){
@@ -220,15 +228,15 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
         private float health = 100;
         private float shields = 100;
         private HostedConnection connection;
-        private Vector3f loc;
-        private Quaternion rot;
+        //private Vector3f loc;
+        //private Quaternion rot;
         public Player(){
-            loc = v3f(0, 0, 0);
+            //loc = v3f(0, 0, 0);
         }
         
         public void setLocation(Vector3f loc, Quaternion rot){
-            this.loc = loc;
-            this.rot = rot;
+            //this.loc = loc;
+            //this.rot = rot;
         }
         public void setConnection(HostedConnection connection){
             this.connection = connection;
@@ -278,13 +286,13 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     @Override
     public void simpleInitApp() {
         try {
-            myServer = Network.createServer(6143);
+            server = Network.createServer(6143);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
         RegisterSerials();
-        myServer.addConnectionListener(this);
-        myServer.start();
+        server.addConnectionListener(this);
+        server.start();
         int i = 0;
         while(i < players.length){
             players[i] = new Player();
@@ -306,7 +314,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     
     @Override
     public void destroy(){
-        myServer.close();
+        server.close();
         super.destroy();
     }
 }

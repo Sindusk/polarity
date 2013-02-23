@@ -14,6 +14,7 @@ import de.lessvoid.nifty.tools.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
+import sin.network.Networking;
 
 /**
  *
@@ -79,7 +80,7 @@ public class MenuState extends AbstractAppState implements ScreenController {
             ListBox<String> list = screen.findNiftyControl("multiplayer.serverlist", ListBox.class);
             String s = list.getSelection().get(0);
             String q = s.substring(1, s.indexOf(']'));
-            if(app.getNetwork().connect(q)){
+            if(Networking.connect(q)){
                 action("start");
             }
         }else if(action.equals("multiplayer.refresh")){

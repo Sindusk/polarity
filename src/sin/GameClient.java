@@ -77,7 +77,6 @@ public class GameClient extends Application{
     
     // Custom Variables:
     private InputHandler input = new InputHandler(); // Class for handling all forms of input.
-    private Networking network = new Networking();   // Class for controlling Networking.
     
     // Getters for Nodes:
     public Node getRoot(){
@@ -122,9 +121,6 @@ public class GameClient extends Application{
     }
     public Character getCharacter(){
         return gameplayState.getCharacter();
-    }
-    public Networking getNetwork(){
-        return network;
     }
     public InputHandler getInputHandler(){
         return input;
@@ -228,7 +224,7 @@ public class GameClient extends Application{
     @Override
     public void destroy(){
         if(Networking.isConnected()){
-            Networking.client.close();
+            Networking.close();
         }
         super.destroy();
     }
