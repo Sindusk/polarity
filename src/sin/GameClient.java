@@ -75,9 +75,6 @@ public class GameClient extends Application{
     private Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
     private Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
     
-    // Custom Variables:
-    private InputHandler input = new InputHandler(); // Class for handling all forms of input.
-    
     // Getters for Nodes:
     public Node getRoot(){
         return rootNode;
@@ -125,9 +122,6 @@ public class GameClient extends Application{
     public Character getCharacter(){
         return gameplayState.getCharacter();
     }
-    public InputHandler getInputHandler(){
-        return input;
-    }
     public AppSettings getSettings(){
         return settings;
     }
@@ -141,6 +135,7 @@ public class GameClient extends Application{
         super.start();
     }
     public static void main(String[] args) throws IOException {
+        // Tone down loggers severely:
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         if(MODE_DEBUG){
             try {
@@ -172,20 +167,16 @@ public class GameClient extends Application{
         viewPort.attachScene(rootNode);
         guiViewPort.attachScene(guiNode);
         
-        // Tune logger down to warnings and worse:
-        Logger.getLogger("com.jme3").setLevel(Level.WARNING);
-        
         // Initialize keybinds & Tools.
         T.initialize(app);
-        input = new InputHandler();
-        input.initialize(app, context);
+        InputHandler.initialize(app, context);
         
         // Initialize new HUD & remove debug HUD elements:
         Networking.initialize(app);
         RecoilManager.initialize(app);
         Weapons.initialize(app);
         PlayerManager.initialize(app);
-        Character.initialize(app);
+        //Character.initialize(app);
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
         

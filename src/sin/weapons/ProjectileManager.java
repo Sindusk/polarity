@@ -36,6 +36,12 @@ public class ProjectileManager {
             //
         }
         
+        public Vector3f getLocation(){
+            return location;
+        }
+        public Vector3f getDirection(){
+            return direction;
+        }
         public String getUpdate(){
             return update;
         }
@@ -66,7 +72,7 @@ public class ProjectileManager {
             if(distance > maxDistance){
                 this.destroy();
             }
-            T.ParseUpdate(this);
+            T.ParseUpdate(this, tpf);
         }
         public void create(Vector3f location, Vector3f direction, float speed, float distance, String update, String collision){
             this.location = location;
@@ -85,6 +91,7 @@ public class ProjectileManager {
             T.addv3f(location, direction);
             projectile.setLocalTranslation(location);
             used = true;
+            T.InitializeUpdate(this);
         }
         public void destroy(){
             distance = 0;

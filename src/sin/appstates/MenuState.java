@@ -39,6 +39,13 @@ public class MenuState extends AbstractAppState implements ScreenController {
         super.initialize(stateManager, app);
         MenuState.app = (GameClient) app;
         
+        //Turn off the super annoying loggers:
+        Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
+        Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
+        Logger.getLogger("NiftyEventBusLog").setLevel(Level.SEVERE);
+        Logger.getAnonymousLogger().getParent().setLevel(java.util.logging.Level.SEVERE);
+        Logger.getLogger("de.lessvoid.nifty.*").setLevel(java.util.logging.Level.SEVERE);
+        
         // Initialize nifty display:
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
                 MenuState.app.getAssetManager(), MenuState.app.getInputManager(),
@@ -46,11 +53,6 @@ public class MenuState extends AbstractAppState implements ScreenController {
         this.nifty = niftyDisplay.getNifty();
         nifty.fromXml("Interface/GUI.xml", "menu");
         MenuState.app.getGuiViewPort().addProcessor(niftyDisplay);
-        
-        // Get rid of (most) logger spam:
-        Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
-        Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
-        Logger.getLogger("NiftyEventBusLog").setLevel(Level.SEVERE);
     }
     
     @Override
@@ -104,6 +106,10 @@ public class MenuState extends AbstractAppState implements ScreenController {
         else if(action.equals("game.return")){
             nifty.gotoScreen("empty");
             app.getInputManager().setCursorVisible(false);
+        }else if(action.equals("game.mainmenu")){
+            app.getStateManager().detach(app.getGameplayState());
+            nifty.gotoScreen("menu");
+            Networking.disconnect();
         }
     }
     

@@ -1,7 +1,6 @@
 package sin.weapons;
 
 import com.jme3.audio.AudioNode;
-import com.jme3.collision.CollisionResult;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.material.Material;
@@ -375,7 +374,7 @@ public class Weapons{
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            damage = new RangedBulletDamage(135f, 85f, "", "damage(5.5):destroy");
+            damage = new RangedBulletDamage(100f, 85f, "spiral(0.3)", "damage(5.5):destroy");
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;

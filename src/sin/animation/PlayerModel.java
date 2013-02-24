@@ -128,8 +128,6 @@ public class PlayerModel {
         parts[0].setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
         parts[2].setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
         parts[3].setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
-        //body[HEAD].setLocalRotation(rot);
-        //node.setLocalRotation(new Quaternion(0, rot.getX(), 0, rot.getZ()));
     }
     public void create(Node node, Vector3f loc){
         //loc = T.v3f(0, 0, 0);

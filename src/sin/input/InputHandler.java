@@ -10,8 +10,6 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector3f;
 import com.jme3.system.JmeContext;
 import sin.GameClient;
-import sin.appstates.MenuState;
-import sin.network.Networking;
 import sin.player.MovementManager;
 import sin.player.MovementManager.MH;
 import sin.weapons.RecoilManager;
@@ -19,10 +17,10 @@ import sin.weapons.TracerManager;
 import sin.world.DecalManager;
 
 /**
- *
+ * InputHandler - Handles all input from users and organizes them based on conditions.
  * @author SinisteRing
  */
-public class InputHandler{// implements ActionListener, AnalogListener{
+public class InputHandler{
     private static GameClient app;
     
     // Constant Variables:
@@ -32,7 +30,7 @@ public class InputHandler{// implements ActionListener, AnalogListener{
         return app.getStateManager().hasState(app.getGameplayState()) && app.getMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
     }
     
-    private ActionListener gameplayAction = new ActionListener(){
+    private static ActionListener gameplayAction = new ActionListener(){
         public void onAction(String bind, boolean down, float tpf){
             if(!inGameplay()){
                 return;
@@ -75,15 +73,13 @@ public class InputHandler{// implements ActionListener, AnalogListener{
                 }else if(bind.equals("Misc_Key_4")){
                     //
                 }else if(bind.equals("Game_Menu")){
-                    //app.getStateManager().detach(app.getGameplayState());
                     app.getMenuState().getNifty().gotoScreen("game.menu");
                     app.getInputManager().setCursorVisible(true);
-                    Networking.disconnect();
                 }
             }
         }
     };
-    private AnalogListener gameplayAnalog = new AnalogListener(){
+    private static AnalogListener gameplayAnalog = new AnalogListener(){
         public void onAnalog(String name, float value, float tpf) {
             if(!inGameplay()){
                 return;
@@ -100,20 +96,21 @@ public class InputHandler{// implements ActionListener, AnalogListener{
             }
         }
     };
-
-    private void createMapping(String name, KeyTrigger trigger){
+    
+    private static void createMapping(String name, KeyTrigger trigger){
         app.getInputManager().addMapping(name, trigger);
         app.getInputManager().addListener(gameplayAction, name);
     }
-    private void createMapping(String name, MouseButtonTrigger trigger){
+    private static void createMapping(String name, MouseButtonTrigger trigger){
         app.getInputManager().addMapping(name, trigger);
         app.getInputManager().addListener(gameplayAction, name);
     }
-    private void createMapping(String name, MouseAxisTrigger trigger){
+    private static void createMapping(String name, MouseAxisTrigger trigger){
         app.getInputManager().addMapping(name, trigger);
         app.getInputManager().addListener(gameplayAnalog, name);
     }
-    public void initialize(GameClient app, JmeContext context){
+    
+    public static void initialize(GameClient app, JmeContext context){
         InputHandler.app = app;
         // Camera:
         createMapping("Cam_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));

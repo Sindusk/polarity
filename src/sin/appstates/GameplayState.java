@@ -35,7 +35,7 @@ public class GameplayState extends AbstractAppState {
     private Character character;    // Used for character (user) control.
     private HUD hud = new HUD();    // Used for GUI and HUD elements.
     
-    // All nodes used for use in the Gameplay:
+    // All nodes used in the Gameplay:
     private Node root;      // Root Node.
     private Node gui;       // Node for 2D GUI.
     private Node world;     // Node for 3D world.
@@ -106,6 +106,7 @@ public class GameplayState extends AbstractAppState {
         
         // Initialize Projectiles:
         AmmoManager.initialize(app);
+        Character.initialize(app);
         DamageManager.initialize(app);
         DecalManager.initialize(app);
         MovementManager.initialize(app);
@@ -140,7 +141,7 @@ public class GameplayState extends AbstractAppState {
         super.cleanup();
         app.getRoot().detachChild(root);
         app.getGUI().detachChild(gui);
-        gui.detachAllChildren();
+        //gui.detachAllChildren();
         //world.detachChild(character.getNode());
         app.getInputManager().setCursorVisible(true);
     }

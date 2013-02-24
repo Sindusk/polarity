@@ -65,7 +65,7 @@ public class HUD {
     }
 
     // Constant Variables:
-    private static final float CROSSHAIR_LENGTH = 18;
+    private static final float CROSSHAIR_LENGTH = 16;
     private static final float CROSSHAIR_OFFSET = 5;
     private static final float CROSSHAIR_WIDTH = 3.2f;
     private static final int FTEXT_NUM = 50;
