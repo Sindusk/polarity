@@ -195,6 +195,10 @@ public class World {
         return app.getBulletAppState();
     }
     
+    public static void generateWorldData(){
+        
+    }
+    
     public static Node genZone(int var, int x, int y, int z){
         Node node = new Node();
         Geometry geo;

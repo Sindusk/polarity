@@ -3,6 +3,7 @@ package sin.hud;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
@@ -141,7 +142,22 @@ public class HUD {
             i++;
         }
         Vector3f ploc = app.getCharacter().getLocation();
-        loc.setText("X: "+String.format("%5.0f", ploc.getX())+"\nY: "+String.format("%5.0f", ploc.getY())+"\nZ: "+String.format("%5.0f", ploc.getZ()));
+        Vector3f pdir = app.getCamera().getDirection();
+        String compass;
+        if(FastMath.abs(pdir.getX()) > FastMath.abs(pdir.getZ())){
+            if(pdir.getX() > 0){
+                compass = "North";
+            }else{
+                compass = "South";
+            }
+        }else{
+            if(pdir.getZ() > 0){
+                compass = "East";
+            }else{
+                compass = "West";
+            }
+        }
+        loc.setText("X: "+String.format("%5.0f", ploc.getX())+"\nY: "+String.format("%5.0f", ploc.getY())+"\nZ: "+String.format("%5.0f", ploc.getZ())+"\nFacing: "+compass);
         RecoilManager.updateCrosshairs();
     }
     public static void clear(){

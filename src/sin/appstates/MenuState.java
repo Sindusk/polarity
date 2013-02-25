@@ -85,12 +85,16 @@ public class MenuState extends AbstractAppState implements ScreenController {
             ListBox<String> list = screen.findNiftyControl("multiplayer.serverlist", ListBox.class);
             String s = list.getSelection().get(0);
             String q = s.substring(1, s.indexOf(']'));
+            Label label = screen.findNiftyControl("multiplayer.message", Label.class);
+            label.setText("Contacting Server: "+q+"...");
             if(Networking.connect(q)){
+                label.setText("Connection Successful!");
                 action("start");
+            }else{
+                label.setText("Connection Failed.");
             }
         }else if(action.equals("multiplayer.refresh")){
             Label label = screen.findNiftyControl("multiplayer.message", Label.class);
-            label.setColor(Color.BLACK);
             label.setText("Not Yet Implemented!");
         }else if(action.equals("multiplayer.back")){
             nifty.gotoScreen("menu");
