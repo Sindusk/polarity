@@ -256,12 +256,11 @@ public class Networking {
         }
         private void WorldMessage(WorldData d){
             //world = d.getWorld();
-            final int[][] world = d.getWorld();
+            final int[][][] world = d.getWorld();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    //worldNode.detachAllChildren();
-                    app.getCharacter().kill();
                     World.create(world, app.getTerrain());
+                    app.getCharacter().kill();
                     return null;
                 }
             });

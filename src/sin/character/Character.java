@@ -20,9 +20,8 @@ public class Character {
     // Instance Variables:
     private Weapon[][] weapons = new Weapon[2][2];
     private int set = 0;
-    //private Stats charStats;
     private CharacterControl player;
-    private Node charNode = new Node();
+    private Node node = new Node();
 
     public final void create(){
         CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
@@ -38,10 +37,9 @@ public class Character {
         weapons[0][1] = b;
         weapons[1][0] = c;
         weapons[1][1] = d;
-        weapons[0][0].enable(charNode);
-        weapons[0][1].enable(charNode);
+        weapons[0][0].enable(node);
+        weapons[0][1].enable(node);
         StatsManager.createCharacter(health, shields);
-        //charStats = new Stats(health, shields);
         this.create();
     }
 
@@ -60,7 +58,7 @@ public class Character {
         return player;
     }
     public Node getNode(){
-        return charNode;
+        return node;
     }
     public Weapon getWeapon(boolean left){
         if(left){
@@ -95,8 +93,8 @@ public class Character {
         }else if(set == 1){
             set = 0;
         }
-        weapons[set][0].enable(charNode);
-        weapons[set][1].enable(charNode);
+        weapons[set][0].enable(node);
+        weapons[set][1].enable(node);
     }
 
     public void update(float tpf){

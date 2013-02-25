@@ -119,7 +119,6 @@ public class GameplayState extends AbstractAppState {
         World.initialize(app);
         World.createSinglePlayerArea(singleNode);
         hud.initialize(app, gui);
-        //dcs.initialize();
         
         character = new Character(
                 new M4A1(true), new LaserPistol(false),
@@ -141,6 +140,7 @@ public class GameplayState extends AbstractAppState {
         super.cleanup();
         app.getRoot().detachChild(root);
         app.getGUI().detachChild(gui);
+        HUD.clear();
         //gui.detachAllChildren();
         //world.detachChild(character.getNode());
         app.getInputManager().setCursorVisible(true);

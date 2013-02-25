@@ -64,15 +64,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class GameServer extends SimpleApplication implements ConnectionListener {
     
-    private static final String SERVER_VERSION = "ALPHA 0.05";
+    private static final String SERVER_VERSION = "ALPHA 0.06";
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     private Player[] players = new Player[16];
-    private int[][] world;
+    private int[][][] world;
     private Server server = null;
     
-    private Vector3f v3f(float x, float y, float z){
-        return new Vector3f(x, y, z);
-    }
     private int FindEmptyID(){
         int i = 0;
         while(i < players.length){
@@ -272,13 +269,18 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
 
     private void initWorld(){
         int x = 0;
+        int y;
         int z;
-        world = new int[World.ZONE_X_NUM][World.ZONE_Z_NUM];
+        world = new int[World.ZONE_X_NUM][World.ZONE_Y_NUM][World.ZONE_Z_NUM];
         while(x < World.ZONE_X_NUM){
-            z = 0;
-            while(z < World.ZONE_Z_NUM){
-                world[x][z] = FastMath.rand.nextInt(World.ZONE_VARIATIONS);
-                z++;
+            y = 0;
+            while(y < World.ZONE_Y_NUM){
+                z = 0;
+                while(z < World.ZONE_Z_NUM){
+                    world[x][y][z] = FastMath.rand.nextInt(World.ZONE_VARIATIONS);
+                    z++;
+                }
+                y++;
             }
             x++;
         }

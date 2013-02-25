@@ -58,13 +58,12 @@ public class World {
     private static GameClient app;
     
     // Constant Variables:
-    public static final float ZONE_SIZE = 30;
+    public static final float ZONE_WIDTH = 25;
+    public static final float ZONE_HEIGHT = 15;
     public static final int ZONE_VARIATIONS = 3;
     public static final int ZONE_X_NUM = 10;
+    public static final int ZONE_Y_NUM = 4;
     public static final int ZONE_Z_NUM = 10;
-    
-    //private static AssetManager assetManager;
-    //private static BulletAppState bulletAppState;
     
     // Create Geometry class:
     public static class CG{
@@ -196,46 +195,48 @@ public class World {
         return app.getBulletAppState();
     }
     
-    public static Node genZone(int var, int x, int z){
+    public static Node genZone(int var, int x, int y, int z){
         Node node = new Node();
         Geometry geo;
-        float geoSize = ZONE_SIZE/2;
+        float geoSize = ZONE_WIDTH/2;
         if(var == 0){
-            CG.createPhyBox(node, "floor", T.v3f(geoSize, .1f, geoSize), T.v3f(0, 0, 0), "Textures/wall.png", T.v2f(1, 1));
+            CG.createPhyBox(node, "floor", T.v3f(geoSize, 1f, geoSize), T.v3f(0, 0, 0), "Textures/wall.png", T.v2f(1, 1));
             geo = CG.createPhyCylinder(node, "pillar", geoSize/5, geoSize, T.v3f(0, geoSize/2, 0), "Textures/wall.png", T.v2f(1, 1));
             geo.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.PI/2, Vector3f.UNIT_X));
         }else if(var == 1){
-            CG.createPhyBox(node, "floor", T.v3f(geoSize, .1f, geoSize), T.v3f(0, 0, 0), "Textures/brick.png", T.v2f(1, 1));
+            CG.createPhyBox(node, "floor", T.v3f(geoSize, 1f, geoSize), T.v3f(0, 0, 0), "Textures/brick.png", T.v2f(1, 1));
             CG.createPhyBox(node, "flybox", T.v3f(geoSize/4, geoSize/4, geoSize/4), T.v3f(0, geoSize, 0), "Textures/brick.png", T.v2f(1, 1));
         }else if(var == 2){
-            CG.createPhyBox(node, "floor", T.v3f(geoSize, .1f, geoSize), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
+            CG.createPhyBox(node, "floor", T.v3f(geoSize, 1f, geoSize), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
         }
-        node.setLocalTranslation(x*ZONE_SIZE, 0, z*ZONE_SIZE);
+        node.setLocalTranslation(x*ZONE_WIDTH, y*ZONE_HEIGHT, z*ZONE_WIDTH);
         return node;
     }
     
-    public static void initialize(GameClient app){
-        World.app = app;
-    }
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
         CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(5, 5));
         CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), "Textures/brick.png", T.v2f(50, 20));
     }
-    public static void create(int[][] world, Node node){
+    public static void create(int[][][] world, Node node){
         int x = 0;
+        int y;
         int z;
         while(x < world.length){
-            z = 0;
-            while(z < world[x].length){
-                if(!(x == world.length/2 && z == world[x].length/2)) {
-                    node.attachChild(genZone(world[x][z], x-(world.length/2), z-(world[x].length/2)));
-                }else{
-                    CG.createPhyBox(node, "Start", T.v3f(World.ZONE_SIZE/2, 5, World.ZONE_SIZE/2), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
+            y = 0;
+            while(y < world[x].length){
+                z = 0;
+                while(z < world[x][y].length){
+                    node.attachChild(genZone(world[x][y][z], x-(world.length/2), y-(world[x].length/2), z-(world[x][y].length/2)));
+                    z++;
                 }
-                z++;
+                y++;
             }
             x++;
         }
+    }
+    
+    public static void initialize(GameClient app){
+        World.app = app;
     }
 }

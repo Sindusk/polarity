@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package sin.netdata;
 
 import com.jme3.network.AbstractMessage;
@@ -13,15 +9,15 @@ import com.jme3.network.serializing.Serializable;
  */
 @Serializable
 public class WorldData extends AbstractMessage {
-    private int[][] world;
+    private int[][][] world;
     public WorldData(){
         //
     }
-    public WorldData(int[][] world){
+    public WorldData(int[][][] world){
         this.world = world;
         this.setReliable(true);
     }
-    public int[][] getWorld(){
+    public int[][][] getWorld(){
         return world;
     }
 }

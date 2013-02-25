@@ -20,7 +20,7 @@ import sin.world.World;
 public class HUD {
     private static GameClient app;
     
-    private class FloatingText{
+    private static class FloatingText{
         // Constant Variables:
         private static final float SIZE = 1;
         private static final float TIME = 0.5f;
@@ -72,9 +72,10 @@ public class HUD {
 
     // Instance Variables:
     private static Node node = new Node("GUI");      // Node used to attach/detach GUI and HUD elements.
-    private float cx, cy;
-    private FloatingText[] texts = new FloatingText[FTEXT_NUM];
-    private BitmapText ping;
+    private static float cx, cy;
+    private static FloatingText[] texts = new FloatingText[FTEXT_NUM];
+    private static BitmapText ping;
+    private static BitmapText loc;
     private static Geometry[] crosshair = new Geometry[4];
 
     public HUD(){
@@ -88,7 +89,7 @@ public class HUD {
         return ping;
     }
     
-    private void createCrosshairs(float length, float offset, float width){
+    private static void createCrosshairs(float length, float offset, float width){
         crosshair[0] = World.CG.createLine(node, "", width, T.v3f(cx-(length+offset), cy), T.v3f(cx-offset, cy), ColorRGBA.Red);
         crosshair[1] = World.CG.createLine(node, "", width, T.v3f(cx, cy-(length+offset)), T.v3f(cx, cy-offset), ColorRGBA.Red);
         crosshair[2] = World.CG.createLine(node, "", width, T.v3f(cx+(length+offset), cy), T.v3f(cx+offset, cy), ColorRGBA.Red);
@@ -139,32 +140,29 @@ public class HUD {
             }
             i++;
         }
+        Vector3f ploc = app.getCharacter().getLocation();
+        loc.setText("X: "+String.format("%5.0f", ploc.getX())+"\nY: "+String.format("%5.0f", ploc.getY())+"\nZ: "+String.format("%5.0f", ploc.getZ()));
         RecoilManager.updateCrosshairs();
     }
-    public void initialize(GameClient app, Node root){
+    public static void clear(){
+        node.detachAllChildren();
+    }
+    public static void initialize(GameClient app, Node root){
         HUD.app = app;
         root.attachChild(node);
         
         // Get the center coordinates for the screen:
-        this.cx = app.getSettings().getWidth()/2;
-        this.cy = app.getSettings().getHeight()/2;
+        cx = app.getSettings().getWidth()/2;
+        cy = app.getSettings().getHeight()/2;
 
         // Create crosshairs:
         createCrosshairs(CROSSHAIR_LENGTH, CROSSHAIR_OFFSET, CROSSHAIR_WIDTH);
 
         // Create dynamic bar UI elements:
-        //bar[HEALTH] = new DynamicBar(0, T.v2f(cx, 30), 200, 40, 25, ColorRGBA.Red, 100, true);
-        //bar[HEALTH].create(node);
-        //bar[SHIELD] = new DynamicBar(0, T.v2f(cx, 90), 200, 40, 25, ColorRGBA.Blue, 100, true);
-        //bar[SHIELD].create(node);
-        //bar[AMMO_LEFT] = new DynamicBar(1, T.v2f(cx-130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
-        //bar[AMMO_LEFT].create(node);
-        //bar[AMMO_RIGHT] = new DynamicBar(1, T.v2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
         BarManager.add(node, BH.HEALTH, 0, T.v2f(cx, 30), 200, 40, 25, ColorRGBA.Red, 100, true);
         BarManager.add(node, BH.SHIELDS, 0, T.v2f(cx, 90), 200, 40, 25, ColorRGBA.Blue, 100, true);
         BarManager.add(node, BH.AMMO_LEFT, 1, T.v2f(cx-130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
         BarManager.add(node, BH.AMMO_RIGHT, 1, T.v2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
-        //bar[AMMO_RIGHT].create(node);
 
         // Initialize ping display:
         ping = new BitmapText(T.getFont("Tele-Marines"));
@@ -173,6 +171,14 @@ public class HUD {
         ping.setLocalTranslation(T.v3f(20, cy*2-20));
         ping.setText("Not Connected");
         node.attachChild(ping);
+        
+        // Initialize location display:
+        loc = new BitmapText(T.getFont("Batman26"));
+        loc.setColor(ColorRGBA.Cyan);
+        loc.setSize(14);
+        loc.setLocalTranslation(T.v3f(20, cy*2-40));
+        loc.setText("Location: X, Y, Z");
+        node.attachChild(loc);
 
         // Initialize floating texts:
         int i = 0;
