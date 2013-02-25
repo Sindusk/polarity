@@ -1,7 +1,6 @@
 package sin.weapons;
 
 import sin.GameClient;
-import sin.hud.BarManager;
 import sin.hud.BarManager.BH;
 
 /**
@@ -12,10 +11,10 @@ public class AmmoManager {
     private static GameClient app;
     
     public static class Ammo{
-        protected boolean reloading = false;
+        private boolean reloading = false;
         private int clip;
-        protected int max;
-        public BH barIndex;
+        private int max;
+        private BH barIndex;
 
         public Ammo(int max, boolean left){
             this.clip = max;
@@ -36,11 +35,24 @@ public class AmmoManager {
         public void decClip(){
             this.clip--;
         }
+        
+        public void setReloading(boolean reloading){
+            this.reloading = reloading;
+        }
+        public boolean isReloading(){
+            return reloading;
+        }
         public void setClip(int clip){
             this.clip = clip;
         }
         public int getClip(){
             return clip;
+        }
+        public int getMax(){
+            return max;
+        }
+        public BH getBarIndex(){
+            return barIndex;
         }
 
         public void updateBar(){
@@ -63,8 +75,8 @@ public class AmmoManager {
 
         @Override
         public float reload(){
-            reloading = true;
-            this.setClip(max);
+            this.setReloading(true);
+            this.setClip(this.getMax());
             return time;
         }
     }
@@ -79,7 +91,7 @@ public class AmmoManager {
 
         @Override
         public void recharge(float tpf){
-            if(this.getClip() < max){
+            if(this.getClip() < this.getMax()){
                 time += tpf;
                 if(time >= interval){
                     this.incClip();

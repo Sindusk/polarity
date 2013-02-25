@@ -10,6 +10,7 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector3f;
 import com.jme3.system.JmeContext;
 import sin.GameClient;
+import sin.hud.HUD;
 import sin.player.MovementManager;
 import sin.player.MovementManager.MH;
 import sin.weapons.RecoilManager;
@@ -75,6 +76,7 @@ public class InputHandler{
                 }else if(bind.equals("Game_Menu")){
                     app.getMenuState().getNifty().gotoScreen("game.menu");
                     app.getInputManager().setCursorVisible(true);
+                    HUD.showCrosshairs(false);
                 }
             }
         }

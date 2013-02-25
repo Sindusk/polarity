@@ -14,6 +14,7 @@ import de.lessvoid.nifty.tools.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
+import sin.hud.HUD;
 import sin.network.Networking;
 
 /**
@@ -106,6 +107,7 @@ public class MenuState extends AbstractAppState implements ScreenController {
         else if(action.equals("game.return")){
             nifty.gotoScreen("empty");
             app.getInputManager().setCursorVisible(false);
+            HUD.showCrosshairs(true);
         }else if(action.equals("game.mainmenu")){
             app.getStateManager().detach(app.getGameplayState());
             nifty.gotoScreen("menu");

@@ -25,7 +25,7 @@ public class Character {
     private Node charNode = new Node();
 
     public final void create(){
-        CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 10f, 1);
+        CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
         player = new CharacterControl(capsuleShape, 0.05f);
         player.setJumpSpeed(30);
         player.setFallSpeed(30);

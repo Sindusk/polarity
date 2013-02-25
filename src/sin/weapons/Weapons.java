@@ -243,7 +243,7 @@ public class Weapons{
         public void updateModel(){
             super.updateModel();
             Quaternion rot = app.getCamera().getRotation().clone();
-            if(ammo.reloading){
+            if(ammo.isReloading()){
                 rot.multLocal(new Quaternion().fromAngleAxis(FastMath.PI/16, Vector3f.UNIT_X));
             }
             model.setLocalRotation(rot);
@@ -256,7 +256,7 @@ public class Weapons{
         @Override
         public void enable(Node node){
             super.enable(node);
-            app.getHUD().setBarMax(ammo.barIndex, ammo.max);
+            app.getHUD().setBarMax(ammo.getBarIndex(), ammo.getMax());
             ammo.updateBar();
         }
         @Override
@@ -268,10 +268,10 @@ public class Weapons{
         @Override
         public void tick(float tpf){
             if(cooling == 0){
-                if(ammo.reloading){
-                    ammo.reloading = false;
+                if(ammo.isReloading()){
+                    ammo.setReloading(false);
                     ammo.updateBar();
-                }else if(ammo.getClip() == 0 && !ammo.reloading){
+                }else if(ammo.getClip() == 0 && !ammo.isReloading()){
                     this.reload();
                     return;
                 }else if(firing){
@@ -282,7 +282,7 @@ public class Weapons{
         }
         
         public void reload(){
-            if(!ammo.reloading) {
+            if(!ammo.isReloading() && ammo.getClip() != ammo.getMax()) {
                 cooling += ammo.reload();
             }
         }
@@ -304,7 +304,7 @@ public class Weapons{
         @Override
         public void enable(Node node){
             super.enable(node);
-            app.getHUD().setBarMax(ammo.barIndex, ammo.max);
+            app.getHUD().setBarMax(ammo.getBarIndex(), ammo.getMax());
             ammo.updateBar();
         }
         @Override

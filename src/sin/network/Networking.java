@@ -5,6 +5,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
+import com.jme3.network.ClientStateListener;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
@@ -94,6 +95,7 @@ public class Networking {
                 return false;
             }
             Networking.registerSerials();
+            client.addClientStateListener(new ClientListener());
             client.start();
             client.send(new ConnectData(app.getVersion()));
             timers[PING] = 1;
@@ -144,7 +146,7 @@ public class Networking {
         }
     }
 
-    private static class ClientListener implements MessageListener<Client> {
+    private static class ClientListener implements MessageListener<Client>, ClientStateListener {
         private Client client;
 
         private void ConnectMessage(ConnectData d){
@@ -290,6 +292,14 @@ public class Networking {
             }else if(m instanceof WorldData){
                 WorldMessage((WorldData) m);
             }
+        }
+
+        public void clientConnected(Client c) {
+            T.log("Welcome to the server.");
+        }
+
+        public void clientDisconnected(Client c, DisconnectInfo info) {
+            app.getMenuState().action("game.mainmenu");
         }
     }
     

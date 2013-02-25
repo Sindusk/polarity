@@ -75,7 +75,7 @@ public class HUD {
     private float cx, cy;
     private FloatingText[] texts = new FloatingText[FTEXT_NUM];
     private BitmapText ping;
-    private Geometry[] crosshair = new Geometry[4];
+    private static Geometry[] crosshair = new Geometry[4];
 
     public HUD(){
         //
@@ -117,6 +117,18 @@ public class HUD {
     }
     public void updateBar(BH handle, int value){
         BarManager.updateBar(handle, value);
+    }
+    
+    public static void showCrosshairs(boolean show){
+        int i = 0;
+        while(i < crosshair.length){
+            if(show){
+                node.attachChild(crosshair[i]);
+            }else{
+                node.detachChild(crosshair[i]);
+            }
+            i++;
+        }
     }
 
     public void update(float tpf){

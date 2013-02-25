@@ -16,9 +16,9 @@ import sin.weapons.ProjectileManager;
 import sin.weapons.RecoilManager;
 import sin.weapons.TracerManager;
 import sin.weapons.Weapons.AK47;
+import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
 import sin.weapons.Weapons.Raygun;
-import sin.weapons.Weapons.Sword;
 import sin.world.DecalManager;
 import sin.world.World;
 
@@ -122,7 +122,7 @@ public class GameplayState extends AbstractAppState {
         //dcs.initialize();
         
         character = new Character(
-                new M4A1(true), new Sword(false),
+                new M4A1(true), new LaserPistol(false),
                 new Raygun(true), new AK47(false), 100, 100);
         world.attachChild(character.getNode());
         
