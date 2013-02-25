@@ -6,7 +6,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.data.ProjectileData;
+import sin.netdata.ProjectileData;
 import sin.network.Networking;
 import sin.tools.T;
 import sin.world.World;

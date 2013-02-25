@@ -13,18 +13,18 @@ import com.jme3.network.serializing.Serializer;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import sin.GameClient;
-import sin.data.ConnectData;
-import sin.data.DecalData;
-import sin.data.DisconnectData;
-import sin.data.ErrorData;
-import sin.data.IDData;
-import sin.data.MoveData;
-import sin.data.PingData;
-import sin.data.ProjectileData;
-import sin.data.ShotData;
-import sin.data.SoundData;
-import sin.data.WorldData;
-import sin.player.PlayerManager;
+import sin.netdata.ConnectData;
+import sin.netdata.DecalData;
+import sin.netdata.DisconnectData;
+import sin.netdata.ErrorData;
+import sin.netdata.IDData;
+import sin.netdata.MoveData;
+import sin.netdata.PingData;
+import sin.netdata.ProjectileData;
+import sin.netdata.ShotData;
+import sin.netdata.SoundData;
+import sin.netdata.WorldData;
+import sin.character.PlayerManager;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
 import sin.world.DecalManager;
@@ -43,7 +43,7 @@ public class Networking {
     private static int     CLIENT_ID = -1;
     // Constant Variables:
     private static final float PING_INTERVAL = 1;
-    private static final float MOVE_INTERVAL = 0.2f;
+    private static final float MOVE_INTERVAL = 0.1f;
 
     // Index Holders:
     private static final int PING = 0;

@@ -4,10 +4,10 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import sin.GameClient;
-import sin.data.DecalData;
-import sin.data.ShotData;
+import sin.netdata.DecalData;
+import sin.netdata.ShotData;
 import sin.network.Networking;
-import sin.player.PlayerManager;
+import sin.character.PlayerManager;
 import sin.tools.T;
 import sin.world.DecalManager;
 

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package sin.data;
+package sin.netdata;
 
 import com.jme3.network.AbstractMessage;
 import com.jme3.network.serializing.Serializable;
@@ -12,16 +12,15 @@ import com.jme3.network.serializing.Serializable;
  * @author SinisteRing
  */
 @Serializable
-public class WorldData extends AbstractMessage {
-    private int[][] world;
-    public WorldData(){
+public class DisconnectData extends AbstractMessage {
+    private int id;
+    public DisconnectData(){
         //
     }
-    public WorldData(int[][] world){
-        this.world = world;
-        this.setReliable(true);
+    public DisconnectData(int id){
+        this.id = id;
     }
-    public int[][] getWorld(){
-        return world;
+    public int getID(){
+        return id;
     }
 }

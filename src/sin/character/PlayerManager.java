@@ -1,4 +1,4 @@
-package sin.player;
+package sin.character;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;

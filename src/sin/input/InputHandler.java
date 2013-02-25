@@ -11,8 +11,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.system.JmeContext;
 import sin.GameClient;
 import sin.hud.HUD;
-import sin.player.MovementManager;
-import sin.player.MovementManager.MH;
+import sin.character.MovementManager;
+import sin.character.MovementManager.MH;
 import sin.weapons.RecoilManager;
 import sin.weapons.TracerManager;
 import sin.world.DecalManager;
@@ -132,6 +132,10 @@ public class InputHandler{
         // Actions:
         createMapping("Reload", new KeyTrigger(KeyInput.KEY_R));
         createMapping("Swap", new KeyTrigger(KeyInput.KEY_Q));
+        createMapping("Ability_1", new KeyTrigger(KeyInput.KEY_1));
+        createMapping("Ability_2", new KeyTrigger(KeyInput.KEY_2));
+        createMapping("Ability_3", new KeyTrigger(KeyInput.KEY_3));
+        createMapping("Ability_4", new KeyTrigger(KeyInput.KEY_4));
         // Miscellaneous:
         createMapping("Game_Menu", new KeyTrigger(KeyInput.KEY_ESCAPE));
         createMapping("Misc_Key_1", new KeyTrigger(KeyInput.KEY_V));

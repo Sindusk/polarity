@@ -1,4 +1,4 @@
-package sin.data;
+package sin.netdata;
 
 import com.jme3.network.AbstractMessage;
 import com.jme3.network.serializing.Serializable;

@@ -58,7 +58,7 @@ public class World {
     private static GameClient app;
     
     // Constant Variables:
-    public static final float ZONE_SIZE = 50;
+    public static final float ZONE_SIZE = 30;
     public static final int ZONE_VARIATIONS = 3;
     public static final int ZONE_X_NUM = 10;
     public static final int ZONE_Z_NUM = 10;

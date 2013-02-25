@@ -1,4 +1,4 @@
-package sin.player;
+package sin.character;
 
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.control.CharacterControl;

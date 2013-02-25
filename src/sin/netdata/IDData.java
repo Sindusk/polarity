@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package sin.data;
+package sin.netdata;
 
 import com.jme3.network.AbstractMessage;
 import com.jme3.network.serializing.Serializable;

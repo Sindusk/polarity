@@ -1,4 +1,4 @@
-package sin.data;
+package sin.netdata;
 
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;

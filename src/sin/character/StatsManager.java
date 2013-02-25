@@ -1,10 +1,10 @@
-package sin.player;
+package sin.character;
 
 import com.jme3.math.FastMath;
 import java.util.HashMap;
 import sin.GameClient;
 import sin.hud.BarManager;
-import sin.player.PlayerManager.Player;
+import sin.character.PlayerManager.Player;
 
 /**
  * StatsManager - Used for the managment of player stats.

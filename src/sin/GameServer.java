@@ -16,17 +16,17 @@ import com.jme3.renderer.RenderManager;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sin.data.ConnectData;
-import sin.data.DecalData;
-import sin.data.DisconnectData;
-import sin.data.ErrorData;
-import sin.data.IDData;
-import sin.data.MoveData;
-import sin.data.PingData;
-import sin.data.ProjectileData;
-import sin.data.ShotData;
-import sin.data.SoundData;
-import sin.data.WorldData;
+import sin.netdata.ConnectData;
+import sin.netdata.DecalData;
+import sin.netdata.DisconnectData;
+import sin.netdata.ErrorData;
+import sin.netdata.IDData;
+import sin.netdata.MoveData;
+import sin.netdata.PingData;
+import sin.netdata.ProjectileData;
+import sin.netdata.ShotData;
+import sin.netdata.SoundData;
+import sin.netdata.WorldData;
 import sin.world.*;
 
 /**
