@@ -91,6 +91,9 @@ public class MovementManager {
 
         app.getCharacter().getPlayer().setWalkDirection(wd);
         app.getCharacter().getNode().setLocalTranslation(app.getCamera().getLocation());
+        if(app.getCharacter().getLocation().getY() < -20){
+            app.getCharacter().kill();
+        }
         //UpdateWeaponUI();
     }
     

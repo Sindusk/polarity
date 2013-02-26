@@ -1,7 +1,6 @@
 package sin;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.ConnectionListener;
@@ -14,7 +13,6 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.netdata.ConnectData;
@@ -68,7 +66,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     private static final String SERVER_VERSION = "ALPHA 0.06";
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     private Player[] players = new Player[16];
-    private ArrayList<GeometryData> map;
+    //private ArrayList<GeometryData> map;
     private Server server = null;
     
     private int FindEmptyID(){
@@ -83,8 +81,8 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     }
     private void sendGeometry(HostedConnection c){
         int i = 0;
-        while(i < map.size()){
-            c.send(map.get(i));
+        while(i < World.getMap().size()){
+            c.send(World.getMap().get(i));
             i++;
         }
     }
@@ -127,8 +125,6 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
         server.addMessageListener(new ServerListener(), ShotData.class);
         Serializer.registerClass(SoundData.class);
         server.addMessageListener(new ServerListener(), SoundData.class);
-        //Serializer.registerClass(WorldData.class);
-        //server.addMessageListener(new ServerListener(), WorldData.class);
     }
     
     private class ServerListener implements MessageListener<HostedConnection>{
@@ -172,7 +168,6 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
                 players[id].connect();
                 players[id].setConnection(connection);
                 server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
-                //connection.send(new WorldData(world));
                 sendGeometry(connection);
             }else{
                 int id = FindEmptyID();
@@ -277,28 +272,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
         app.showSettings = false;
         app.start();
     }
-
-    private void initWorld(){
-        map = World.generateWorldData();
-    }
-    /*private void initWorld(){
-        int x = 0;
-        int y;
-        int z;
-        world = new int[World.ZONE_X_NUM][World.ZONE_Y_NUM][World.ZONE_Z_NUM];
-        while(x < World.ZONE_X_NUM){
-            y = 0;
-            while(y < World.ZONE_Y_NUM){
-                z = 0;
-                while(z < World.ZONE_Z_NUM){
-                    world[x][y][z] = FastMath.rand.nextInt(World.ZONE_VARIATIONS);
-                    z++;
-                }
-                y++;
-            }
-            x++;
-        }
-    }*/
+    
     @Override
     public void simpleInitApp() {
         try {
@@ -315,7 +289,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
             i++;
         }
         flyCam.setDragToRotate(true);
-        initWorld();
+        World.generateWorldData();
     }
 
     @Override

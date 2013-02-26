@@ -19,6 +19,7 @@ import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
 import sin.weapons.Weapons.Raygun;
+import sin.world.CG;
 import sin.world.DecalManager;
 import sin.world.World;
 
@@ -106,6 +107,7 @@ public class GameplayState extends AbstractAppState {
         
         // Initialize Projectiles:
         AmmoManager.initialize(app);
+        CG.initialize(app);
         Character.initialize(app);
         AttackManager.initialize(app);
         DecalManager.initialize(app);

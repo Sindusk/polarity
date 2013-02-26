@@ -19,6 +19,7 @@ import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture.WrapMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import sin.GameClient;
 import sin.netdata.GeometryData;
 import sin.tools.T;
@@ -59,168 +60,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 public class World {
     private static GameClient app;
     
+    private static HashMap<Vector3f, String> world = new HashMap();
+    private static ArrayList<GeometryData> map = new ArrayList();
+    
     // Constant Variables:
-    public static final float ZONE_WIDTH = 25;
-    public static final float ZONE_HEIGHT = 15;
+    public static final float ZONE_WIDTH = 10;
+    public static final float ZONE_HEIGHT = 5;
     public static final int ZONE_VARIATIONS = 3;
     public static final int ZONE_X_NUM = 10;
     public static final int ZONE_Y_NUM = 4;
     public static final int ZONE_Z_NUM = 10;
     
-    // Create Geometry class:
-    public static class CG{
-        private static Material getMaterial(ColorRGBA color){
-            Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            m.setColor("Color", color);
-            if(color.getAlpha() < 1){
-                m.setTransparent(true);
-                m.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-            }
-            return m;
-        }
-        private static Material getMaterial(String tex){
-            Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            m.setTexture("ColorMap", app.getAssetManager().loadTexture(tex));
-            m.getTextureParam("ColorMap").getTextureValue().setWrap(WrapMode.Repeat);
-            return m;
-        }
-        
-        // Boxes:
-        public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
-            Box b = new Box(trans, size.getX(), size.getY(), size.getZ());
-            Geometry g = new Geometry(name, b);
-            Material m = getMaterial(color);
-            g.setMaterial(m);
-            if(node != null) {
-                node.attachChild(g);
-            }
-            return g;
-        }
-        public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, String tex, Vector2f scale){
-            Box b = new Box(trans, size.getX(), size.getY(), size.getZ());
-            b.scaleTextureCoordinates(scale);
-            Geometry g = new Geometry(name, b);
-            Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            m.setTexture("ColorMap", app.getAssetManager().loadTexture(tex));
-            m.getTextureParam("ColorMap").getTextureValue().setWrap(WrapMode.Repeat);
-            g.setMaterial(m);
-            if(node != null) {
-                node.attachChild(g);
-            }
-            return g;
-        }
-        public static Geometry createBox(Node node, GeometryData d){
-            Geometry g = createBox(node, "", d.getSize(), d.getTrans(), d.getTex(), d.getScale());
-            if(d.getRot() != null){
-                g.setLocalRotation(d.getRot());
-            }
-            return g;
-        }
-        public static Geometry createPhyBox(Node node, String name, Vector3f size, Vector3f trans, String tex, Vector2f scale){
-            Geometry g = createBox(node, name, size, trans, tex, scale);
-            CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
-            RigidBodyControl rbc = new RigidBodyControl(cs, 0);
-            rbc.setKinematic(true);
-            g.addControl(rbc);
-            app.getBulletAppState().getPhysicsSpace().add(rbc);
-            return g;
-        }
-        public static Geometry createPhyBox(Node node, GeometryData d){
-            Geometry g = createPhyBox(node, "", d.getSize(), d.getTrans(), d.getTex(), d.getScale());
-            if(d.getRot() != null){
-                g.setLocalRotation(d.getRot());
-            }
-            return g;
-        }
-        
-        // Cylinders:
-        public static Geometry createCylinder(Node node, String name, float radius, float length, Vector3f trans, ColorRGBA color, Vector2f scale){
-            Cylinder b = new Cylinder(16, 16, radius, length, true);
-            b.scaleTextureCoordinates(scale);
-            Geometry g = new Geometry(name, b);
-            Material m = getMaterial(color);
-            g.setMaterial(m);
-            g.setLocalTranslation(trans);
-            if(node != null) {
-                node.attachChild(g);
-            }
-            return g;
-        }
-        public static Geometry createCylinder(Node node, String name, float radius, float length, Vector3f trans, String tex, Vector2f scale){
-            Cylinder b = new Cylinder(16, 16, radius, length, true);
-            b.scaleTextureCoordinates(scale);
-            Geometry g = new Geometry(name, b);
-            Material m = getMaterial(tex);
-            g.setMaterial(m);
-            g.setLocalTranslation(trans);
-            if(node != null) {
-                node.attachChild(g);
-            }
-            return g;
-        }
-        public static Geometry createPhyCylinder(Node node, String name, float radius, float length, Vector3f trans, String tex, Vector2f scale){
-            Geometry g = createCylinder(node, name, radius, length, trans, tex, scale);
-            CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
-            RigidBodyControl rbc = new RigidBodyControl(cs, 0);
-            rbc.setKinematic(true);
-            g.addControl(rbc);
-            app.getBulletAppState().getPhysicsSpace().add(rbc);
-            return g;
-        }
-        
-        // Lines:
-        public static Geometry createLine(Node node, String name, float width, Vector3f start, Vector3f stop, ColorRGBA color){
-            Line b = new Line(start, stop);
-            b.setLineWidth(width);
-            Geometry g = new Geometry(name, b);
-            Material m = getMaterial(color);
-            g.setMaterial(m);
-            if(node != null) {
-                node.attachChild(g);
-            }
-            return g;
-        }
-        
-        // Spheres:
-        public static Geometry createSphere(Node node, String name, float radius, Vector3f trans, ColorRGBA color){
-            Sphere b = new Sphere(16, 16, radius);
-            Geometry g = new Geometry(name, b);
-            Material m = getMaterial(color);
-            g.setMaterial(m);
-            g.setLocalTranslation(trans);
-            if(node != null) {
-                node.attachChild(g);
-            }
-            return g;
-        }
-        public static Geometry createSphere(Node node, String name, float radius, Vector3f trans, String tex, Sphere.TextureMode mode){
-            Sphere b = new Sphere(16, 16, radius);
-            b.setTextureMode(mode);
-            Geometry g = new Geometry(name, b);
-            Material m = getMaterial(tex);
-            g.setMaterial(m);
-            g.setLocalTranslation(trans);
-            if(node != null) {
-                node.attachChild(g);
-            }
-            return g;
-        }
-    }
-    
     public static BulletAppState getBulletAppState(){
         return app.getBulletAppState();
+    }
+    
+    public static ArrayList<GeometryData> getMap(){
+        return map;
     }
     
     public static GeometryData geoData(String type, Vector3f size, Vector3f trans, Quaternion rot, String tex, Vector2f scale, boolean phy){
         return new GeometryData(type, size, trans, rot, tex, scale, phy);
     }
-    public static ArrayList<GeometryData> generateWorldData(){
-        ArrayList<GeometryData> map = new ArrayList();
-        map.add(geoData("box", T.v3f(ZONE_WIDTH, 1f, ZONE_WIDTH), T.v3f(0, 0, 0), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
-        map.add(geoData("box", T.v3f(1f, ZONE_HEIGHT, ZONE_WIDTH), T.v3f(-ZONE_WIDTH, ZONE_HEIGHT/2, 0), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
-        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, 1f), T.v3f(0, ZONE_HEIGHT/2, ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
-        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, 1f), T.v3f(0, ZONE_HEIGHT/2, -ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
-        return map;
+    
+    public static void generateHallway(){
+        int i = 1;
+        float height = 0;
+        float rng;
+        while(i < 10){
+            rng = FastMath.nextRandomFloat();
+            if(rng < 0.7f){ // Flat
+                map.add(geoData("box", T.v3f(ZONE_WIDTH, 1f, ZONE_WIDTH), T.v3f(i*ZONE_WIDTH*2, height, 0), null, T.getMaterial("lava_rock"), T.v2f(1, 1), true));
+            }else if(rng < 0.85f){ // Up
+                height += ZONE_HEIGHT;
+                map.add(geoData("box", T.v3f(ZONE_WIDTH, 1f, ZONE_WIDTH), T.v3f(i*ZONE_WIDTH*2, height-(ZONE_HEIGHT/2.0f), 0),
+                        new Quaternion().fromAngleAxis(FastMath.PI/6, Vector3f.UNIT_Z), T.getMaterial("lava_rock"), T.v2f(1, 1), true));
+            }else{
+                height -= ZONE_HEIGHT;
+                map.add(geoData("box", T.v3f(ZONE_WIDTH, 1f, ZONE_WIDTH), T.v3f(i*ZONE_WIDTH*2, height+(ZONE_HEIGHT/2.0f), 0),
+                        new Quaternion().fromAngleAxis(-FastMath.PI/6, Vector3f.UNIT_Z), T.getMaterial("lava_rock"), T.v2f(1, 1), true));
+            }
+            i++;
+        }
+    }
+    
+    public static void generateWorldData(){
+        map.add(geoData("box", T.v3f(ZONE_WIDTH, 1f, ZONE_WIDTH), T.v3f(0, 0, 0), null, T.getMaterial("lava_rock"), T.v2f(1, 1), true));
+        map.add(geoData("box", T.v3f(1f, ZONE_HEIGHT, ZONE_WIDTH), T.v3f(-ZONE_WIDTH, ZONE_HEIGHT, 0), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
+        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, 1f), T.v3f(0, ZONE_HEIGHT, ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
+        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, 1f), T.v3f(0, ZONE_HEIGHT, -ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
+        world.put(T.v3f(0, 0, 0), "a");
+        generateHallway();
     }
     public static void createGeometry(GeometryData d){
         if(d.getType().equals("box")){
@@ -252,8 +142,8 @@ public class World {
     
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
-        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), T.getMaterial("BC_Tex"), T.v2f(5, 5));
-        CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), T.getMaterial("brick"), T.v2f(50, 20));
+        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), T.getMaterial("lava_rock"), T.v2f(5, 5));
+        CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), T.getMaterial("BC_Tex"), T.v2f(25, 10));
     }
     
     public static void initialize(GameClient app){

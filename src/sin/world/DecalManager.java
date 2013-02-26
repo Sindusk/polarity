@@ -33,7 +33,7 @@ public class DecalManager{
         
         public void create(Vector3f loc){
             if(decal == null){
-                decal = World.CG.createSphere(node, "decal", DECAL_SIZE, loc, ColorRGBA.Black);
+                decal = CG.createSphere(node, "decal", DECAL_SIZE, loc, ColorRGBA.Black);
             }else{
                 decal.setLocalTranslation(loc);
             }

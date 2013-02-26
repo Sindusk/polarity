@@ -4,7 +4,6 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapFont;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -25,12 +24,23 @@ public class T {
     
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
     
-    private static HashMap<Projectile, Float> SpiralTimer = new HashMap();
-    private static HashMap<Projectile, Vector3f> SpiralDirection = new HashMap();
+    private static HashMap<Projectile, HashMap<String, Float>> UpdateMap = new HashMap();
+    //private static HashMap<Projectile, Float> SpiralTimer = new HashMap();
+    //private static HashMap<Projectile, Float> SpiralRotation = new HashMap();
+    
+    private static Vector3f spiral(Projectile p, float t){
+        Vector3f dirVec=p.getDirection(); //your perpendicular plane is x=0
+        Vector3f camUp=p.getUp();
+        Vector3f rotY=camUp.subtract(camUp.project(dirVec)).normalizeLocal();
+        Vector3f rotX=dirVec.cross(rotY).normalizeLocal();
+        float rotationAngle=FastMath.PI*t;
+        Vector3f lilProjectileVelocity=rotY.mult(FastMath.cos(rotationAngle)).addLocal(rotX.mult(FastMath.sin(rotationAngle)));
+        return lilProjectileVelocity;
+    }
     
     // Projectile Action Parsing:
     private static String[] getArgs(String s){
-        return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(":");
+        return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
     }
     private static float getValueF(String s){
         return Float.parseFloat(s);
@@ -38,11 +48,14 @@ public class T {
     
     public static void InitializeUpdate(Projectile p){
         String[] actions = p.getUpdate().split(":");
+        String[] args;
+        UpdateMap.put(p, new HashMap());
         int i = 0;
         while(i < actions.length){
             if(actions[i].contains("spiral")){
-                SpiralTimer.put(p, 0f);
-                SpiralDirection.put(p, p.getDirection().clone());
+                args = getArgs(actions[i]);
+                UpdateMap.get(p).put(i+"spiral.timer", 0f);
+                UpdateMap.get(p).put(i+"spiral.rot", getValueF(args[0]));
             }
             i++;
         }
@@ -54,18 +67,21 @@ public class T {
         while(i < actions.length){
             if(actions[i].contains("spiral")){
                 args = getArgs(actions[i]);
-                float timer = SpiralTimer.get(p);
-                if(timer > getValueF(args[0])){
-                    Vector3f dir = SpiralDirection.get(p).clone();
-                    dir.multLocal(randFloat(-1, 1), randFloat(-1, 1), randFloat(-1, 1));
-                    dir.normalizeLocal();
-                    ProjectileManager.addNew(p.getLocation().clone(), dir, 20, 20, "", "damage(2.3):destroy");
-                    SpiralDirection.put(p, dir);
+                HashMap<String, Float> meow = UpdateMap.get(p);
+                float timer = 0;
+                if(meow.get(i+"spiral.timer") != null){
+                    timer = meow.get(i+"spiral.timer");
+                }
+                if(timer > getValueF(args[1])){
+                    float rot = UpdateMap.get(p).get(i+"spiral.rot");
+                    ProjectileManager.addNew(p.getLocation().clone(), spiral(p, rot), T.v3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy");
+                    rot += getValueF(args[2]);
+                    UpdateMap.get(p).put(i+"spiral.rot", rot);
                     timer = 0;
                 }else{
                     timer += tpf;
                 }
-                SpiralTimer.put(p, timer);
+                UpdateMap.get(p).put(i+"spiral.timer", timer);
             }
             i++;
         }

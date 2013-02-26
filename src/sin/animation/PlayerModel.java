@@ -10,6 +10,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
 import sin.tools.T;
+import sin.world.CG;
 import sin.world.World;
 
 /**
@@ -34,43 +35,43 @@ public class PlayerModel {
     private boolean initialized = false;
 
     public void GenHead(Node node, String name){
-        World.CG.createSphere(node, name, .7f, T.v3f(0, .5f, 0), "Textures/wall.png", Sphere.TextureMode.Polar);
-        World.CG.createSphere(node, name, .5f, T.v3f(0, .1f, 0), "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, .7f, T.v3f(0, .5f, 0), T.getMaterial("wall"), Sphere.TextureMode.Polar);
+        CG.createSphere(node, name, .5f, T.v3f(0, .1f, 0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
     }
     public void GenTorso(Node node, String name){
-        World.CG.createBox(node, name, T.v3f(1.2f, .6f, .4f), T.v3f(0, .75f, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
-        World.CG.createBox(node, name, T.v3f(.95f, .4f, .35f), T.v3f(0, -.2f, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
+        CG.createBox(node, name, T.v3f(1.2f, .6f, .4f), T.v3f(0, .75f, 0), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+        CG.createBox(node, name, T.v3f(.95f, .4f, .35f), T.v3f(0, -.2f, 0), T.getMaterial("BC_Tex"), T.v2f(1, 1));
         float radius = .75f;
         Vector3f trans = T.v3f(-.6f, .85f, 0);
-        World.CG.createSphere(node, name, radius, trans, "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
         trans.setX(trans.getX()*-1);
-        World.CG.createSphere(node, name, radius, trans, "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
         radius = .5f;
         trans = T.v3f(.3f, -.7f, -.1f);
-        World.CG.createSphere(node, name, radius, trans, "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
         trans.setX(trans.getX()*-1);
-        World.CG.createSphere(node, name, radius, trans, "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
     }
     public void GenArm(Node node, String name){
-        World.CG.createSphere(node, name, .65f, T.v3f(0,0,0), "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, .65f, T.v3f(0,0,0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
         Quaternion facing = new Quaternion().fromAngleAxis(-FastMath.PI/2.3f, Vector3f.UNIT_X);
-        Geometry g = World.CG.createCylinder(node, name, .45f, 1.7f, T.v3f(0, -.95f, -.2f), "Textures/BC_Tex.png", T.v2f(1, 1));
+        Geometry g = CG.createCylinder(node, name, .45f, 1.7f, T.v3f(0, -.95f, -.2f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
         g.setLocalRotation(facing);
-        World.CG.createSphere(node, name, .5f, T.v3f(0, -1.6f, -.35f), "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
-        World.CG.createCylinder(node, name, .42f, 1.7f, T.v3f(0, -1.65f, .55f), "Textures/BC_Tex.png", T.v2f(1, 1));
-        World.CG.createBox(node, name, T.v3f(.5f, .5f, .5f), T.v3f(0, -1.65f, 1.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
+        CG.createSphere(node, name, .5f, T.v3f(0, -1.6f, -.35f), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+        CG.createCylinder(node, name, .42f, 1.7f, T.v3f(0, -1.65f, .55f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+        CG.createBox(node, name, T.v3f(.5f, .5f, .5f), T.v3f(0, -1.65f, 1.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
     }
     public void GenLeg(Node node, String name){
-        World.CG.createSphere(node, name, .5f, T.v3f(0, 0, 0), "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, .5f, T.v3f(0, 0, 0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
         Quaternion facing = new Quaternion().fromAngleAxis(FastMath.PI/2.3f, Vector3f.UNIT_X);
-        Geometry g = World.CG.createCylinder(node, name, .45f, 1.2f, T.v3f(0, -.5f, .1f), "Textures/BC_Tex.png", T.v2f(1, 1));
+        Geometry g = CG.createCylinder(node, name, .45f, 1.2f, T.v3f(0, -.5f, .1f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
         g.setLocalRotation(facing);
-        World.CG.createSphere(node, name, .5f, T.v3f(0, -1.2f, .2f), "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
+        CG.createSphere(node, name, .5f, T.v3f(0, -1.2f, .2f), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
         facing = new Quaternion().fromAngleAxis(FastMath.PI/1.8f, Vector3f.UNIT_X);
-        g = World.CG.createCylinder(node, name, .45f, 1.2f, T.v3f(0, -1.8f, .1f), "Textures/BC_Tex.png", T.v2f(1, 1));
+        g = CG.createCylinder(node, name, .45f, 1.2f, T.v3f(0, -1.8f, .1f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
         g.setLocalRotation(facing);
-        World.CG.createSphere(node, name, .5f, T.v3f(0, -2.3f, 0), "Textures/BC_Tex.png", Sphere.TextureMode.Projected);
-        World.CG.createBox(node, name, T.v3f(.4f, .2f, 1), T.v3f(0, -3f, .3f), "Textures/BC_Tex.png", T.v2f(1, 1));
+        CG.createSphere(node, name, .5f, T.v3f(0, -2.3f, 0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+        CG.createBox(node, name, T.v3f(.4f, .2f, 1), T.v3f(0, -3f, .3f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
     }
 
     public PlayerModel(){

@@ -120,7 +120,7 @@ public class AttackManager {
             this.update = update;
         }
         public void attack(Ray ray){
-            ProjectileManager.addNew(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), update, this.getCollision());
+            ProjectileManager.addNew(ray.getOrigin(), ray.getDirection(), app.getCamera().getUp(), this.getRange(), this.getSpeed(), update, this.getCollision());
         }
     }
     public static class RangedRayAttack extends RangedAttack{

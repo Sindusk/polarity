@@ -12,14 +12,16 @@ import com.jme3.network.serializing.Serializable;
 public class ProjectileData extends AbstractMessage {
     private Vector3f loc;
     private Vector3f dir;
+    private Vector3f up;
     private float dist;
     private float speed;
     private String update;
     private String collision;
     public ProjectileData(){}
-    public ProjectileData(Vector3f loc, Vector3f dir, float dist, float speed, String update, String collision){
+    public ProjectileData(Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
         this.loc = loc;
         this.dir = dir;
+        this.up = up;
         this.dist = dist;
         this.speed = speed;
         this.update = update;
@@ -30,6 +32,9 @@ public class ProjectileData extends AbstractMessage {
     }
     public Vector3f getDirection(){
         return dir;
+    }
+    public Vector3f getUp(){
+        return up;
     }
     public float getDistance(){
         return dist;

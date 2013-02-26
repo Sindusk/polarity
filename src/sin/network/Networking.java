@@ -85,8 +85,6 @@ public class Networking {
         client.addMessageListener(new ClientListener(), ShotData.class);
         Serializer.registerClass(SoundData.class);
         client.addMessageListener(new ClientListener(), SoundData.class);
-        //Serializer.registerClass(WorldData.class);
-        //client.addMessageListener(new ClientListener(), WorldData.class);
     }
     public static boolean connect(String ip){
         if(client == null){
@@ -232,13 +230,14 @@ public class Networking {
         private void ProjectileMessage(ProjectileData d){
             final Vector3f loc = d.getLocation();
             final Vector3f dir = d.getDirection();
+            final Vector3f up = d.getUp();
             final float dist = d.getDistance();
             final float speed = d.getSpeed();
             final String update = d.getUpdate();
             final String collision = d.getCollision();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    ProjectileManager.add(loc, dir, dist, speed, update, collision);
+                    ProjectileManager.add(loc, dir, up, dist, speed, update, collision);
                     return null;
                 }
             });

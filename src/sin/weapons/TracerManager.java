@@ -7,7 +7,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.tools.T;
-import sin.world.World.CG;
+import sin.world.CG;
 
 /**
  * Tracer Manager - Used mainly for testing, handles the creation and management of tracers.

@@ -11,7 +11,7 @@ import com.jme3.scene.Node;
 import java.util.HashMap;
 import sin.GameClient;
 import sin.tools.T;
-import sin.world.World;
+import sin.world.CG;
 
 /**
  * HUD - Used for control over HUD and GUI elements while in game.
@@ -91,14 +91,14 @@ public class BarManager {
 
             ColorRGBA b_color = ColorRGBA.Black;
             // Create Borders:
-            World.CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx, tly), T.v3f(tlx+width, tly), b_color);
-            World.CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx, tly), T.v3f(tlx, tly+height), b_color);
-            World.CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx+width, tly+height), T.v3f(tlx, tly+height), b_color);
-            World.CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx+width, tly+height), T.v3f(tlx+width, tly), b_color);
+            CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx, tly), T.v3f(tlx+width, tly), b_color);
+            CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx, tly), T.v3f(tlx, tly+height), b_color);
+            CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx+width, tly+height), T.v3f(tlx, tly+height), b_color);
+            CG.createLine(bar, "", BORDER_WIDTH, T.v3f(tlx+width, tly+height), T.v3f(tlx+width, tly), b_color);
 
             fillLoc = T.v3f(topLeft.getX()+(width/2), topLeft.getY()+(height/2), 1);
             //fill = GenerateFill(width/2, height/2, color);
-            fill = World.CG.createBox(bar, "", T.v3f(width/2, height/2), T.v3f(0, 0, 0), color);
+            fill = CG.createBox(bar, "", T.v3f(width/2, height/2), T.v3f(0, 0, 0), color);
             fill.setLocalTranslation(fillLoc);
             bar.attachChild(fill);
 
