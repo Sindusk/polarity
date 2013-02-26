@@ -1,4 +1,4 @@
-package sin.weapons;
+package sin.world;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
@@ -28,9 +28,7 @@ public class TracerManager {
         private Geometry tracer;
         private boolean used = false;
         
-        public Tracer(){
-            //
-        }
+        public Tracer(){}
         
         public boolean inUse(){
             return used;
@@ -38,9 +36,11 @@ public class TracerManager {
         
         public void create(Vector3f start, Vector3f end){
             tracer = CG.createLine(node, "", TRACER_WIDTH, start, end, ColorRGBA.Blue);
+            used = true;
         }
         public void destroy(){
-            node.detachChild(tracer);
+            tracer.removeFromParent();
+            used = false;
         }
     }
     
@@ -72,10 +72,9 @@ public class TracerManager {
     public static void clear(){
         int i = 0;
         while(i < tracers.length){
-            if(tracers[i] == null){
-                break;
+            if(tracers[i] != null){
+                tracers[i].destroy();
             }
-            tracers[i].destroy();
             i++;
         }
     }

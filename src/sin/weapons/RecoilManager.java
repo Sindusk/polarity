@@ -6,6 +6,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.HashMap;
 import sin.GameClient;
+import sin.hud.HUD;
 
 /**
  * RecoilManager - Used for all recoil management.
@@ -25,13 +26,6 @@ public class RecoilManager{
         UP, UP_TOTAL, LEFT, LEFT_TOTAL
     }
     private static HashMap<RH, Float> recoil = new HashMap();
-
-    // Index Holders:
-    private static final int UP = 0;
-    private static final int UP_TOTAL = 1;
-    private static final int LEFT = 2;
-    private static final int LEFT_TOTAL = 3;
-    //public float recoil[] = new float[]{0, 0, 0, 0};
     
     public static void addRecoil(RH handle, float value){
         recoil.put(handle, getRecoil(handle)+value);
@@ -94,7 +88,7 @@ public class RecoilManager{
     }
     public static void updateCrosshairs(){
         if(getSpreadMod() != 0){
-            app.getHUD().updateCrosshairs();
+            HUD.updateCrosshairs();
         }
     }
     public static void recoil(float up, float left){

@@ -22,7 +22,7 @@ public class Character {
     private int set = 0;
     private CharacterControl player;
     private Node node = new Node();
-
+    
     public final void create(){
         CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
         player = new CharacterControl(capsuleShape, 0.05f);
@@ -42,7 +42,7 @@ public class Character {
         StatsManager.createCharacter(health, shields);
         this.create();
     }
-
+    
     public void setFiring(boolean left, boolean firing){
         if(left) {
             weapons[set][0].setFiring(firing);
@@ -67,13 +67,14 @@ public class Character {
             return weapons[set][1];
         }
     }
-
+    
     public void damage(float damage){
         StatsManager.damage(damage);
     }
     public void kill(){
         StatsManager.refreshCharacter();
         player.setPhysicsLocation(T.v3f(0, 10, 0));
+        app.getCamera().lookAtDirection(T.v3f(1, 0, 0), Vector3f.UNIT_Y);
     }
     public void reload(){
         if(weapons[set][0] instanceof RangedReloadWeapon){
@@ -96,7 +97,7 @@ public class Character {
         weapons[set][0].enable(node);
         weapons[set][1].enable(node);
     }
-
+    
     public void update(float tpf){
         MovementManager.move();
         weapons[set][0].tick(tpf);

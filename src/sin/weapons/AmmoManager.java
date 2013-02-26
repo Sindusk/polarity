@@ -2,6 +2,7 @@ package sin.weapons;
 
 import sin.GameClient;
 import sin.hud.BarManager.BH;
+import sin.hud.HUD;
 
 /**
  * Ammo Manager - Used for everything ammo.
@@ -25,8 +26,8 @@ public class AmmoManager {
                 this.barIndex = BH.AMMO_RIGHT;
             }
             //app.hud.bar[barIndex].setMax(max);
-            app.getHUD().setBarMax(barIndex, max);
-            app.getHUD().updateBar(barIndex, clip);
+            HUD.setBarMax(barIndex, max);
+            HUD.updateBar(barIndex, clip);
         }
         
         public void incClip(){
@@ -56,7 +57,7 @@ public class AmmoManager {
         }
 
         public void updateBar(){
-            app.getHUD().updateBar(barIndex, clip);
+            HUD.updateBar(barIndex, clip);
         }
         public float reload(){
             return 0;

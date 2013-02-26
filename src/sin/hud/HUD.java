@@ -78,14 +78,10 @@ public class HUD {
     private static BitmapText loc;
     private static Geometry[] crosshair = new Geometry[4];
 
-    public HUD(){
-        //
-    }
-
     public static Node getGUI(){
         return node;
     }
-    public BitmapText getPing(){
+    public static BitmapText getPing(){
         return ping;
     }
     
@@ -95,14 +91,14 @@ public class HUD {
         crosshair[2] = CG.createLine(node, "", width, T.v3f(cx+(length+offset), cy), T.v3f(cx+offset, cy), ColorRGBA.Red);
         crosshair[3] = CG.createLine(node, "", width, T.v3f(cx, cy+(length+offset)), T.v3f(cx, cy+offset), ColorRGBA.Red);
     }
-    public void updateCrosshairs(){
+    public static void updateCrosshairs(){
         float mod = RecoilManager.getSpreadMod();
         crosshair[0].setLocalTranslation(T.v3f(-mod, 0));
         crosshair[1].setLocalTranslation(T.v3f(0, -mod));
         crosshair[2].setLocalTranslation(T.v3f(mod, 0));
         crosshair[3].setLocalTranslation(T.v3f(0, mod));
     }
-    public void addFloatingText(Vector3f loc, Vector3f lookAt, float damage){
+    public static void addFloatingText(Vector3f loc, Vector3f lookAt, float damage){
         int i = 0;
         while(i < texts.length){
             if(!texts[i].used){
@@ -113,10 +109,10 @@ public class HUD {
         }
     }
 
-    public void setBarMax(BH handle, int value){
+    public static void setBarMax(BH handle, int value){
         BarManager.setBarMax(handle, value);
     }
-    public void updateBar(BH handle, int value){
+    public static void updateBar(BH handle, int value){
         BarManager.updateBar(handle, value);
     }
     
@@ -132,7 +128,7 @@ public class HUD {
         }
     }
 
-    public void update(float tpf){
+    public static void update(float tpf){
         int i = 0;
         while(i < texts.length){
             if(texts[i].used){
@@ -160,6 +156,7 @@ public class HUD {
         RecoilManager.updateCrosshairs();
     }
     public static void clear(){
+        BarManager.clear();
         node.detachAllChildren();
     }
     public static void initialize(GameClient app, Node root){

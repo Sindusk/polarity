@@ -61,6 +61,9 @@ public class T {
         }
     }
     public static void ParseUpdate(Projectile p, float tpf){
+        if(p.getUpdate().isEmpty()){
+            return;
+        }
         String[] actions = p.getUpdate().split(":");
         String[] args;
         int i = 0;

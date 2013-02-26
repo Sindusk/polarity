@@ -1,5 +1,6 @@
 package sin.weapons;
 
+import sin.world.TracerManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
@@ -8,6 +9,7 @@ import sin.netdata.DecalData;
 import sin.netdata.ShotData;
 import sin.network.Networking;
 import sin.character.PlayerManager;
+import sin.hud.HUD;
 import sin.tools.T;
 import sin.world.DecalManager;
 
@@ -30,7 +32,7 @@ public class AttackManager {
         if(part >= 0){
             int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
             float dmg = calculate(part, damage);
-            app.getHUD().addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
+            HUD.addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
             if(Networking.isConnected()) {
                 Networking.send(new ShotData(Networking.getID(), player, dmg));
             }

@@ -40,7 +40,7 @@ public class DecalManager{
             node.attachChild(decal);
         }
         public void destroy(){
-            node.detachChild(decal);
+            decal.removeFromParent();
         }
     }
 
@@ -53,7 +53,7 @@ public class DecalManager{
         decals.put(numDecals, d);
         numDecals++;
     }
-    public static void resetDecals(){
+    public static void clear(){
         int i = 0;
         while(i < numDecals){
             decals.get(i).destroy();

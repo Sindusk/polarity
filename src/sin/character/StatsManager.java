@@ -5,6 +5,7 @@ import java.util.HashMap;
 import sin.GameClient;
 import sin.hud.BarManager;
 import sin.character.PlayerManager.Player;
+import sin.hud.HUD;
 
 /**
  * StatsManager - Used for the managment of player stats.
@@ -31,15 +32,15 @@ public class StatsManager {
             this.health_max = health_max;
             this.shields = shields_max;
             this.shields_max = shields_max;
-            app.getHUD().setBarMax(BarManager.BH.HEALTH, (int) health_max);
-            app.getHUD().setBarMax(BarManager.BH.SHIELDS, (int) shields_max);
-            app.getHUD().updateBar(BarManager.BH.HEALTH, (int) FastMath.ceil(health));
-            app.getHUD().updateBar(BarManager.BH.SHIELDS, (int) FastMath.ceil(shields));
+            HUD.setBarMax(BarManager.BH.HEALTH, (int) health_max);
+            HUD.setBarMax(BarManager.BH.SHIELDS, (int) shields_max);
+            HUD.updateBar(BarManager.BH.HEALTH, (int) FastMath.ceil(health));
+            HUD.updateBar(BarManager.BH.SHIELDS, (int) FastMath.ceil(shields));
         }
 
         public void update(){
-            app.getHUD().updateBar(BarManager.BH.HEALTH, (int) FastMath.ceil(health));
-            app.getHUD().updateBar(BarManager.BH.SHIELDS, (int) FastMath.ceil(shields));
+            HUD.updateBar(BarManager.BH.HEALTH, (int) FastMath.ceil(health));
+            HUD.updateBar(BarManager.BH.SHIELDS, (int) FastMath.ceil(shields));
         }
         public void damage(float damage){
             if(shields > 0){

@@ -1,6 +1,10 @@
 package sin.world;
 
 import com.jme3.bullet.collision.shapes.CollisionShape;
+import com.jme3.bullet.collision.shapes.GImpactCollisionShape;
+import com.jme3.bullet.collision.shapes.MeshCollisionShape;
+import com.jme3.bullet.collision.shapes.PlaneCollisionShape;
+import com.jme3.bullet.collision.shapes.SimplexCollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.material.Material;
@@ -13,7 +17,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Line;
+import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture;
 import sin.GameClient;
 import sin.netdata.GeometryData;
@@ -137,7 +143,18 @@ public class CG {
         }
         return g;
     }
-
+    
+    public static Geometry createQuad(Node node, String name, float width, float height, Vector3f trans, ColorRGBA color){
+        Quad b = new Quad(width, height);
+        Geometry g = new Geometry(name, b);
+        Material m = getMaterial(color);
+        g.setMaterial(m);
+        if(node != null){
+            node.attachChild(g);
+        }
+        return g;
+    }
+    
     // Spheres:
     public static Geometry createSphere(Node node, String name, float radius, Vector3f trans, ColorRGBA color){
         Sphere b = new Sphere(16, 16, radius);

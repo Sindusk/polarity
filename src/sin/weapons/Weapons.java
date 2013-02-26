@@ -12,6 +12,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.hud.HUD;
 import sin.network.Networking;
 import sin.tools.T;
 import sin.weapons.AmmoManager.RechargeAmmo;
@@ -259,7 +260,7 @@ public class Weapons{
         @Override
         public void enable(Node node){
             super.enable(node);
-            app.getHUD().setBarMax(ammo.getBarIndex(), ammo.getMax());
+            HUD.setBarMax(ammo.getBarIndex(), ammo.getMax());
             ammo.updateBar();
         }
         @Override
@@ -307,7 +308,7 @@ public class Weapons{
         @Override
         public void enable(Node node){
             super.enable(node);
-            app.getHUD().setBarMax(ammo.getBarIndex(), ammo.getMax());
+            HUD.setBarMax(ammo.getBarIndex(), ammo.getMax());
             ammo.updateBar();
         }
         @Override

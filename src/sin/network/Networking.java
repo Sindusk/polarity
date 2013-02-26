@@ -24,6 +24,7 @@ import sin.netdata.ProjectileData;
 import sin.netdata.ShotData;
 import sin.netdata.SoundData;
 import sin.character.PlayerManager;
+import sin.hud.HUD;
 import sin.netdata.GeometryData;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
@@ -87,13 +88,8 @@ public class Networking {
         client.addMessageListener(new ClientListener(), SoundData.class);
     }
     public static boolean connect(String ip){
-        if(client == null){
-            try {
-                client = Network.connectToServer(ip, 6143);
-            } catch (IOException ex) {
-                T.log(ex);
-                return false;
-            }
+        try {
+            client = Network.connectToServer(ip, 6143);
             Networking.registerSerials();
             client.addClientStateListener(new ClientListener());
             client.start();
@@ -101,12 +97,10 @@ public class Networking {
             timers[PING] = 1;
             timers[MOVE] = 0;
             return true;
-        }else if(client != null && !client.isConnected()){
-            client.start();
-            client.send(new ConnectData(app.getVersion()));
-            return true;
+        } catch (IOException ex) {
+            T.log(ex);
+            return false;
         }
-        return false;
     }
     public static void disconnect(){
         if(!CLIENT_CONNECTED){
@@ -222,7 +216,7 @@ public class Networking {
             final float pingTime = app.getTimer().getTimeInSeconds() - time;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    app.getHUD().getPing().setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
+                    HUD.getPing().setText("Ping: "+(int) FastMath.ceil(pingTime*1000)+" ms");
                     return null;
                 }
             });

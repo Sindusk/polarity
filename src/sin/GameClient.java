@@ -117,9 +117,6 @@ public class GameClient extends Application{
     }
     
     // Getters for helper classes:
-    public HUD getHUD(){
-        return gameplayState.getHUD();
-    }
     public Character getCharacter(){
         return gameplayState.getCharacter();
     }
@@ -128,6 +125,13 @@ public class GameClient extends Application{
     }
     public String getVersion(){
         return CLIENT_VERSION;
+    }
+    
+    public void resetBulletAppState(){
+        stateManager.detach(bulletAppState);
+        bulletAppState = new BulletAppState();
+        stateManager.attach(bulletAppState);
+        bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
     }
     
     // Main:

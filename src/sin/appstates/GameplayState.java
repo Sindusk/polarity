@@ -14,7 +14,7 @@ import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.RecoilManager;
-import sin.weapons.TracerManager;
+import sin.world.TracerManager;
 import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
@@ -34,7 +34,6 @@ public class GameplayState extends AbstractAppState {
     
     // Classes used for logic:
     private Character character;    // Used for character (user) control.
-    private HUD hud = new HUD();    // Used for GUI and HUD elements.
     
     // All nodes used in the Gameplay:
     private Node root;      // Root Node.
@@ -85,9 +84,6 @@ public class GameplayState extends AbstractAppState {
     public Character getCharacter(){
         return character;
     }
-    public HUD getHUD(){
-        return hud;
-    }
     
     @Override
     public void initialize(AppStateManager stateManager, Application theApp){
@@ -120,7 +116,7 @@ public class GameplayState extends AbstractAppState {
         // Initialize HUD & World:
         World.initialize(app);
         World.createSinglePlayerArea(singleNode);
-        hud.initialize(app, gui);
+        HUD.initialize(app, gui);
         
         character = new Character(
                 new M4A1(true), new LaserPistol(false),
@@ -141,6 +137,9 @@ public class GameplayState extends AbstractAppState {
     public void cleanup(){
         super.cleanup();
         app.getRoot().detachChild(root);
+        World.clear();
+        DecalManager.clear();
+        app.resetBulletAppState();
         app.getGUI().detachChild(gui);
         HUD.clear();
         //gui.detachAllChildren();
@@ -151,7 +150,7 @@ public class GameplayState extends AbstractAppState {
     @Override
     public void update(float tpf){
         super.update(tpf); // makes sure to execute AppTasks
-
+        
         // Clear client keys which are buggy and annoying:
         if(!CLIENT_KEYS_CLEARED) {
             ClearClientKeys();
@@ -163,7 +162,7 @@ public class GameplayState extends AbstractAppState {
         
         // Update character location & hud:
         character.update(tpf);
-        hud.update(tpf);
+        HUD.update(tpf);
         ProjectileManager.update(tpf);
         
         // Update network if connected:

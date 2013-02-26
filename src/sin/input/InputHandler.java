@@ -14,7 +14,7 @@ import sin.hud.HUD;
 import sin.character.MovementManager;
 import sin.character.MovementManager.MH;
 import sin.weapons.RecoilManager;
-import sin.weapons.TracerManager;
+import sin.world.TracerManager;
 import sin.world.DecalManager;
 
 /**
@@ -68,7 +68,7 @@ public class InputHandler{
                     TracerManager.toggle();
                 }else if(bind.equals("Misc_Key_2")){
                     TracerManager.clear();
-                    DecalManager.resetDecals();
+                    DecalManager.clear();
                 }else if(bind.equals("Misc_Key_3")){
                     //
                 }else if(bind.equals("Misc_Key_4")){

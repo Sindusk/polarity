@@ -51,10 +51,10 @@ public class BarManager {
         public boolean isUsed(){
             return used;
         }
-
         public void setMax(int max){
             this.max = max;
         }
+        
         public void update(int value){
             //this.value = value;
             float perc = (float) value/max;
@@ -160,6 +160,15 @@ public class BarManager {
             }
             bars[i].create(node, type, loc, width, height, textSize, color, max, showMax);
             handles.put(handle, i);
+        }
+    }
+    public static void clear(){
+        int i = 0;
+        while(i < bars.length){
+            if(bars[i] != null){
+                bars[i].destroy();
+            }
+            i++;
         }
     }
     
