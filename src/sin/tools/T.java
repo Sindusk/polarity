@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
-import sin.weapons.DamageManager;
+import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;
 
@@ -77,7 +77,7 @@ public class T {
         while(i < actions.length){
             if(actions[i].contains("damage")){
                 args = getArgs(actions[i]);
-                DamageManager.damage(target, getValueF(args[0]));
+                AttackManager.damage(target, getValueF(args[0]));
             }
             i++;
         }
@@ -89,9 +89,12 @@ public class T {
         }
     }
     
-    // HUD, Font, UI:
+    // Asset Management:
     public static BitmapFont getFont(String fnt){
         return app.getAssetManager().loadFont("Interface/Fonts/"+fnt+".fnt");
+    }
+    public static String getMaterial(String tex){
+        return "Textures/Material/"+tex+".png";
     }
     
     // Geometry and Collisions:

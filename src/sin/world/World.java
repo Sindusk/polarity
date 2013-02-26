@@ -18,7 +18,9 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture.WrapMode;
+import java.util.ArrayList;
 import sin.GameClient;
+import sin.netdata.GeometryData;
 import sin.tools.T;
 
 /**
@@ -107,6 +109,13 @@ public class World {
             }
             return g;
         }
+        public static Geometry createBox(Node node, GeometryData d){
+            Geometry g = createBox(node, "", d.getSize(), d.getTrans(), d.getTex(), d.getScale());
+            if(d.getRot() != null){
+                g.setLocalRotation(d.getRot());
+            }
+            return g;
+        }
         public static Geometry createPhyBox(Node node, String name, Vector3f size, Vector3f trans, String tex, Vector2f scale){
             Geometry g = createBox(node, name, size, trans, tex, scale);
             CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
@@ -114,6 +123,13 @@ public class World {
             rbc.setKinematic(true);
             g.addControl(rbc);
             app.getBulletAppState().getPhysicsSpace().add(rbc);
+            return g;
+        }
+        public static Geometry createPhyBox(Node node, GeometryData d){
+            Geometry g = createPhyBox(node, "", d.getSize(), d.getTrans(), d.getTex(), d.getScale());
+            if(d.getRot() != null){
+                g.setLocalRotation(d.getRot());
+            }
             return g;
         }
         
@@ -195,11 +211,28 @@ public class World {
         return app.getBulletAppState();
     }
     
-    public static void generateWorldData(){
-        
+    public static GeometryData geoData(String type, Vector3f size, Vector3f trans, Quaternion rot, String tex, Vector2f scale, boolean phy){
+        return new GeometryData(type, size, trans, rot, tex, scale, phy);
+    }
+    public static ArrayList<GeometryData> generateWorldData(){
+        ArrayList<GeometryData> map = new ArrayList();
+        map.add(geoData("box", T.v3f(ZONE_WIDTH, 1f, ZONE_WIDTH), T.v3f(0, 0, 0), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
+        map.add(geoData("box", T.v3f(1f, ZONE_HEIGHT, ZONE_WIDTH), T.v3f(-ZONE_WIDTH, ZONE_HEIGHT/2, 0), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
+        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, 1f), T.v3f(0, ZONE_HEIGHT/2, ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
+        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, 1f), T.v3f(0, ZONE_HEIGHT/2, -ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
+        return map;
+    }
+    public static void createGeometry(GeometryData d){
+        if(d.getType().equals("box")){
+            if(d.getPhy()){
+                CG.createPhyBox(app.getTerrain(), d);
+            }else{
+                CG.createBox(app.getTerrain(), d);
+            }
+        }
     }
     
-    public static Node genZone(int var, int x, int y, int z){
+    /*public static Node genZone(int var, int x, int y, int z){
         Node node = new Node();
         Geometry geo;
         float geoSize = ZONE_WIDTH/2;
@@ -215,29 +248,12 @@ public class World {
         }
         node.setLocalTranslation(x*ZONE_WIDTH, y*ZONE_HEIGHT, z*ZONE_WIDTH);
         return node;
-    }
+    }*/
     
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
-        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(5, 5));
-        CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), "Textures/brick.png", T.v2f(50, 20));
-    }
-    public static void create(int[][][] world, Node node){
-        int x = 0;
-        int y;
-        int z;
-        while(x < world.length){
-            y = 0;
-            while(y < world[x].length){
-                z = 0;
-                while(z < world[x][y].length){
-                    node.attachChild(genZone(world[x][y][z], x-(world.length/2), y-(world[x].length/2), z-(world[x][y].length/2)));
-                    z++;
-                }
-                y++;
-            }
-            x++;
-        }
+        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), T.getMaterial("BC_Tex"), T.v2f(5, 5));
+        CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), T.getMaterial("brick"), T.v2f(50, 20));
     }
     
     public static void initialize(GameClient app){

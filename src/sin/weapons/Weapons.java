@@ -12,13 +12,14 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.network.Networking;
 import sin.tools.T;
 import sin.weapons.AmmoManager.RechargeAmmo;
 import sin.weapons.AmmoManager.ReloadAmmo;
-import sin.weapons.DamageManager.DamageTemplate;
-import sin.weapons.DamageManager.MeleeDamage;
-import sin.weapons.DamageManager.RangedBulletDamage;
-import sin.weapons.DamageManager.RangedLaserDamage;
+import sin.weapons.AttackManager.AttackTemplate;
+import sin.weapons.AttackManager.MeleeAttack;
+import sin.weapons.AttackManager.RangedBulletAttack;
+import sin.weapons.AttackManager.RangedRayAttack;
 import sin.weapons.RecoilManager.RH;
 import sin.world.World;
 
@@ -74,20 +75,23 @@ public class Weapons{
     }
     // Audio & Models:
     private static class WeaponAudio{
+        private String weapon;
         private AudioNode fireNode;
 
-        private static String GetSound(String weapon, String sound){
+        private static String getSound(String weapon, String sound){
             return "Sounds/Weapons/"+weapon+"/"+sound+".ogg";
         }
 
         public WeaponAudio(String weapon, float fireVolume){
-            fireNode = new AudioNode(app.getAssetManager(), GetSound(weapon, "fire"), false);
+            this.weapon = getSound(weapon, "fire");
+            fireNode = new AudioNode(app.getAssetManager(), this.weapon, false);
             fireNode.setPositional(false);
             fireNode.setVolume(fireVolume);
         }
 
         public void fire(){
             fireNode.playInstance();
+            Networking.sendSound(weapon);
         }
     }
     private static class WeaponMuzzle{
@@ -132,7 +136,7 @@ public class Weapons{
         protected boolean left;
 
         // Helper Classes:
-        protected DamageTemplate damage;
+        protected AttackTemplate damage;
         protected Recoils recoils;
         protected Spread spread;
         protected WeaponAudio audio;
@@ -188,7 +192,6 @@ public class Weapons{
             RecoilManager.recoil(recoils.up(), recoils.left());
             audio.fire();
             cooling += cooldown;
-            muzzle.muzzle.emitAllParticles();
         }
         public void cool(float tpf){
             if(cooling != 0){
@@ -334,7 +337,7 @@ public class Weapons{
             super(Archetype.ANCIENT, Classification.SLASHING, left);
             name = "Sword";
             audio = new WeaponAudio(name, 1);
-            damage = new MeleeDamage(14f, "damage(6.5)");
+            damage = new MeleeAttack("damage(6.5)", 14f);
             recoils = new Recoils(0, 0, 0, 0);
             spread = new Spread(0, 0);
             automatic = true;
@@ -347,15 +350,15 @@ public class Weapons{
     public static class M4A1 extends RangedReloadWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            World.CG.createCylinder(model, "", .15f, 2f, T.v3f(0, 0, 3.2f), "Textures/wall.png", T.v2f(1, 1));
-            World.CG.createBox(model, "", T.v3f(.25f, .25f, 2.5f), T.v3f(0, 0, 1f), "Textures/BC_Tex.png", T.v2f(1, 1));
+            World.CG.createCylinder(model, "", .15f, 2f, T.v3f(0, 0, 3.2f), T.getMaterial("wall"), T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.25f, .25f, 2.5f), T.v3f(0, 0, 1f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
         }
         public M4A1(boolean left){
             super(Archetype.MODERN, Classification.ASSAULT, left);
             name = "M4A1";
             audio = new WeaponAudio(name, 1);
             ammo = new ReloadAmmo(30, 1.2f, left);
-            damage = new RangedBulletDamage(100f, 100f, "", "damage(4.5):destroy");
+            damage = new RangedBulletAttack("", "damage(4.5):destroy", 100f, 100f);
             recoils = new Recoils(35, 65, -25, 25);
             spread = new Spread(0, 15);
             automatic = true;
@@ -366,15 +369,15 @@ public class Weapons{
     public static class AK47 extends RangedReloadWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            World.CG.createBox(model, "", T.v3f(.2f, .2f, 1.7f), T.v3f(0f, 0f, 2f), "Textures/BC_Tex.png", T.v2f(1, 1));
-            World.CG.createBox(model, "", T.v3f(.15f, .2f, .3f), T.v3f(0f, .2f, 2f), "Textures/brick.png", T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.2f, .2f, 1.7f), T.v3f(0f, 0f, 2f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.15f, .2f, .3f), T.v3f(0f, .2f, 2f), T.getMaterial("brick"), T.v2f(1, 1));
         }
         public AK47(boolean left){
             super(Archetype.MODERN, Classification.ASSAULT, left);
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            damage = new RangedBulletDamage(100f, 85f, "spiral(0.3)", "damage(5.5):destroy");
+            damage = new RangedBulletAttack("spiral(0.3)", "damage(5.5):destroy", 100f, 85f);
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;
@@ -385,14 +388,14 @@ public class Weapons{
     public static class Raygun extends RangedRechargeWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            World.CG.createCylinder(model, "", .2f, 3f, T.v3f(0, 0, 2.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
+            World.CG.createCylinder(model, "", .2f, 3f, T.v3f(0, 0, 2.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
         }
         public Raygun(boolean left){
             super(Archetype.ENERGY, Classification.LASER, left);
             name = "Raygun";
             audio = new WeaponAudio(name, 0.5f);
             ammo = new RechargeAmmo(100, 0.2f, left);
-            damage = new RangedLaserDamage(85f, "damage(2.5)");
+            damage = new RangedRayAttack("damage(2.5)", 85f);
             recoils = new Recoils(15, 30, -10, 10);
             spread = new Spread(0, 5);
             automatic = true;
@@ -403,15 +406,15 @@ public class Weapons{
     public static class LaserPistol extends RangedRechargeWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            World.CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), "Textures/BC_Tex.png", T.v2f(1, 1));
-            World.CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), "Textures/wall.png", T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            World.CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), T.getMaterial("wall"), T.v2f(1, 1));
         }
         public LaserPistol(boolean left){
             super(Archetype.ENERGY, Classification.PISTOL, left);
             name = "LaserPistol";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new RechargeAmmo(20, 0.5f, left);
-            damage = new RangedLaserDamage(65f, "damage(6.8)");
+            damage = new RangedRayAttack("damage(6.8)", 65f);
             recoils = new Recoils(40, 60, -15, 15);
             spread = new Spread(0, 15);
             automatic = false;

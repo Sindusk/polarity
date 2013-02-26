@@ -23,8 +23,8 @@ import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.ShotData;
 import sin.netdata.SoundData;
-import sin.netdata.WorldData;
 import sin.character.PlayerManager;
+import sin.netdata.GeometryData;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
 import sin.world.DecalManager;
@@ -71,6 +71,8 @@ public class Networking {
         client.addMessageListener(new ClientListener(), DisconnectData.class);
         Serializer.registerClass(ErrorData.class);
         client.addMessageListener(new ClientListener(), ErrorData.class);
+        Serializer.registerClass(GeometryData.class);
+        client.addMessageListener(new ClientListener(), GeometryData.class);
         Serializer.registerClass(IDData.class);
         client.addMessageListener(new ClientListener(), IDData.class);
         Serializer.registerClass(MoveData.class);
@@ -83,8 +85,8 @@ public class Networking {
         client.addMessageListener(new ClientListener(), ShotData.class);
         Serializer.registerClass(SoundData.class);
         client.addMessageListener(new ClientListener(), SoundData.class);
-        Serializer.registerClass(WorldData.class);
-        client.addMessageListener(new ClientListener(), WorldData.class);
+        //Serializer.registerClass(WorldData.class);
+        //client.addMessageListener(new ClientListener(), WorldData.class);
     }
     public static boolean connect(String ip){
         if(client == null){
@@ -116,9 +118,6 @@ public class Networking {
         CLIENT_CONNECTED = false;
         client.close();
     }
-    public static void send(Message message){
-        client.send(message);
-    }
     public static void close(){
         client.close();
     }
@@ -144,6 +143,15 @@ public class Networking {
             client.send(new MoveData(CLIENT_ID, app.getCharacter().getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
+    }
+    
+    public static void send(Message message){
+        if(isConnected()){
+            client.send(message);
+        }
+    }
+    public static void sendSound(String name){
+        send(new SoundData(CLIENT_ID, name));
     }
 
     private static class ClientListener implements MessageListener<Client>, ClientStateListener {
@@ -184,6 +192,16 @@ public class Networking {
         }
         private void ErrorMessage(ErrorData d){
             T.log(d.getError());
+        }
+        private void GeometryMessage(GeometryData d){
+            final GeometryData w = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    World.createGeometry(w);
+                    app.getCharacter().kill();
+                    return null;
+                }
+            });
         }
         private void IDMessage(IDData d){
             CLIENT_CONNECTED = true;
@@ -242,7 +260,6 @@ public class Networking {
                 return;
             }
             final String s = d.getSound();
-            //final Vector3f loc = app.getPlayer(d.getID()).getLocation();
             final Vector3f loc = PlayerManager.getPlayer(d.getID()).getLocation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
@@ -254,8 +271,7 @@ public class Networking {
                 }
             });
         }
-        private void WorldMessage(WorldData d){
-            //world = d.getWorld();
+        /*private void WorldMessage(WorldData d){
             final int[][][] world = d.getWorld();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
@@ -264,7 +280,7 @@ public class Networking {
                     return null;
                 }
             });
-        }
+        }*/
 
         public void messageReceived(Client source, Message m) {
             client = source;
@@ -276,6 +292,8 @@ public class Networking {
                 DisconnectMessage((DisconnectData) m);
             }else if(m instanceof ErrorData){
                 ErrorMessage((ErrorData) m);
+            }else if(m instanceof GeometryData){
+                GeometryMessage((GeometryData) m);
             }else if(m instanceof IDData){
                 IDMessage((IDData) m);
             }else if(m instanceof MoveData){
@@ -288,8 +306,6 @@ public class Networking {
                 ShotMessage((ShotData) m);
             }else if(m instanceof SoundData){
                 SoundMessage((SoundData) m);
-            }else if(m instanceof WorldData){
-                WorldMessage((WorldData) m);
             }
         }
 

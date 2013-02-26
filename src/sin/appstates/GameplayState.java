@@ -11,7 +11,7 @@ import sin.character.Character;
 import sin.character.MovementManager;
 import sin.character.StatsManager;
 import sin.weapons.AmmoManager;
-import sin.weapons.DamageManager;
+import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.RecoilManager;
 import sin.weapons.TracerManager;
@@ -107,7 +107,7 @@ public class GameplayState extends AbstractAppState {
         // Initialize Projectiles:
         AmmoManager.initialize(app);
         Character.initialize(app);
-        DamageManager.initialize(app);
+        AttackManager.initialize(app);
         DecalManager.initialize(app);
         MovementManager.initialize(app);
         ProjectileManager.initialize(app);

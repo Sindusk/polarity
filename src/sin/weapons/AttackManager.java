@@ -12,10 +12,10 @@ import sin.tools.T;
 import sin.world.DecalManager;
 
 /**
- * Damage - Used for aiding the damage functions for weaponry.
+ * AttackManager - Used for aiding the damage functions for weaponry.
  * @author SinisteRing
  */
-public class DamageManager {
+public class AttackManager {
     private static GameClient app;
     
     // Helper Functions:
@@ -58,10 +58,10 @@ public class DamageManager {
         return -1;
     }
     
-    public static abstract class DamageTemplate{
+    public static abstract class AttackTemplate{
         private String collision;
         
-        public DamageTemplate(String collision){
+        public AttackTemplate(String collision){
             this.collision = collision;
         }
         protected String getCollision(){
@@ -70,10 +70,10 @@ public class DamageManager {
         
         public abstract void attack(Ray ray);
     }
-    public static class MeleeDamage extends DamageTemplate{
+    public static class MeleeAttack extends AttackTemplate{
         private float range;
         
-        public MeleeDamage(float range, String collision){
+        public MeleeAttack(String collision, float range){
             super(collision);
             this.range = range;
         }
@@ -92,10 +92,10 @@ public class DamageManager {
             }
         }
     }
-    public static abstract class RangedDamage extends DamageTemplate{
+    public static abstract class RangedAttack extends AttackTemplate{
         private float range;
         
-        public RangedDamage(float range, String collision){
+        public RangedAttack(String collision, float range){
             super(collision);
             this.range = range;
         }
@@ -106,7 +106,7 @@ public class DamageManager {
         
         public abstract void attack(Ray ray);
     }
-    public static class RangedBulletDamage extends RangedDamage{
+    public static class RangedBulletAttack extends RangedAttack{
         private float speed;
         private String update;
         
@@ -114,8 +114,8 @@ public class DamageManager {
             return speed;
         }
         
-        public RangedBulletDamage(float range, float speed, String update, String collision){
-            super(range, collision);
+        public RangedBulletAttack(String update, String collision, float range, float speed){
+            super(collision, range);
             this.speed = speed;
             this.update = update;
         }
@@ -123,9 +123,9 @@ public class DamageManager {
             ProjectileManager.addNew(ray.getOrigin(), ray.getDirection(), this.getRange(), this.getSpeed(), update, this.getCollision());
         }
     }
-    public static class RangedLaserDamage extends RangedDamage{
-        public RangedLaserDamage(float range, String collision){
-            super(range, collision);
+    public static class RangedRayAttack extends RangedAttack{
+        public RangedRayAttack(String collision, float range){
+            super(collision, range);
         }
         public void attack(Ray ray){
             CollisionResult target = T.getClosestCollision(ray);
@@ -144,6 +144,6 @@ public class DamageManager {
     }
     
     public static void initialize(GameClient app){
-        DamageManager.app = app;
+        AttackManager.app = app;
     }
 }

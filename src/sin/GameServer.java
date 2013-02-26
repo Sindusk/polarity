@@ -14,19 +14,20 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.netdata.ConnectData;
 import sin.netdata.DecalData;
 import sin.netdata.DisconnectData;
 import sin.netdata.ErrorData;
+import sin.netdata.GeometryData;
 import sin.netdata.IDData;
 import sin.netdata.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.ShotData;
 import sin.netdata.SoundData;
-import sin.netdata.WorldData;
 import sin.world.*;
 
 /**
@@ -67,7 +68,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     private static final String SERVER_VERSION = "ALPHA 0.06";
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     private Player[] players = new Player[16];
-    private int[][][] world;
+    private ArrayList<GeometryData> map;
     private Server server = null;
     
     private int FindEmptyID(){
@@ -79,6 +80,13 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
             i++;
         }
         return -1;
+    }
+    private void sendGeometry(HostedConnection c){
+        int i = 0;
+        while(i < map.size()){
+            c.send(map.get(i));
+            i++;
+        }
     }
 
     public void connectionAdded(Server server, HostedConnection conn) {
@@ -105,6 +113,8 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
         server.addMessageListener(new ServerListener(), DisconnectData.class);
         Serializer.registerClass(ErrorData.class);
         server.addMessageListener(new ServerListener(), ErrorData.class);
+        Serializer.registerClass(GeometryData.class);
+        server.addMessageListener(new ServerListener(), GeometryData.class);
         Serializer.registerClass(IDData.class);
         server.addMessageListener(new ServerListener(), IDData.class);
         Serializer.registerClass(MoveData.class);
@@ -117,8 +127,8 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
         server.addMessageListener(new ServerListener(), ShotData.class);
         Serializer.registerClass(SoundData.class);
         server.addMessageListener(new ServerListener(), SoundData.class);
-        Serializer.registerClass(WorldData.class);
-        server.addMessageListener(new ServerListener(), WorldData.class);
+        //Serializer.registerClass(WorldData.class);
+        //server.addMessageListener(new ServerListener(), WorldData.class);
     }
     
     private class ServerListener implements MessageListener<HostedConnection>{
@@ -162,7 +172,8 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
                 players[id].connect();
                 players[id].setConnection(connection);
                 server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
-                connection.send(new WorldData(world));
+                //connection.send(new WorldData(world));
+                sendGeometry(connection);
             }else{
                 int id = FindEmptyID();
                 if(id == -1){
@@ -268,6 +279,9 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     }
 
     private void initWorld(){
+        map = World.generateWorldData();
+    }
+    /*private void initWorld(){
         int x = 0;
         int y;
         int z;
@@ -284,7 +298,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
             }
             x++;
         }
-    }
+    }*/
     @Override
     public void simpleInitApp() {
         try {
