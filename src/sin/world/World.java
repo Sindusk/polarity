@@ -19,14 +19,14 @@ import sin.tools.T;
 public class World {
     private static GameClient app;
     
-    private static HashMap<Vector3f, String> world = new HashMap();
-    private static ArrayList<GeometryData> map = new ArrayList();
-    
     // Constant Variables:
     private static final float WALL_WIDTH = 0.1f;
     private static final float ZONE_WIDTH = 10;
-    private static final float ZONE_HEIGHT = 5;
-    private static final float ZONE_RAMP_LENGTH = FastMath.sqrt(FastMath.sqr(ZONE_WIDTH)+FastMath.sqr(ZONE_HEIGHT));
+    private static final float ZONE_HEIGHT = 10;
+    
+    private static HashMap<Vector3f, String> world = new HashMap();
+    private static ArrayList<GeometryData> map = new ArrayList();
+    private static int hallNum = 0;
     
     public static BulletAppState getBulletAppState(){
         return app.getBulletAppState();
@@ -40,34 +40,54 @@ public class World {
         return new GeometryData(type, size, trans, rot, tex, scale, phy);
     }
     
-    public static void generateHallway(){
-        int i = 1;
-        float height = 0;
+    public static void generateHallway(Vector3f start, float xi, float zi){
+        float x = start.getX()+xi;
+        float z = start.getZ()+zi;
+        int i = 0;
+        int iMax = FastMath.nextRandomInt(10, 15);
         float rng;
-        while(i < 10){
-            rng = FastMath.nextRandomFloat();
-            if(rng < 0.50f){ // Flat
-                map.add(geoData("box", T.v3f(ZONE_WIDTH, WALL_WIDTH, ZONE_WIDTH), T.v3f(i*ZONE_WIDTH*2, height, 0), null, T.getMaterial("lava_rock"), T.v2f(1, 1), true));
-            }else if(rng < 0.75f){ // Up
-                height += ZONE_HEIGHT;
-                map.add(geoData("box", T.v3f(ZONE_RAMP_LENGTH, WALL_WIDTH, ZONE_RAMP_LENGTH), T.v3f(i*ZONE_WIDTH*2, height-(ZONE_HEIGHT/2.0f), 0),
-                        new Quaternion().fromAngleAxis(FastMath.PI/6, Vector3f.UNIT_Z), T.getMaterial("lava_rock"), T.v2f(1, 1), true));
-            }else{
-                height -= ZONE_HEIGHT;
-                map.add(geoData("box", T.v3f(ZONE_WIDTH, WALL_WIDTH, ZONE_WIDTH), T.v3f(i*ZONE_WIDTH*2, height+(ZONE_HEIGHT/2.0f), 0),
-                        new Quaternion().fromAngleAxis(-FastMath.PI/16, Vector3f.UNIT_Z), T.getMaterial("lava_rock"), T.v2f(1, 1), true));
+        hallNum++;
+        while(i < iMax){
+            if(world.get(T.v3f(x, start.getY(), z)) != null && world.get(T.v3f(x, start.getY(), z)).contains("f")){
+                break;
             }
+            rng = FastMath.nextRandomFloat();
+            map.add(geoData("box", T.v3f(ZONE_WIDTH/2, WALL_WIDTH, ZONE_WIDTH/2), T.v3f(x*ZONE_WIDTH, 0, z*ZONE_WIDTH),
+                    null, T.getMaterial("lava_rock"), T.v2f(1, 1), true));
+            world.put(T.v3f(x, start.getY(), z), "f");
+            if(rng < 0.2 && hallNum < 20){
+                if(rng < 0.1){
+                    generateHallway(T.v3f(x, start.getY(), z), zi, xi);
+                }else{
+                    generateHallway(T.v3f(x, start.getY(), z), -zi, -xi);
+                }
+            }
+            x += xi;
+            z += zi;
             i++;
+        }
+    }
+    public static void generateStart(){
+        int x = -2;
+        int z;
+        while(x <= 2){
+            z = -2;
+            while(z <= 2){
+                map.add(geoData("box", T.v3f(ZONE_WIDTH/2, WALL_WIDTH, ZONE_WIDTH/2), T.v3f(x*ZONE_WIDTH, 0, z*ZONE_WIDTH),
+                        null, T.getMaterial("brick"), T.v2f(1, 1), true));
+                world.put(T.v3f(x, 0, z), "f");
+                z++;
+            }
+            x++;
         }
     }
     
     public static void generateWorldData(){
-        map.add(geoData("box", T.v3f(ZONE_WIDTH, .1f, ZONE_WIDTH), T.v3f(0, 0, 0), null, T.getMaterial("lava_rock"), T.v2f(1, 1), true));
-        map.add(geoData("box", T.v3f(.1f, ZONE_HEIGHT, ZONE_WIDTH), T.v3f(-ZONE_WIDTH, ZONE_HEIGHT, 0), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
-        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, .1f), T.v3f(0, ZONE_HEIGHT, ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
-        map.add(geoData("box", T.v3f(ZONE_WIDTH, ZONE_HEIGHT, .1f), T.v3f(0, ZONE_HEIGHT, -ZONE_WIDTH), null, T.getMaterial("BC_Tex"), T.v2f(1, 1), true));
-        world.put(T.v3f(0, 0, 0), "a");
-        generateHallway();
+        Vector3f start = T.v3f(2, 0, 0);
+        float xi = 1;
+        float zi = 0;
+        generateStart();
+        generateHallway(start, xi, zi);
     }
     public static void createGeometry(GeometryData d){
         if(d.getType().equals("box")){

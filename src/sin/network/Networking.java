@@ -32,7 +32,7 @@ import sin.world.DecalManager;
 import sin.world.World;
 
 /**
- *
+ * Networking - Used for the connection and maintainence of client-side networking.
  * @author SinisteRing
  */
 public class Networking {
@@ -54,7 +54,7 @@ public class Networking {
     private static boolean pinging = false;
     private static float[] timers = new float[2];
     private static float time;
-
+    
     public Networking(){
         //
     }
@@ -62,7 +62,7 @@ public class Networking {
     public static int getID(){
         return CLIENT_ID;
     }
-
+    
     private static void registerSerials(){
         Serializer.registerClass(ConnectData.class);
         client.addMessageListener(new ClientListener(), ConnectData.class);
@@ -145,7 +145,7 @@ public class Networking {
     public static void sendSound(String name){
         send(new SoundData(CLIENT_ID, name));
     }
-
+    
     private static class ClientListener implements MessageListener<Client>, ClientStateListener {
         private Client client;
 
