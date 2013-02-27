@@ -13,6 +13,7 @@ import sin.GameClient;
 import sin.hud.HUD;
 import sin.character.MovementManager;
 import sin.character.MovementManager.MH;
+import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.world.TracerManager;
 import sin.world.DecalManager;
@@ -70,7 +71,7 @@ public class InputHandler{
                     TracerManager.clear();
                     DecalManager.clear();
                 }else if(bind.equals("Misc_Key_3")){
-                    //
+                    app.getCharacter().getPlayer().setPhysicsLocation(T.v3f(-50, 110, 0));
                 }else if(bind.equals("Misc_Key_4")){
                     //
                 }else if(bind.equals("Game_Menu")){

@@ -1,6 +1,7 @@
 package sin.world;
 
 import com.jme3.bullet.BulletAppState;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
@@ -20,9 +21,13 @@ public class World {
     private static GameClient app;
     
     // Constant Variables:
-    private static final float WALL_WIDTH = 0.1f;
-    private static final float ZONE_WIDTH = 10;
-    private static final float ZONE_HEIGHT = 10;
+    private static final float WW = 0.1f;   // Wall Width
+    private static final float ZS = 10;     // Zone Width
+    private static final int HALL_LENGTH_MIN = 20;
+    private static final int HALL_LENGTH_MAX = 25;
+    private static final int HALL_MAX = 25;
+    private static final int HALL_SPREAD = 8;
+    //private static final float ZONE_HEIGHT = 10;
     
     private static HashMap<Vector3f, String> world = new HashMap();
     private static ArrayList<GeometryData> map = new ArrayList();
@@ -39,31 +44,46 @@ public class World {
     public static GeometryData geoData(String type, Vector3f size, Vector3f trans, Quaternion rot, String tex, Vector2f scale, boolean phy){
         return new GeometryData(type, size, trans, rot, tex, scale, phy);
     }
+    public static GeometryData geoFloor(float x, float y, float z, Quaternion rot, String tex, Vector2f scale, boolean phy){
+        return geoData("box", T.v3f(ZS/2, WW, ZS/2), T.v3f(x*ZS, y*ZS, z*ZS), rot, tex, scale, phy);
+    }
     
     public static void generateHallway(Vector3f start, float xi, float zi){
+        Vector3f loc;
         float x = start.getX()+xi;
         float z = start.getZ()+zi;
+        float w;
         int i = 0;
-        int iMax = FastMath.nextRandomInt(10, 15);
+        int iMax = FastMath.nextRandomInt(HALL_LENGTH_MIN, HALL_LENGTH_MAX);
+        int spread = 0;
         float rng;
         hallNum++;
-        while(i < iMax){
-            if(world.get(T.v3f(x, start.getY(), z)) != null && world.get(T.v3f(x, start.getY(), z)).contains("f")){
+        while(i <= iMax){
+            loc = T.v3f(x, start.getY(), z);
+            if(world.get(loc) != null && world.get(loc).contains("f")){
                 break;
             }
+            w = -1;
+            while(w <= 1){
+                map.add(geoFloor((w*zi)+x, start.getY(), (w*xi)+z, null, T.getMaterial("lava_rock"), T.v2f(1, 1), true));
+                world.put(T.v3f((w*zi)+x, start.getY(), (w*xi)+z), "f");
+                w++;
+            }
             rng = FastMath.nextRandomFloat();
-            map.add(geoData("box", T.v3f(ZONE_WIDTH/2, WALL_WIDTH, ZONE_WIDTH/2), T.v3f(x*ZONE_WIDTH, 0, z*ZONE_WIDTH),
-                    null, T.getMaterial("lava_rock"), T.v2f(1, 1), true));
-            world.put(T.v3f(x, start.getY(), z), "f");
-            if(rng < 0.2 && hallNum < 20){
-                if(rng < 0.1){
-                    generateHallway(T.v3f(x, start.getY(), z), zi, xi);
+            if(rng < 0.18 && hallNum < HALL_MAX && spread > HALL_SPREAD && i != iMax){
+                if(rng < 0.06){
+                    generateHallway(loc, zi, xi);
+                }else if(rng < 0.12){
+                    generateHallway(loc, -zi, -xi);
                 }else{
-                    generateHallway(T.v3f(x, start.getY(), z), -zi, -xi);
+                    generateHallway(loc, zi, xi);
+                    generateHallway(loc, -zi, xi);
                 }
+                spread = 0;
             }
             x += xi;
             z += zi;
+            spread++;
             i++;
         }
     }
@@ -73,8 +93,7 @@ public class World {
         while(x <= 2){
             z = -2;
             while(z <= 2){
-                map.add(geoData("box", T.v3f(ZONE_WIDTH/2, WALL_WIDTH, ZONE_WIDTH/2), T.v3f(x*ZONE_WIDTH, 0, z*ZONE_WIDTH),
-                        null, T.getMaterial("brick"), T.v2f(1, 1), true));
+                map.add(geoFloor(x, 0, z, null, T.getMaterial("brick"), T.v2f(1, 1), true));
                 world.put(T.v3f(x, 0, z), "f");
                 z++;
             }
@@ -122,8 +141,9 @@ public class World {
     
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
-        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), T.getMaterial("lava_rock"), T.v2f(5, 5));
-        CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), T.getMaterial("BC_Tex"), T.v2f(25, 10));
+        //CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), T.getMaterial("lava_rock"), T.v2f(5, 5));
+        //CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), T.getMaterial("BC_Tex"), T.v2f(25, 10));
+        CG.createPhyBox(node, "platform", T.v3f(3, 3, 3), T.v3f(-50, 0, 0), ColorRGBA.Black);
     }
     
     public static void initialize(GameClient app){

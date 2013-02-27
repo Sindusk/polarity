@@ -88,6 +88,15 @@ public class CG {
         app.getBulletAppState().getPhysicsSpace().add(rbc);
         return g;
     }
+    public static Geometry createPhyBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
+        Geometry g = createBox(node, name, size, trans, color);
+        CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
+        RigidBodyControl rbc = new RigidBodyControl(cs, 0);
+        rbc.setKinematic(true);
+        g.addControl(rbc);
+        app.getBulletAppState().getPhysicsSpace().add(rbc);
+        return g;
+    }
     public static Geometry createPhyBox(Node node, GeometryData d){
         Geometry g = createPhyBox(node, "", d.getSize(), d.getTrans(), d.getTex(), d.getScale());
         if(d.getRot() != null){
