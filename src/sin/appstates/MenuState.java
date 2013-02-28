@@ -122,7 +122,10 @@ public class MenuState extends AbstractAppState implements ScreenController {
     public void bind(Nifty nifty, Screen screen) {
         this.nifty = nifty;
         this.screen = screen;
-        if(screen.getScreenId().equals("menu.multiplayer")){
+        if(screen.getScreenId().equals("menu")){
+            Label t = screen.findNiftyControl("menu.version", Label.class);
+            t.setText(app.getVersion());
+        }else if(screen.getScreenId().equals("menu.multiplayer")){
             ListBox<String> list = screen.findNiftyControl("multiplayer.serverlist", ListBox.class);
             list.addItem("[localhost] Local Server");
             list.addItem("[25.216.174.196] Sinister Server");

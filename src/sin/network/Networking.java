@@ -59,6 +59,9 @@ public class Networking {
         //
     }
     
+    public static boolean isConnected(){
+        return CLIENT_CONNECTED;
+    }
     public static int getID(){
         return CLIENT_ID;
     }
@@ -112,9 +115,6 @@ public class Networking {
     }
     public static void close(){
         client.close();
-    }
-    public static boolean isConnected(){
-        return CLIENT_CONNECTED;
     }
     public static void update(float tpf){
         int i = 0;
@@ -264,16 +264,6 @@ public class Networking {
                 }
             });
         }
-        /*private void WorldMessage(WorldData d){
-            final int[][][] world = d.getWorld();
-            app.enqueue(new Callable<Void>(){
-                public Void call() throws Exception{
-                    World.create(world, app.getTerrain());
-                    app.getCharacter().kill();
-                    return null;
-                }
-            });
-        }*/
 
         public void messageReceived(Client source, Message m) {
             client = source;

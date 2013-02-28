@@ -3,8 +3,7 @@ package sin.character;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import sin.GameClient;
-import sin.animation.PlayerModel;
-import sin.tools.T;
+import sin.animation.Models.PlayerModel;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -16,16 +15,11 @@ public class PlayerManager{
     private static Player[] player = new Player[16];
     
     public static class Player{
-        //private int id;
-        //private boolean created;
         private PlayerModel model;
         private Vector3f loc;
-        //private Quaternion rot = new Quaternion();
         private boolean used = false;
 
-        public Player(){
-            //
-        }
+        public Player(){}
         
         public Vector3f getLocation(){
             return loc;
@@ -36,16 +30,11 @@ public class PlayerManager{
         
         public void update(Vector3f loc, Quaternion rot){
             this.loc = loc;
-            //this.rot = rot;
             model.update(loc, rot);
         }
         public void create(int id, Vector3f loc){
-            this.model = new PlayerModel();
-            //this.id = id;
-            if(!model.isInitialized()){
-                model.initModel(id);
-            }
-            model.create(app.getPlayerNode(), loc);
+            this.model = new PlayerModel(app.getPlayerNode(), id);
+            model.create();
             used = true;
         }
         public void destroy(){

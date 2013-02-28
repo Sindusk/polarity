@@ -21,14 +21,27 @@ public class AttackManager {
     private static GameClient app;
     
     // Helper Functions:
-    public static float calculate(int part, float dmg){
-        if(part == 0){
+    public static float modDamage(String part, float dmg){
+        if(part.equals("head")){
             dmg *= 1.5f;
         }
         return dmg;
     }
     public static void damage(CollisionResult target, float damage){
-        int part = getHitbox(target.getGeometry().getName());
+        String data[] = getPartData(target);
+        if(data == null){
+            return;
+        }
+        if(data[0].equals("player")){
+            int id = Integer.parseInt(data[1]);
+            damage = modDamage(data[2], damage);
+            HUD.addFloatingText(PlayerManager.getPlayer(id).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), damage);
+            Networking.send(new ShotData(Networking.getID(), id, damage));
+        }else{
+            DecalManager.create(target.getContactPoint());
+            Networking.send(new DecalData(target.getContactPoint()));
+        }
+        /*int part = getHitbox(target.getGeometry().getName());
         if(part >= 0){
             int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
             float dmg = calculate(part, damage);
@@ -41,11 +54,14 @@ public class AttackManager {
             if(Networking.isConnected()) {
                 Networking.send(new DecalData(target.getContactPoint()));
             }
-        }
+        }*/
     }
     
     public static float getDistance(Vector3f player, Vector3f target){
         return target.distance(player);
+    }
+    public static String[] getPartData(CollisionResult target){
+        return target.getGeometry().getParent().getName().split(":");
     }
     public static int getHitbox(String name){
         if(name.contains("head")) {

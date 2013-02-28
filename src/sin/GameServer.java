@@ -63,10 +63,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class GameServer extends SimpleApplication implements ConnectionListener {
     
-    private static final String SERVER_VERSION = "ALPHA 0.06";
+    private static final String SERVER_VERSION = "DEV 0.07";
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     private Player[] players = new Player[16];
-    //private ArrayList<GeometryData> map;
     private Server server = null;
     
     private int FindEmptyID(){
@@ -277,7 +276,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
     public void simpleInitApp() {
         try {
             server = Network.createServer(6143);
-        } catch (IOException ex) {
+        }catch (IOException ex){
             logger.log(Level.SEVERE, null, ex);
         }
         RegisterSerials();

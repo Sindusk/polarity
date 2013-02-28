@@ -27,7 +27,6 @@ public class World {
     private static final int HALL_LENGTH_MAX = 25;
     private static final int HALL_MAX = 25;
     private static final int HALL_SPREAD = 8;
-    //private static final float ZONE_HEIGHT = 10;
     
     private static HashMap<Vector3f, String> world = new HashMap();
     private static ArrayList<GeometryData> map = new ArrayList();
@@ -56,8 +55,17 @@ public class World {
         int i = 0;
         int iMax = FastMath.nextRandomInt(HALL_LENGTH_MIN, HALL_LENGTH_MAX);
         int spread = 0;
+        float hallcheck = 0.3f;
         float rng;
         hallNum++;
+        if(FastMath.abs(xi) > 1 || FastMath.abs(zi) > 1){
+            if(xi != 0){
+                xi /= FastMath.abs(xi);
+            }
+            if(zi != 0){
+                zi /= FastMath.abs(zi);
+            }
+        }
         while(i <= iMax){
             loc = T.v3f(x, start.getY(), z);
             if(world.get(loc) != null && world.get(loc).contains("f")){
@@ -69,15 +77,16 @@ public class World {
                 world.put(T.v3f((w*zi)+x, start.getY(), (w*xi)+z), "f");
                 w++;
             }
+            //world.put(loc, "f");
             rng = FastMath.nextRandomFloat();
-            if(rng < 0.18 && hallNum < HALL_MAX && spread > HALL_SPREAD && i != iMax){
-                if(rng < 0.06){
-                    generateHallway(loc, zi, xi);
-                }else if(rng < 0.12){
-                    generateHallway(loc, -zi, -xi);
+            if(rng < hallcheck && hallNum < HALL_MAX && spread > HALL_SPREAD && i != iMax){
+                if(rng < hallcheck/3){
+                    generateHallway(loc, zi*2, xi*2);
+                }else if(rng < hallcheck/1.5f){
+                    generateHallway(loc, -zi*2, -xi*2);
                 }else{
-                    generateHallway(loc, zi, xi);
-                    generateHallway(loc, -zi, xi);
+                    generateHallway(loc, zi*2, xi*2);
+                    generateHallway(loc, -zi*2, xi*2);
                 }
                 spread = 0;
             }
@@ -118,31 +127,14 @@ public class World {
         }
     }
     
-    /*public static Node genZone(int var, int x, int y, int z){
-        Node node = new Node();
-        Geometry geo;
-        float geoSize = ZONE_WIDTH/2;
-        if(var == 0){
-            CG.createPhyBox(node, "floor", T.v3f(geoSize, 1f, geoSize), T.v3f(0, 0, 0), "Textures/wall.png", T.v2f(1, 1));
-            geo = CG.createPhyCylinder(node, "pillar", geoSize/5, geoSize, T.v3f(0, geoSize/2, 0), "Textures/wall.png", T.v2f(1, 1));
-            geo.setLocalRotation(new Quaternion().fromAngleAxis(FastMath.PI/2, Vector3f.UNIT_X));
-        }else if(var == 1){
-            CG.createPhyBox(node, "floor", T.v3f(geoSize, 1f, geoSize), T.v3f(0, 0, 0), "Textures/brick.png", T.v2f(1, 1));
-            CG.createPhyBox(node, "flybox", T.v3f(geoSize/4, geoSize/4, geoSize/4), T.v3f(0, geoSize, 0), "Textures/brick.png", T.v2f(1, 1));
-        }else if(var == 2){
-            CG.createPhyBox(node, "floor", T.v3f(geoSize, 1f, geoSize), T.v3f(0, 0, 0), "Textures/BC_Tex.png", T.v2f(1, 1));
-        }
-        node.setLocalTranslation(x*ZONE_WIDTH, y*ZONE_HEIGHT, z*ZONE_WIDTH);
-        return node;
-    }*/
     public static void clear(){
         app.getTerrain().detachAllChildren();
     }
     
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
-        //CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), T.getMaterial("lava_rock"), T.v2f(5, 5));
-        //CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), T.getMaterial("BC_Tex"), T.v2f(25, 10));
+        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, 0, 0), T.getMaterial("lava_rock"), T.v2f(5, 5));
+        CG.createPhyBox(node, "wall", T.v3f(50, 20, 0.1f), T.v3f(0, 20, -50), T.getMaterial("BC_Tex"), T.v2f(25, 10));
         CG.createPhyBox(node, "platform", T.v3f(3, 3, 3), T.v3f(-50, 0, 0), ColorRGBA.Black);
     }
     

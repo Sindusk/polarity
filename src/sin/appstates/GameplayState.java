@@ -5,11 +5,13 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.animation.Models;
 import sin.hud.HUD;
 import sin.network.Networking;
 import sin.character.Character;
 import sin.character.MovementManager;
 import sin.character.StatsManager;
+import sin.npc.NPCManager;
 import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
@@ -41,13 +43,13 @@ public class GameplayState extends AbstractAppState {
     private Node world;     // Node for 3D world.
     
     // Other nodes:
-    private Node collisionNode = new Node();    // Node encompassing anything able to be shot [single, world, player].
-    private Node miscNode = new Node();         // Node encompassing all miscellaneous geometry [floating text].
-    private Node singleNode = new Node();       // Node encompassing single player testing (Static).
-    private Node playerNode = new Node();       // Node encompassing player models (Kinematic).
-    private Node projectileNode = new Node();   // Node for all projectiles.
-    private Node terrainNode = new Node();      // Node for all world terrain.
-    private Node tracerNode = new Node();       // Node encompassing tracers, mainly for testing.
+    private Node collisionNode = new Node("");  // Node encompassing anything able to be shot [single, world, player].
+    private Node miscNode = new Node("");       // Node encompassing all miscellaneous geometry [floating text].
+    private Node singleNode = new Node("");     // Node encompassing single player testing (Static).
+    private Node playerNode = new Node("");     // Node encompassing player models (Kinematic).
+    private Node projectileNode = new Node(""); // Node for all projectiles.
+    private Node terrainNode = new Node("");    // Node for all world terrain.
+    private Node tracerNode = new Node("");     // Node encompassing tracers, mainly for testing.
     
     public GameplayState(){
         //
@@ -107,7 +109,9 @@ public class GameplayState extends AbstractAppState {
         Character.initialize(app);
         AttackManager.initialize(app);
         DecalManager.initialize(app);
+        Models.initialize(app);
         MovementManager.initialize(app);
+        NPCManager.initialize(app);
         ProjectileManager.initialize(app);
         RecoilManager.initialize(app);
         StatsManager.initialize(app);

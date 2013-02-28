@@ -25,17 +25,15 @@ public class T {
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
     
     private static HashMap<Projectile, HashMap<String, Float>> UpdateMap = new HashMap();
-    //private static HashMap<Projectile, Float> SpiralTimer = new HashMap();
-    //private static HashMap<Projectile, Float> SpiralRotation = new HashMap();
     
     private static Vector3f spiral(Projectile p, float t){
-        Vector3f dirVec=p.getDirection(); //your perpendicular plane is x=0
-        Vector3f camUp=p.getUp();
-        Vector3f rotY=camUp.subtract(camUp.project(dirVec)).normalizeLocal();
-        Vector3f rotX=dirVec.cross(rotY).normalizeLocal();
-        float rotationAngle=FastMath.PI*t;
-        Vector3f lilProjectileVelocity=rotY.mult(FastMath.cos(rotationAngle)).addLocal(rotX.mult(FastMath.sin(rotationAngle)));
-        return lilProjectileVelocity;
+        Vector3f dirVec = p.getDirection(); //your perpendicular plane is x=0
+        Vector3f camUp = p.getUp();
+        Vector3f rotY = camUp.subtract(camUp.project(dirVec)).normalizeLocal();
+        Vector3f rotX = dirVec.cross(rotY).normalizeLocal();
+        float rotationAngle = FastMath.PI*t;
+        Vector3f velocity = rotY.mult(FastMath.cos(rotationAngle)).addLocal(rotX.mult(FastMath.sin(rotationAngle)));
+        return velocity;
     }
     
     // Projectile Action Parsing:
