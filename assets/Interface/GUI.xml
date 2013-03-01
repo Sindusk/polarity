@@ -14,7 +14,7 @@
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
                 <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Single Player" />
-                <interact onClick="action(start)"/>
+                <interact onClick="action(single)"/>
             </panel>
             <panel height="3%"/>
             <panel id="menu.multiplayer" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">

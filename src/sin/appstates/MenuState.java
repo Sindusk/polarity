@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import sin.GameClient;
 import sin.hud.HUD;
 import sin.network.Networking;
+import sin.world.World;
 
 /**
  *
@@ -71,6 +72,9 @@ public class MenuState extends AbstractAppState implements ScreenController {
         if(action.equals("start")){
             app.getStateManager().attach(app.getGameplayState());
             nifty.gotoScreen("empty");
+        }
+        else if(action.equals("single")){
+            action("start");
         }else if(action.equals("multiplayer")){
             nifty.gotoScreen("menu.multiplayer");
         }else if(action.equals("character")){

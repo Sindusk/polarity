@@ -26,6 +26,7 @@ import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.ShotData;
 import sin.netdata.SoundData;
+import sin.tools.T;
 import sin.world.*;
 
 /**
@@ -154,7 +155,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
             players[d.getID()].disconnect();
         }
         private void IDMessage(IDData d){
-            System.out.println("Handling IDData for "+d.getID()+"...");
+            T.log("Connecting player "+d.getID());
             if(!players[d.getID()].isConnected()){
                 int id = d.getID();
                 int i = 0;
@@ -171,7 +172,7 @@ public class GameServer extends SimpleApplication implements ConnectionListener 
             }else{
                 int id = FindEmptyID();
                 if(id == -1){
-                    System.out.println("Server full. [IDM]");
+                    T.log("Server full. [IDM]");
                     connection.send(new ErrorData(-1, "Server Full.", true));
                     connection.close("Server Full");
                 }

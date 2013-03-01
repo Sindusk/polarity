@@ -17,6 +17,7 @@ import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.world.TracerManager;
 import sin.world.DecalManager;
+import sin.world.World;
 
 /**
  * InputHandler - Handles all input from users and organizes them based on conditions.
@@ -73,7 +74,7 @@ public class InputHandler{
                 }else if(bind.equals("Misc_Key_3")){
                     app.getCharacter().getPlayer().setPhysicsLocation(T.v3f(-50, 110, 0));
                 }else if(bind.equals("Misc_Key_4")){
-                    //
+                    World.toggleWireframe();
                 }else if(bind.equals("Game_Menu")){
                     app.getMenuState().getNifty().gotoScreen("game.menu");
                     app.getInputManager().setCursorVisible(true);
@@ -133,6 +134,7 @@ public class InputHandler{
         // Actions:
         createMapping("Reload", new KeyTrigger(KeyInput.KEY_R));
         createMapping("Swap", new KeyTrigger(KeyInput.KEY_Q));
+        // Abilities:
         createMapping("Ability_1", new KeyTrigger(KeyInput.KEY_1));
         createMapping("Ability_2", new KeyTrigger(KeyInput.KEY_2));
         createMapping("Ability_3", new KeyTrigger(KeyInput.KEY_3));
@@ -141,7 +143,7 @@ public class InputHandler{
         createMapping("Game_Menu", new KeyTrigger(KeyInput.KEY_ESCAPE));
         createMapping("Misc_Key_1", new KeyTrigger(KeyInput.KEY_V));
         createMapping("Misc_Key_2", new KeyTrigger(KeyInput.KEY_B));
-        createMapping("Misc_Key_3", new KeyTrigger(KeyInput.KEY_O));
-        createMapping("Misc_Key_4", new KeyTrigger(KeyInput.KEY_I));
+        createMapping("Misc_Key_3", new KeyTrigger(KeyInput.KEY_T));
+        createMapping("Misc_Key_4", new KeyTrigger(KeyInput.KEY_G));
     }
 }

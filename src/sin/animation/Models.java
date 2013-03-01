@@ -16,7 +16,7 @@ import sin.world.CG;
 import sin.world.World;
 
 /**
- *
+ * Models - Creates and manages all Model classes.
  * @author SinisteRing
  */
 public class Models {
@@ -52,7 +52,7 @@ public class Models {
     public static class PlayerModel extends ModelTemplate{
         // Instance Variables:
         private RigidBodyControl rbc;
-
+        
         public static Node genHead(){
             Node part = new Node();
             CG.createSphere(part, "", .7f, T.v3f(0, .5f, 0), T.getMaterial("wall"), Sphere.TextureMode.Polar);
@@ -100,7 +100,7 @@ public class Models {
             CG.createBox(part, "", T.v3f(.4f, .2f, 1), T.v3f(0, -3f, .3f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
             return part;
         }
-
+        
         public PlayerModel(Node node, int id){
             super(node, "player:"+id);
             this.addPart(genHead(), "head", T.v3f(0, 1.75f, 0));

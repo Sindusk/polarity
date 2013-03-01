@@ -13,7 +13,7 @@ public class MovementManager {
     private static GameClient app;
     
     // Constant Variables:
-    private static final float MOVE_SPEED = 0.25f;
+    private static final float MOVE_SPEED = 0.50f;
     private static final float CROUCH_PENALTY = 0.6f;
     
     private static HashMap<MH, Boolean> movement = new HashMap();

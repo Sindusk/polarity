@@ -76,6 +76,7 @@ public class HUD {
     private static FloatingText[] texts = new FloatingText[FTEXT_NUM];
     private static BitmapText ping;
     private static BitmapText loc;
+    private static BitmapText fps;
     private static Geometry[] crosshair = new Geometry[4];
 
     public static Node getGUI(){
@@ -153,12 +154,14 @@ public class HUD {
             }
         }
         loc.setText("X: "+String.format("%5.0f", ploc.getX())+"\nY: "+String.format("%5.0f", ploc.getY())+"\nZ: "+String.format("%5.0f", ploc.getZ())+"\nFacing: "+compass);
+        fps.setText("FPS: " + String.format("%5.0f", 1/tpf));
         RecoilManager.updateCrosshairs();
     }
     public static void clear(){
         BarManager.clear();
         node.detachAllChildren();
     }
+    
     public static void initialize(GameClient app, Node root){
         HUD.app = app;
         root.attachChild(node);
@@ -189,8 +192,15 @@ public class HUD {
         loc.setColor(ColorRGBA.Cyan);
         loc.setSize(14);
         loc.setLocalTranslation(T.v3f(20, cy*2-40));
-        loc.setText("Location: X, Y, Z");
+        loc.setText("");
         node.attachChild(loc);
+        
+        fps = new BitmapText(T.getFont("Batman26"));
+        fps.setColor(ColorRGBA.Red);
+        fps.setSize(16);
+        fps.setLocalTranslation(T.v3f(20, cy*2-100));
+        fps.setText("");
+        node.attachChild(fps);
 
         // Initialize floating texts:
         int i = 0;

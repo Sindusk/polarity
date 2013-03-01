@@ -109,6 +109,7 @@ public class GameplayState extends AbstractAppState {
         Character.initialize(app);
         AttackManager.initialize(app);
         DecalManager.initialize(app);
+        HUD.initialize(app, gui);
         Models.initialize(app);
         MovementManager.initialize(app);
         NPCManager.initialize(app);
@@ -116,11 +117,10 @@ public class GameplayState extends AbstractAppState {
         RecoilManager.initialize(app);
         StatsManager.initialize(app);
         TracerManager.initialize(app);
+        World.initialize(app);
         
         // Initialize HUD & World:
-        World.initialize(app);
         World.createSinglePlayerArea(singleNode);
-        HUD.initialize(app, gui);
         
         character = new Character(
                 new M4A1(true), new LaserPistol(false),
@@ -135,6 +135,8 @@ public class GameplayState extends AbstractAppState {
         world.attachChild(miscNode);
         world.attachChild(projectileNode);
         root.attachChild(world);
+        
+        app.getInputManager().setCursorVisible(false);
     }
     
     @Override
@@ -155,11 +157,6 @@ public class GameplayState extends AbstractAppState {
     public void update(float tpf){
         super.update(tpf); // makes sure to execute AppTasks
         
-        // Clear client keys which are buggy and annoying:
-        if(!CLIENT_KEYS_CLEARED) {
-            ClearClientKeys();
-        }
-        
         // Update audio listeners:
         app.getListener().setLocation(app.getCamera().getLocation());
         app.getListener().setRotation(app.getCamera().getRotation());
@@ -173,9 +170,5 @@ public class GameplayState extends AbstractAppState {
         if(Networking.isConnected()) {
             Networking.update(tpf);
         }
-    }
-    private void ClearClientKeys(){
-        app.getInputManager().setCursorVisible(false);
-        CLIENT_KEYS_CLEARED = true;
     }
 }

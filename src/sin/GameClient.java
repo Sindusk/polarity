@@ -60,8 +60,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 public class GameClient extends Application{
     // --- Global Constant Variables --- //
-    private static final boolean MODE_DEBUG = false;            // Debug Mode
-    private static final String CLIENT_VERSION = "DEV 0.07";  // Client Version (Important for client-server connections)
+    private static final boolean MODE_DEBUG = false;         // Debug Mode
+    private static final String CLIENT_VERSION = "DEV 0.07"; // Client Version (Important for client-server connections)
+    private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
     
     // Important System Variables:
     private static final Logger logger = Logger.getLogger(GameClient.class.getName());
@@ -128,10 +129,12 @@ public class GameClient extends Application{
     }
     
     public void resetBulletAppState(){
-        stateManager.detach(bulletAppState);
+        if(stateManager.hasState(bulletAppState)){
+            stateManager.detach(bulletAppState);
+        }
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
+        bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
     }
     
     // Main:
@@ -186,14 +189,11 @@ public class GameClient extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize App States:
-        bulletAppState = new BulletAppState();  
         gameplayState = new GameplayState();
         menuState = new MenuState();
         // Attach App States:
-        stateManager.attach(bulletAppState);
         stateManager.attach(menuState);
-        
-        bulletAppState.getPhysicsSpace().setAccuracy(0.01f);
+        resetBulletAppState();
     }
     
     // Update:

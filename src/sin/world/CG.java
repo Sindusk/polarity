@@ -1,10 +1,6 @@
 package sin.world;
 
 import com.jme3.bullet.collision.shapes.CollisionShape;
-import com.jme3.bullet.collision.shapes.GImpactCollisionShape;
-import com.jme3.bullet.collision.shapes.MeshCollisionShape;
-import com.jme3.bullet.collision.shapes.PlaneCollisionShape;
-import com.jme3.bullet.collision.shapes.SimplexCollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.material.Material;
@@ -19,7 +15,6 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
-import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture;
 import sin.GameClient;
 import sin.netdata.GeometryData;
@@ -62,9 +57,8 @@ public class CG {
         Box b = new Box(Vector3f.ZERO, size.getX(), size.getY(), size.getZ());
         b.scaleTextureCoordinates(scale);
         Geometry g = new Geometry(name, b);
-        Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        m.setTexture("ColorMap", app.getAssetManager().loadTexture(tex));
-        m.getTextureParam("ColorMap").getTextureValue().setWrap(Texture.WrapMode.Repeat);
+        Material m = getMaterial(tex);
+        World.addMaterial(m);
         g.setMaterial(m);
         g.setLocalTranslation(trans);
         if(node != null) {
@@ -83,7 +77,6 @@ public class CG {
         Geometry g = createBox(node, name, size, trans, tex, scale);
         CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
         RigidBodyControl rbc = new RigidBodyControl(cs, 0);
-        rbc.setKinematic(true);
         g.addControl(rbc);
         app.getBulletAppState().getPhysicsSpace().add(rbc);
         return g;
@@ -92,7 +85,6 @@ public class CG {
         Geometry g = createBox(node, name, size, trans, color);
         CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
         RigidBodyControl rbc = new RigidBodyControl(cs, 0);
-        rbc.setKinematic(true);
         g.addControl(rbc);
         app.getBulletAppState().getPhysicsSpace().add(rbc);
         return g;
