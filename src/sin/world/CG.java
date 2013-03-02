@@ -115,6 +115,7 @@ public class CG {
         b.scaleTextureCoordinates(scale);
         Geometry g = new Geometry(name, b);
         Material m = getMaterial(tex);
+        World.addMaterial(m);
         g.setMaterial(m);
         g.setLocalTranslation(trans);
         if(node != null) {
@@ -145,6 +146,7 @@ public class CG {
         return g;
     }
     
+    // Quads:
     public static Geometry createQuad(Node node, String name, float width, float height, Vector3f trans, ColorRGBA color){
         Quad b = new Quad(width, height);
         Geometry g = new Geometry(name, b);

@@ -3,7 +3,7 @@
     <useControls filename="nifty-default-controls.xml"/>
     <useStyles filename="nifty-default-styles.xml"/>
     
-    <screen id="menu" controller="sin.appstates.MenuState">
+    <screen id="menu" controller="sin.appstates.ClientMenuState">
         <layer id="background" backgroundColor="#000f" childLayout="vertical">
             <panel height="8%" />
             <text text="Project Polarity" font="Interface/Fonts/Batman26.fnt" height="5%" align="center" />
@@ -51,7 +51,7 @@
         </layer>
     </screen>
     
-    <screen id="menu.multiplayer" controller="sin.appstates.MenuState">
+    <screen id="menu.multiplayer" controller="sin.appstates.ClientMenuState">
         <layer id="background" backgrounColor="#000f" childLayout="vertical">
             <panel height="8%" />
             <text text="Multiplayer" font="Interface/Fonts/Batman26.fnt" height="5%" align="center" />
@@ -88,7 +88,7 @@
         </layer>
     </screen>
     
-    <screen id="menu.character" controller="sin.appstates.MenuState">
+    <screen id="menu.character" controller="sin.appstates.ClientMenuState">
         <layer id="background" backgroundColor="#000f" childLayout="vertical">
             <panel height="8%" />
             <text text="Character" height="5%" font="Interface/Fonts/Batman26.fnt" color="#000f" align="center" />
@@ -103,7 +103,7 @@
         </layer>
     </screen>
     
-    <screen id="menu.options" controller="sin.appstates.MenuState">
+    <screen id="menu.options" controller="sin.appstates.ClientMenuState">
         <layer id="background" backgroundColor="#000f" childLayout="vertical">
             <panel height="8%" />
             <text text="Options" height="5%" font="Interface/Fonts/Batman26.fnt" color="#000f" align="center" />
@@ -131,7 +131,7 @@
         </layer>
     </screen>
     
-    <screen id="game.menu" controller="sin.appstates.MenuState">
+    <screen id="game.menu" controller="sin.appstates.ClientMenuState">
         <layer id="background" backgroundColor="#0005" childLayout="vertical">
             <panel height="8%" />
             <text text="Game Menu" height="5%" font="Interface/Fonts/Batman26.fnt" color="#000f" align="center" />
@@ -150,14 +150,6 @@
                 </effect>
                 <text font="Interface/Fonts/Batman26.fnt" text="Main Menu" />
                 <interact onClick="action(game.mainmenu)"/>
-            </panel>
-            <panel height="3%" />
-            <panel id="game.quit" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
-                <effect>
-                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
-                </effect>
-                <text font="Interface/Fonts/Batman26.fnt" text="Exit" />
-                <interact onClick="action(quit)"/>
             </panel>
         </layer>
     </screen>

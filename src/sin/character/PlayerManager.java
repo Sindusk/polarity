@@ -34,7 +34,6 @@ public class PlayerManager{
         }
         public void create(int id, Vector3f loc){
             this.model = new PlayerModel(app.getPlayerNode(), id);
-            model.create();
             used = true;
         }
         public void destroy(){

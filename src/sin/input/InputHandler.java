@@ -72,13 +72,11 @@ public class InputHandler{
                     TracerManager.clear();
                     DecalManager.clear();
                 }else if(bind.equals("Misc_Key_3")){
-                    app.getCharacter().getPlayer().setPhysicsLocation(T.v3f(-50, 110, 0));
+                    app.getCharacter().getPlayer().setPhysicsLocation(T.v3f(0, 110, 0));
                 }else if(bind.equals("Misc_Key_4")){
                     World.toggleWireframe();
                 }else if(bind.equals("Game_Menu")){
-                    app.getMenuState().getNifty().gotoScreen("game.menu");
-                    app.getInputManager().setCursorVisible(true);
-                    HUD.showCrosshairs(false);
+                    app.getMenuState().toggleGameMenu();
                 }
             }
         }

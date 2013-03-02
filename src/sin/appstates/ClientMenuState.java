@@ -10,19 +10,17 @@ import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import de.lessvoid.nifty.tools.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
 import sin.hud.HUD;
 import sin.network.Networking;
-import sin.world.World;
 
 /**
  *
  * @author SinisteRing
  */
-public class MenuState extends AbstractAppState implements ScreenController {
+public class ClientMenuState extends AbstractAppState implements ScreenController {
     private static GameClient app;
     
     private Nifty nifty;
@@ -32,41 +30,19 @@ public class MenuState extends AbstractAppState implements ScreenController {
         return nifty;
     }
     
-    public MenuState(){
-        //
-    }
+    public ClientMenuState(){}
     
-    @Override
-    public void initialize(AppStateManager stateManager, Application app){
-        super.initialize(stateManager, app);
-        MenuState.app = (GameClient) app;
-        
-        //Turn off the super annoying loggers:
-        Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
-        Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
-        Logger.getLogger("NiftyEventBusLog").setLevel(Level.SEVERE);
-        Logger.getAnonymousLogger().getParent().setLevel(java.util.logging.Level.SEVERE);
-        Logger.getLogger("de.lessvoid.nifty.*").setLevel(java.util.logging.Level.SEVERE);
-        
-        // Initialize nifty display:
-        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
-                MenuState.app.getAssetManager(), MenuState.app.getInputManager(),
-                MenuState.app.getAudioRenderer(), MenuState.app.getGuiViewPort());
-        this.nifty = niftyDisplay.getNifty();
-        nifty.fromXml("Interface/GUI.xml", "menu");
-        MenuState.app.getGuiViewPort().addProcessor(niftyDisplay);
+    public void toggleGameMenu(){
+        if(nifty.getCurrentScreen().getScreenId().equals("game.menu")){
+            nifty.gotoScreen("empty");
+            app.getInputManager().setCursorVisible(false);
+            HUD.showCrosshairs(true);
+        }else{
+            nifty.gotoScreen("game.menu");
+            app.getInputManager().setCursorVisible(true);
+            HUD.showCrosshairs(false);
+        }
     }
-    
-    @Override
-    public void cleanup(){
-        super.cleanup();
-    }
-    
-    @Override
-    public void update(float tpf){
-        super.update(tpf);
-    }
-    
     public void action(String action){
         // Main Menu:
         if(action.equals("start")){
@@ -82,7 +58,7 @@ public class MenuState extends AbstractAppState implements ScreenController {
         }else if(action.equals("options")){
             nifty.gotoScreen("menu.options");
         }else if(action.equals("quit")){
-            MenuState.app.stop();
+            app.stop();
         }
         // Multiplayer Menu:
         else if(action.equals("multiplayer.connect")){
@@ -121,6 +97,37 @@ public class MenuState extends AbstractAppState implements ScreenController {
             nifty.gotoScreen("menu");
             Networking.disconnect();
         }
+    }
+    
+    @Override
+    public void initialize(AppStateManager stateManager, Application app){
+        super.initialize(stateManager, app);
+        ClientMenuState.app = (GameClient) app;
+        
+        //Turn off the super annoying loggers:
+        Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
+        Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
+        Logger.getLogger("NiftyEventBusLog").setLevel(Level.SEVERE);
+        Logger.getAnonymousLogger().getParent().setLevel(Level.SEVERE);
+        Logger.getLogger("de.lessvoid.nifty.*").setLevel(Level.SEVERE);
+        
+        // Initialize nifty display:
+        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
+                ClientMenuState.app.getAssetManager(), ClientMenuState.app.getInputManager(),
+                ClientMenuState.app.getAudioRenderer(), ClientMenuState.app.getGuiViewPort());
+        this.nifty = niftyDisplay.getNifty();
+        nifty.fromXml("Interface/ClientGUI.xml", "menu");
+        ClientMenuState.app.getGuiViewPort().addProcessor(niftyDisplay);
+    }
+    
+    @Override
+    public void cleanup(){
+        super.cleanup();
+    }
+    
+    @Override
+    public void update(float tpf){
+        super.update(tpf);
     }
     
     public void bind(Nifty nifty, Screen screen) {

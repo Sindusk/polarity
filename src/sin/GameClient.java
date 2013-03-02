@@ -2,6 +2,7 @@ package sin;
 
 import com.jme3.app.Application;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.BulletAppState.ThreadingType;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
@@ -12,8 +13,8 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sin.appstates.GameplayState;
-import sin.appstates.MenuState;
+import sin.appstates.ClientGameplayState;
+import sin.appstates.ClientMenuState;
 import sin.hud.HUD;
 import sin.input.InputHandler;
 import sin.network.Networking;
@@ -59,29 +60,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 public class GameClient extends Application{
+    private static GameClient app;
+    
     // --- Global Constant Variables --- //
     private static final boolean MODE_DEBUG = false;         // Debug Mode
-    private static final String CLIENT_VERSION = "DEV 0.07"; // Client Version (Important for client-server connections)
+    private static final String CLIENT_VERSION = "DEV 0.08"; // Client Version (Important for client-server connections)
     private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
-    
-    // Important System Variables:
     private static final Logger logger = Logger.getLogger(GameClient.class.getName());
-    private static GameClient app;                  // The application itself (this).
+    
     // App States:
     private static BulletAppState bulletAppState;   // Physics State.
-    private static GameplayState gameplayState;     // Gameplay State.
-    private static MenuState menuState;             // Main Menu State.
+    private static ClientGameplayState gameplayState;     // Gameplay State.
+    private static ClientMenuState menuState;             // Main Menu State.
     
     // Nodes:
-    private Node rootNode = new Node("Root Node");   // Node encompassing all visual elements.
-    private Node guiNode = new Node("Gui Node");     // Node encompassing all GUI elements.
+    private Node root = new Node("Root");   // Node encompassing all visual elements.
+    private Node gui = new Node("GUI");     // Node encompassing all GUI elements.
     
     // Getters for Nodes:
     public Node getRoot(){
-        return rootNode;
+        return root;
     }
     public Node getGUI(){
-        return guiNode;
+        return gui;
     }
     // Gameplay State Nodes:
     public Node getCollisionNode(){
@@ -107,10 +108,10 @@ public class GameClient extends Application{
     }
     
     // Getters for States:
-    public GameplayState getGameplayState(){
+    public ClientGameplayState getGameplayState(){
         return gameplayState;
     }
-    public MenuState getMenuState(){
+    public ClientMenuState getMenuState(){
         return menuState;
     }
     public BulletAppState getBulletAppState(){
@@ -133,6 +134,7 @@ public class GameClient extends Application{
             stateManager.detach(bulletAppState);
         }
         bulletAppState = new BulletAppState();
+        bulletAppState.setThreadingType(ThreadingType.PARALLEL);
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
     }
@@ -159,7 +161,7 @@ public class GameClient extends Application{
         set.setSamples(0);
         set.setVSync(false);
         set.setRenderer(AppSettings.LWJGL_OPENGL1);
-        set.setTitle("Polarity");
+        set.setTitle("Polarity Client");
         app.setSettings(set);
         app.start();
         
@@ -170,10 +172,10 @@ public class GameClient extends Application{
     public void initialize(){
         super.initialize();
 
-        guiNode.setQueueBucket(Bucket.Gui);
-        guiNode.setCullHint(CullHint.Never);
-        viewPort.attachScene(rootNode);
-        guiViewPort.attachScene(guiNode);
+        gui.setQueueBucket(Bucket.Gui);
+        gui.setCullHint(CullHint.Never);
+        viewPort.attachScene(root);
+        guiViewPort.attachScene(gui);
         
         // Initialize keybinds & Tools.
         T.initialize(app);
@@ -184,13 +186,12 @@ public class GameClient extends Application{
         RecoilManager.initialize(app);
         Weapons.initialize(app);
         PlayerManager.initialize(app);
-        //Character.initialize(app);
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
         
         // Initialize App States:
-        gameplayState = new GameplayState();
-        menuState = new MenuState();
+        gameplayState = new ClientGameplayState();
+        menuState = new ClientMenuState();
         // Attach App States:
         stateManager.attach(menuState);
         resetBulletAppState();
@@ -203,16 +204,16 @@ public class GameClient extends Application{
         if (speed == 0 || paused) {
             return;
         }
-
         float tpf = timer.getTimePerFrame() * speed;
-        // update states
+        
+        // Update States:
         stateManager.update(tpf);
         
         // Update logical and geometric states:
-        rootNode.updateLogicalState(tpf);
-        guiNode.updateLogicalState(tpf);
-        rootNode.updateGeometricState();
-        guiNode.updateGeometricState();
+        root.updateLogicalState(tpf);
+        gui.updateLogicalState(tpf);
+        root.updateGeometricState();
+        gui.updateGeometricState();
 
         // Render display:
         stateManager.render(renderManager);

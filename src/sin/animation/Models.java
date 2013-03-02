@@ -120,13 +120,6 @@ public class Models {
             parts.get("arm.left").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
             parts.get("arm.right").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
         }
-        public void create(){
-            CollisionShape cs = CollisionShapeFactory.createMeshShape(this.getNode());
-            rbc = new RigidBodyControl(cs, 1);
-            rbc.setKinematic(true);
-            this.getNode().addControl(rbc);
-            //app.getBulletAppState().getPhysicsSpace().add(rbc);
-        }
         public void destroy(){
             this.getNode().removeControl(rbc);
             this.getNode().removeFromParent();

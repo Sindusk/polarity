@@ -19,7 +19,7 @@ import sin.weapons.AmmoManager.RechargeAmmo;
 import sin.weapons.AmmoManager.ReloadAmmo;
 import sin.weapons.AttackManager.AttackTemplate;
 import sin.weapons.AttackManager.MeleeAttack;
-import sin.weapons.AttackManager.RangedBulletAttack;
+import sin.weapons.AttackManager.RangedProjectileAttack;
 import sin.weapons.AttackManager.RangedRayAttack;
 import sin.weapons.RecoilManager.RH;
 import sin.world.CG;
@@ -359,7 +359,7 @@ public class Weapons{
             name = "M4A1";
             audio = new WeaponAudio(name, 1);
             ammo = new ReloadAmmo(30, 1.2f, left);
-            damage = new RangedBulletAttack("", "damage(4.5):destroy", 100f, 100f);
+            damage = new RangedProjectileAttack("", "damage(4.5):destroy", 100f, 100f);
             recoils = new Recoils(35, 65, -25, 25);
             spread = new Spread(0, 15);
             automatic = true;
@@ -378,11 +378,31 @@ public class Weapons{
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            damage = new RangedBulletAttack("spiral(0,0.05,0.1):spiral(1,0.05,0.1)", "damage(5.5):destroy", 100f, 85f);
+            damage = new RangedProjectileAttack("spiral(0,0.1,0.1)", "damage(5.5):destroy", 100f, 85f);
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;
             cooldown = 0.14f;
+            CreateModel();
+        }
+    }
+    
+    public static class LaserPistol extends RangedRechargeWeapon{
+        protected final void CreateModel(){
+            model.setLocalScale(.6f, .6f, .6f);
+            CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), T.getMaterial("wall"), T.v2f(1, 1));
+        }
+        public LaserPistol(boolean left){
+            super(Archetype.ENERGY, Classification.PISTOL, left);
+            name = "Laser Pistol";
+            audio = new WeaponAudio(name, 1.3f);
+            ammo = new RechargeAmmo(20, 0.5f, left);
+            damage = new RangedRayAttack("damage(6.8)", 65f);
+            recoils = new Recoils(40, 60, -15, 15);
+            spread = new Spread(0, 15);
+            automatic = false;
+            cooldown = 0.2f;
             CreateModel();
         }
     }
@@ -404,22 +424,22 @@ public class Weapons{
             CreateModel();
         }
     }
-    public static class LaserPistol extends RangedRechargeWeapon{
+    
+    public static class RocketLauncher extends RangedReloadWeapon{
         protected final void CreateModel(){
-            model.setLocalScale(.6f, .6f, .6f);
-            CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
-            CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), T.getMaterial("wall"), T.v2f(1, 1));
+            model.setLocalScale(.8f, .8f, .8f);
+            CG.createCylinder(model, "", .3f, 4f, T.v3f(0, 0, 2.5f), T.getMaterial("brick"), T.v2f(1, 1));
         }
-        public LaserPistol(boolean left){
-            super(Archetype.ENERGY, Classification.PISTOL, left);
-            name = "LaserPistol";
-            audio = new WeaponAudio(name, 1.3f);
-            ammo = new RechargeAmmo(20, 0.5f, left);
-            damage = new RangedRayAttack("damage(6.8)", 65f);
-            recoils = new Recoils(40, 60, -15, 15);
-            spread = new Spread(0, 15);
+        public RocketLauncher(boolean left){
+            super(Archetype.EXPLOSIVE, Classification.ASSAULT, left);
+            name = "Rocket Launcher";
+            audio = new WeaponAudio(name, 0.5f);
+            ammo = new ReloadAmmo(1, 1.3f, left);
+            damage = new RangedProjectileAttack("", "aoe(3, 3.4):destroy", 150f, 150f);
+            recoils = new Recoils(180, 240, 30, -30);
+            spread = new Spread(0, 0);
             automatic = false;
-            cooldown = 0.2f;
+            cooldown = 0.3f;
             CreateModel();
         }
     }

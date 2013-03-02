@@ -95,6 +95,9 @@ public class T {
             if(actions[i].contains("damage")){
                 args = getArgs(actions[i]);
                 AttackManager.damage(target, getValueF(args[0]));
+            }else if(actions[i].contains("aoe")){
+                args = getArgs(actions[i]);
+                AttackManager.damageAoE(target, getValueF(args[0]), getValueF(args[1]));
             }
             i++;
         }

@@ -10,7 +10,7 @@ import sin.GameClient;
  *
  * @author SinisteRing
  */
-public class CharacterState extends AbstractAppState {
+public class ClientCharacterState extends AbstractAppState {
     private static GameClient app;
     
     // All nodes used in Character screen:
@@ -21,7 +21,7 @@ public class CharacterState extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application theApp){
         // Basic initialization:
         super.initialize(stateManager, theApp);
-        CharacterState.app = (GameClient) theApp;
+        ClientCharacterState.app = (GameClient) theApp;
         
         // Initialize Nodes:
         root = new Node("Character_Root");

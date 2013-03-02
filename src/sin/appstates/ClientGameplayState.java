@@ -18,9 +18,9 @@ import sin.weapons.ProjectileManager;
 import sin.weapons.RecoilManager;
 import sin.world.TracerManager;
 import sin.weapons.Weapons.AK47;
-import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
 import sin.weapons.Weapons.Raygun;
+import sin.weapons.Weapons.RocketLauncher;
 import sin.world.CG;
 import sin.world.DecalManager;
 import sin.world.World;
@@ -29,7 +29,7 @@ import sin.world.World;
  *
  * @author SinisteRing
  */
-public class GameplayState extends AbstractAppState {
+public class ClientGameplayState extends AbstractAppState {
     private static GameClient app;
     
     private static boolean CLIENT_KEYS_CLEARED = false; // Boolean for stupid keys.
@@ -51,7 +51,7 @@ public class GameplayState extends AbstractAppState {
     private Node terrainNode = new Node("");    // Node for all world terrain.
     private Node tracerNode = new Node("");     // Node encompassing tracers, mainly for testing.
     
-    public GameplayState(){
+    public ClientGameplayState(){
         //
     }
     
@@ -91,7 +91,7 @@ public class GameplayState extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application theApp){
         // Basic initialization:
         super.initialize(stateManager, theApp);
-        GameplayState.app = (GameClient) theApp;
+        ClientGameplayState.app = (GameClient) theApp;
         
         // Create nodes:
         root = new Node("Gameplay_Root");
@@ -123,7 +123,7 @@ public class GameplayState extends AbstractAppState {
         World.createSinglePlayerArea(singleNode);
         
         character = new Character(
-                new M4A1(true), new LaserPistol(false),
+                new M4A1(true), new RocketLauncher(false),
                 new Raygun(true), new AK47(false), 100, 100);
         world.attachChild(character.getNode());
         

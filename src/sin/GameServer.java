@@ -1,6 +1,8 @@
 package sin;
 
+import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.ConnectionListener;
@@ -12,9 +14,15 @@ import com.jme3.network.Network;
 import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial.CullHint;
+import com.jme3.system.AppSettings;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sin.appstates.ServerListenState;
+import sin.appstates.ServerMenuState;
 import sin.netdata.ConnectData;
 import sin.netdata.DecalData;
 import sin.netdata.DisconnectData;
@@ -62,249 +70,95 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Game Server
  * @author SinisteRing
  */
-public class GameServer extends SimpleApplication implements ConnectionListener {
+public class GameServer extends Application{
+    private static GameServer app;
     
-    private static final String SERVER_VERSION = "DEV 0.07";
+    // Global Constant Variables:
+    private static final String SERVER_VERSION = "DEV 0.08";
     private static final Logger logger = Logger.getLogger(GameServer.class.getName());
-    private Player[] players = new Player[16];
-    private Server server = null;
     
-    private int FindEmptyID(){
-        int i = 0;
-        while(i < players.length){
-            if(!players[i].isConnected()){
-                return i;
-            }
-            i++;
-        }
-        return -1;
+    // App States:
+    private ServerMenuState menuState;
+    private ServerListenState listenState;
+    
+    // Nodes:
+    private Node root = new Node("Root");
+    private Node gui = new Node("GUI");
+    
+    public ServerListenState getListenState(){
+        return listenState;
     }
-    private void sendGeometry(HostedConnection c){
-        int i = 0;
-        while(i < World.getMap().size()){
-            c.send(World.getMap().get(i));
-            i++;
-        }
-    }
-
-    public void connectionAdded(Server server, HostedConnection conn) {
-        // Nothing needed here.
-    }
-    public void connectionRemoved(Server server, HostedConnection conn) {
-        int i = 0;
-        while(i < players.length){
-            if(conn == players[i].getConnection()){
-                server.broadcast(new DisconnectData(i));
-                players[i].disconnect();
-                conn.close("Disconnected.");
-            }
-            i++;
-        }
+    public String getVersion(){
+        return SERVER_VERSION;
     }
     
-    private void RegisterSerials(){
-        Serializer.registerClass(ConnectData.class);
-        server.addMessageListener(new ServerListener(), ConnectData.class);
-        Serializer.registerClass(DecalData.class);
-        server.addMessageListener(new ServerListener(), DecalData.class);
-        Serializer.registerClass(DisconnectData.class);
-        server.addMessageListener(new ServerListener(), DisconnectData.class);
-        Serializer.registerClass(ErrorData.class);
-        server.addMessageListener(new ServerListener(), ErrorData.class);
-        Serializer.registerClass(GeometryData.class);
-        server.addMessageListener(new ServerListener(), GeometryData.class);
-        Serializer.registerClass(IDData.class);
-        server.addMessageListener(new ServerListener(), IDData.class);
-        Serializer.registerClass(MoveData.class);
-        server.addMessageListener(new ServerListener(), MoveData.class);
-        Serializer.registerClass(PingData.class);
-        server.addMessageListener(new ServerListener(), PingData.class);
-        Serializer.registerClass(ProjectileData.class);
-        server.addMessageListener(new ServerListener(), ProjectileData.class);
-        Serializer.registerClass(ShotData.class);
-        server.addMessageListener(new ServerListener(), ShotData.class);
-        Serializer.registerClass(SoundData.class);
-        server.addMessageListener(new ServerListener(), SoundData.class);
+    @Override
+    public void start(){
+        super.start();
     }
-    
-    private class ServerListener implements MessageListener<HostedConnection>{
-        private HostedConnection connection;
-        private Server server;
-        
-        private void ConnectMessage(ConnectData d){
-            System.out.println("Handling ConnectData...");
-            if(d.GetVersion().equals(SERVER_VERSION)){
-                int id = FindEmptyID();
-                if(id == -1){
-                    System.out.println("Server full. [CM]");
-                    connection.send(new ErrorData(-1, "Server Full.", true));
-                }
-                //players[id].setConnection(connection);
-                System.out.println("Connecting player "+id+" [Version: "+SERVER_VERSION+"]... [CM]");
-                connection.send(new IDData(id, false));
-            }else{
-                connection.close("Invalid Version.");
-            }
-        }
-        private void DecalMessage(DecalData d){
-            server.broadcast(Filters.notEqualTo(connection), d);
-        }
-        private void ErrorMessage(ErrorData d){
-            System.out.println("Handling ErrorData [ID: "+d.getID()+"]...");
-            connection.close("Client Disconnection.");
-            players[d.getID()].disconnect();
-        }
-        private void IDMessage(IDData d){
-            T.log("Connecting player "+d.getID());
-            if(!players[d.getID()].isConnected()){
-                int id = d.getID();
-                int i = 0;
-                while(i < players.length){
-                    if(players[i].isConnected() && i != id) {
-                        connection.send(new ConnectData(i));
-                    }
-                    i++;
-                }
-                players[id].connect();
-                players[id].setConnection(connection);
-                server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
-                sendGeometry(connection);
-            }else{
-                int id = FindEmptyID();
-                if(id == -1){
-                    T.log("Server full. [IDM]");
-                    connection.send(new ErrorData(-1, "Server Full.", true));
-                    connection.close("Server Full");
-                }
-                System.out.println("Connecting player "+id+" [Version: "+SERVER_VERSION+"]... [IDM]");
-                connection.send(new IDData(id, false));
-            }
-        }
-        private void MoveMessage(MoveData d){
-            //System.out.println("Handling MoveData from client "+d.getID()+"...");
-            server.broadcast(Filters.notEqualTo(connection), d);
-            players[d.getID()].setLocation(d.getLocation(), d.getRotation());
-        }
-        private void PingMessage(PingData d){
-            connection.send(d);
-        }
-        private void ProjectileMessage(ProjectileData d){
-            server.broadcast(Filters.notEqualTo(connection), d);
-        }
-        private void ShotMessage(ShotData d){
-            //System.out.println("Handling ShotData from client "+d.getID()+"...");
-            System.out.println("Player "+d.getID()+" shot Player "+d.getPlayer()+" for "+d.getDamage()+" damage.");
-            server.broadcast(d);
-        }
-        private void SoundMessage(SoundData d){
-            //System.out.println("Handling SoundData from client "+d.getID());
-            server.broadcast(d);
-        }
-        
-        public void messageReceived(HostedConnection source, Message m) {
-            connection = source;
-            server = connection.getServer();
-            if(m instanceof ConnectData){
-                ConnectMessage((ConnectData) m);
-            }else if(m instanceof DecalData){
-                DecalMessage((DecalData) m);
-            }else if(m instanceof ErrorData){
-                ErrorMessage((ErrorData) m);
-            }else if(m instanceof IDData){
-                IDMessage((IDData) m);
-            }else if(m instanceof MoveData){
-                MoveMessage((MoveData) m);
-            }else if(m instanceof PingData){
-                PingMessage((PingData) m);
-            }else if(m instanceof ProjectileData){
-                ProjectileMessage((ProjectileData) m);
-            }else if(m instanceof ShotData){
-                ShotMessage((ShotData) m);
-            }else if(m instanceof SoundData){
-                SoundMessage((SoundData) m);
-            }
-        }
-    }
-    
-    private class Player{
-        private boolean connected = false;
-        private float health = 100;
-        private float shields = 100;
-        private HostedConnection connection;
-        //private Vector3f loc;
-        //private Quaternion rot;
-        public Player(){
-            //loc = v3f(0, 0, 0);
-        }
-        
-        public void setLocation(Vector3f loc, Quaternion rot){
-            //this.loc = loc;
-            //this.rot = rot;
-        }
-        public void setConnection(HostedConnection connection){
-            this.connection = connection;
-        }
-        public boolean isConnected(){
-            return connected;
-        }
-        public HostedConnection getConnection(){
-            return connection;
-        }
-        public float getHealth(){
-            return health;
-        }
-        public float getShields(){
-            return shields;
-        }
-        
-        public void connect(){
-            connected = true;
-        }
-        public void disconnect(){
-            connected = false;
-        }
-    }
-    
     public static void main(String[] args) throws IOException {
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
-        GameServer app = new GameServer();
-        //AppSettings set = new AppSettings(true);
-        app.showSettings = false;
+        app = new GameServer();
+        AppSettings set = new AppSettings(true);
+        set.setResolution(600, 400);
+        set.setSamples(0);
+        set.setVSync(false);
+        set.setRenderer(AppSettings.LWJGL_OPENGL1);
+        set.setTitle("Polarity Server");
+        app.setSettings(set);
         app.start();
     }
     
     @Override
-    public void simpleInitApp() {
-        try {
-            server = Network.createServer(6143);
-        }catch (IOException ex){
-            logger.log(Level.SEVERE, null, ex);
-        }
-        RegisterSerials();
-        server.addConnectionListener(this);
-        server.start();
-        int i = 0;
-        while(i < players.length){
-            players[i] = new Player();
-            i++;
-        }
-        flyCam.setDragToRotate(true);
-        World.generateWorldData();
+    public void initialize(){
+        super.initialize();
+        
+        // Initialize Root and GUI:
+        gui.setQueueBucket(Bucket.Gui);
+        gui.setCullHint(CullHint.Never);
+        viewPort.attachScene(root);
+        guiViewPort.attachScene(gui);
+        
+        // Extra stuff:
+        viewPort.setBackgroundColor(ColorRGBA.Black);
+        setPauseOnLostFocus(false);
+        
+        // Initialize App States:
+        menuState = new ServerMenuState();
+        listenState = new ServerListenState();
+        
+        // Attach App States:
+        stateManager.attach(menuState);
     }
 
     @Override
-    public void simpleUpdate(float tpf) {
-        //TODO: add update code
-    }
+    public void update() {
+        super.update(); // makes sure to execute AppTasks
+        if (speed == 0 || paused) {
+            return;
+        }
+        float tpf = timer.getTimePerFrame() * speed;
+        
+        // Update States:
+        stateManager.update(tpf);
+        
+        // Update logical and geometric states:
+        root.updateLogicalState(tpf);
+        gui.updateLogicalState(tpf);
+        root.updateGeometricState();
+        gui.updateGeometricState();
 
-    @Override
-    public void simpleRender(RenderManager rm) {
-        //TODO: add render code
+        // Render display:
+        stateManager.render(renderManager);
+        renderManager.render(tpf, context.isRenderable());
+        stateManager.postRender();
     }
     
     @Override
     public void destroy(){
-        server.close();
+        if(stateManager.hasState(listenState)){
+            stateManager.detach(listenState);
+        }
         super.destroy();
     }
 }

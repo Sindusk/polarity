@@ -20,7 +20,6 @@ import sin.world.DecalManager;
 public class AttackManager {
     private static GameClient app;
     
-    // Helper Functions:
     public static float modDamage(String part, float dmg){
         if(part.equals("head")){
             dmg *= 1.5f;
@@ -41,20 +40,10 @@ public class AttackManager {
             DecalManager.create(target.getContactPoint());
             Networking.send(new DecalData(target.getContactPoint()));
         }
-        /*int part = getHitbox(target.getGeometry().getName());
-        if(part >= 0){
-            int player = Integer.parseInt(target.getGeometry().getName().substring(0, 2));
-            float dmg = calculate(part, damage);
-            HUD.addFloatingText(PlayerManager.getPlayer(player).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), dmg);
-            if(Networking.isConnected()) {
-                Networking.send(new ShotData(Networking.getID(), player, dmg));
-            }
-        }else{
-            DecalManager.create(target.getContactPoint());
-            if(Networking.isConnected()) {
-                Networking.send(new DecalData(target.getContactPoint()));
-            }
-        }*/
+    }
+    public static void damageAoE(CollisionResult target, float radius, float damage){
+        DecalManager.create(target.getContactPoint());
+        Networking.send(new DecalData(target.getContactPoint()));
     }
     
     public static float getDistance(Vector3f player, Vector3f target){
@@ -124,7 +113,7 @@ public class AttackManager {
         
         public abstract void attack(Ray ray);
     }
-    public static class RangedBulletAttack extends RangedAttack{
+    public static class RangedProjectileAttack extends RangedAttack{
         private float speed;
         private String update;
         
@@ -132,7 +121,7 @@ public class AttackManager {
             return speed;
         }
         
-        public RangedBulletAttack(String update, String collision, float range, float speed){
+        public RangedProjectileAttack(String update, String collision, float range, float speed){
             super(collision, range);
             this.speed = speed;
             this.update = update;

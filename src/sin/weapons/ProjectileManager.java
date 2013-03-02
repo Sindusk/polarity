@@ -56,10 +56,8 @@ public class ProjectileManager {
             return used;
         }
         
-        private void collide(CollisionResult target){
-            if(target.getContactPoint().distance(location) < 0.2){
-                this.destroy();
-                //action.action(target);
+        private void collide(CollisionResult target, float dist){
+            if(target.getContactPoint().distance(location) <= dist*2){
                 T.ParseCollision(this, target);
             }
         }
@@ -70,7 +68,7 @@ public class ProjectileManager {
             projectile.setLocalTranslation(location);
             CollisionResult target = T.getClosestCollision(new Ray(location, direction));
             if(target != null){
-                this.collide(target);
+                this.collide(target, dist);
             }
             distance += dist;
             if(distance > maxDistance){

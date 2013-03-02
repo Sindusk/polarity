@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+    <useControls filename="nifty-default-controls.xml"/>
+    <useStyles filename="nifty-default-styles.xml"/>
+    
+    <screen id="menu" controller="sin.appstates.ServerMenuState">
+        <layer id="background" backgroundColor="#000f" childLayout="vertical">
+            <panel height="8%" />
+            <text text="Project Polarity" font="Interface/Fonts/Batman26.fnt" height="5%" align="center" />
+            <control name="label" id="menu.version" text="" font="Interface/Fonts/Batman26.fnt" height="5%" width="100%" align="center" />
+            <panel height="7%"/>
+            <panel id="menu.start" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                <effect>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                </effect>
+                <text font="Interface/Fonts/Batman26.fnt" color="#000f" text="Start Server" />
+                <interact onClick="action(start)"/>
+            </panel>
+            <panel height="3%"/>
+            <panel id="menu.quit" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                <effect>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                </effect>
+                <text font="Interface/Fonts/Batman26.fnt" text="Exit" />
+                <interact onClick="action(quit)"/>
+            </panel>
+        </layer>
+    </screen>
+    
+    <screen id="empty"></screen>
+</nifty>
