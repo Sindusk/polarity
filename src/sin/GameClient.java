@@ -13,9 +13,8 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sin.appstates.ClientGameplayState;
+import sin.appstates.ClientGameState;
 import sin.appstates.ClientMenuState;
-import sin.hud.HUD;
 import sin.input.InputHandler;
 import sin.network.Networking;
 import sin.character.Character;
@@ -66,12 +65,11 @@ public class GameClient extends Application{
     private static final boolean MODE_DEBUG = false;         // Debug Mode
     private static final String CLIENT_VERSION = "DEV 0.08"; // Client Version (Important for client-server connections)
     private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
-    private static final Logger logger = Logger.getLogger(GameClient.class.getName());
     
     // App States:
-    private static BulletAppState bulletAppState;   // Physics State.
-    private static ClientGameplayState gameplayState;     // Gameplay State.
-    private static ClientMenuState menuState;             // Main Menu State.
+    private static BulletAppState bulletAppState;       // Physics State.
+    private static ClientGameState gameplayState;   // Gameplay State.
+    private static ClientMenuState menuState;           // Main Menu State.
     
     // Nodes:
     private Node root = new Node("Root");   // Node encompassing all visual elements.
@@ -108,7 +106,7 @@ public class GameClient extends Application{
     }
     
     // Getters for States:
-    public ClientGameplayState getGameplayState(){
+    public ClientGameState getGameplayState(){
         return gameplayState;
     }
     public ClientMenuState getMenuState(){
@@ -149,10 +147,10 @@ public class GameClient extends Application{
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         if(MODE_DEBUG){
             try {
-                logger.addHandler(new FileHandler("FPSlog.xml"));
+                Logger.getLogger("polarity").addHandler(new FileHandler("FPSlog.xml"));
                 Logger.getLogger("com.jme3").addHandler(new FileHandler("FPSlog2.xml"));
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
+                T.log(ex);
             }
         }
         app = new GameClient();
@@ -178,7 +176,7 @@ public class GameClient extends Application{
         guiViewPort.attachScene(gui);
         
         // Initialize keybinds & Tools.
-        T.initialize(app);
+        T.initialize(assetManager);
         InputHandler.initialize(app, context);
         
         // Initialize new HUD & remove debug HUD elements:
@@ -190,7 +188,7 @@ public class GameClient extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize App States:
-        gameplayState = new ClientGameplayState();
+        gameplayState = new ClientGameState();
         menuState = new ClientMenuState();
         // Attach App States:
         stateManager.attach(menuState);

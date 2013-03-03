@@ -4,7 +4,6 @@ import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -15,9 +14,9 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
-import com.jme3.texture.Texture;
 import sin.GameClient;
 import sin.netdata.GeometryData;
+import sin.tools.T;
 
 /**
  * CG (Create Geometry) - Used to create geometries of all types without multiple lines of code.
@@ -25,28 +24,12 @@ import sin.netdata.GeometryData;
  */
 public class CG {
     private static GameClient app;
-    
-    private static Material getMaterial(ColorRGBA color){
-            Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            m.setColor("Color", color);
-            if(color.getAlpha() < 1){
-                m.setTransparent(true);
-                m.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-            }
-            return m;
-        }
-    private static Material getMaterial(String tex){
-        Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        m.setTexture("ColorMap", app.getAssetManager().loadTexture(tex));
-        m.getTextureParam("ColorMap").getTextureValue().setWrap(Texture.WrapMode.Repeat);
-        return m;
-    }
 
     // Boxes:
     public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
         Box b = new Box(trans, size.getX(), size.getY(), size.getZ());
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(color);
+        Material m = T.getMaterial(color);
         g.setMaterial(m);
         if(node != null) {
             node.attachChild(g);
@@ -57,7 +40,7 @@ public class CG {
         Box b = new Box(Vector3f.ZERO, size.getX(), size.getY(), size.getZ());
         b.scaleTextureCoordinates(scale);
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(tex);
+        Material m = T.getMaterial(tex);
         World.addMaterial(m);
         g.setMaterial(m);
         g.setLocalTranslation(trans);
@@ -102,7 +85,7 @@ public class CG {
         Cylinder b = new Cylinder(16, 16, radius, length, true);
         b.scaleTextureCoordinates(scale);
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(color);
+        Material m = T.getMaterial(color);
         g.setMaterial(m);
         g.setLocalTranslation(trans);
         if(node != null) {
@@ -114,7 +97,7 @@ public class CG {
         Cylinder b = new Cylinder(16, 16, radius, length, true);
         b.scaleTextureCoordinates(scale);
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(tex);
+        Material m = T.getMaterial(tex);
         World.addMaterial(m);
         g.setMaterial(m);
         g.setLocalTranslation(trans);
@@ -138,7 +121,7 @@ public class CG {
         Line b = new Line(start, stop);
         b.setLineWidth(width);
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(color);
+        Material m = T.getMaterial(color);
         g.setMaterial(m);
         if(node != null) {
             node.attachChild(g);
@@ -150,7 +133,7 @@ public class CG {
     public static Geometry createQuad(Node node, String name, float width, float height, Vector3f trans, ColorRGBA color){
         Quad b = new Quad(width, height);
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(color);
+        Material m = T.getMaterial(color);
         g.setMaterial(m);
         if(node != null){
             node.attachChild(g);
@@ -162,7 +145,7 @@ public class CG {
     public static Geometry createSphere(Node node, String name, float radius, Vector3f trans, ColorRGBA color){
         Sphere b = new Sphere(16, 16, radius);
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(color);
+        Material m = T.getMaterial(color);
         g.setMaterial(m);
         g.setLocalTranslation(trans);
         if(node != null) {
@@ -174,7 +157,7 @@ public class CG {
         Sphere b = new Sphere(16, 16, radius);
         b.setTextureMode(mode);
         Geometry g = new Geometry(name, b);
-        Material m = getMaterial(tex);
+        Material m = T.getMaterial(tex);
         g.setMaterial(m);
         g.setLocalTranslation(trans);
         if(node != null) {

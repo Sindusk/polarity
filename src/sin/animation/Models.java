@@ -55,49 +55,49 @@ public class Models {
         
         public static Node genHead(){
             Node part = new Node();
-            CG.createSphere(part, "", .7f, T.v3f(0, .5f, 0), T.getMaterial("wall"), Sphere.TextureMode.Polar);
-            CG.createSphere(part, "", .5f, T.v3f(0, .1f, 0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", .7f, T.v3f(0, .5f, 0), T.getMaterialPath("wall"), Sphere.TextureMode.Polar);
+            CG.createSphere(part, "", .5f, T.v3f(0, .1f, 0), T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             return part;
         }
         public static Node genTorso(){
             Node part = new Node();
-            CG.createBox(part, "", T.v3f(1.2f, .6f, .4f), T.v3f(0, .75f, 0), T.getMaterial("BC_Tex"), T.v2f(1, 1));
-            CG.createBox(part, "", T.v3f(.95f, .4f, .35f), T.v3f(0, -.2f, 0), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            CG.createBox(part, "", T.v3f(1.2f, .6f, .4f), T.v3f(0, .75f, 0), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
+            CG.createBox(part, "", T.v3f(.95f, .4f, .35f), T.v3f(0, -.2f, 0), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
             float radius = .75f;
             Vector3f trans = T.v3f(-.6f, .85f, 0);
-            CG.createSphere(part, "", radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", radius, trans, T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             trans.setX(trans.getX()*-1);
-            CG.createSphere(part, "", radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", radius, trans, T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             radius = .5f;
             trans = T.v3f(.3f, -.7f, -.1f);
-            CG.createSphere(part, "", radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", radius, trans, T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             trans.setX(trans.getX()*-1);
-            CG.createSphere(part, "", radius, trans, T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", radius, trans, T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             return part;
         }
         public static Node genArm(){
             Node part = new Node();
-            CG.createSphere(part, "", .65f, T.v3f(0,0,0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", .65f, T.v3f(0,0,0), T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             Quaternion facing = new Quaternion().fromAngleAxis(-FastMath.PI/2.3f, Vector3f.UNIT_X);
-            Geometry g = CG.createCylinder(part, "", .45f, 1.7f, T.v3f(0, -.95f, -.2f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            Geometry g = CG.createCylinder(part, "", .45f, 1.7f, T.v3f(0, -.95f, -.2f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
             g.setLocalRotation(facing);
-            CG.createSphere(part, "", .5f, T.v3f(0, -1.6f, -.35f), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
-            CG.createCylinder(part, "", .42f, 1.7f, T.v3f(0, -1.65f, .55f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
-            CG.createBox(part, "", T.v3f(.5f, .5f, .5f), T.v3f(0, -1.65f, 1.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            CG.createSphere(part, "", .5f, T.v3f(0, -1.6f, -.35f), T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createCylinder(part, "", .42f, 1.7f, T.v3f(0, -1.65f, .55f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
+            CG.createBox(part, "", T.v3f(.5f, .5f, .5f), T.v3f(0, -1.65f, 1.5f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
             return part;
         }
         public static Node genLeg(){
             Node part = new Node();
-            CG.createSphere(part, "", .5f, T.v3f(0, 0, 0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", .5f, T.v3f(0, 0, 0), T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             Quaternion facing = new Quaternion().fromAngleAxis(FastMath.PI/2.3f, Vector3f.UNIT_X);
-            Geometry g = CG.createCylinder(part, "", .45f, 1.2f, T.v3f(0, -.5f, .1f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            Geometry g = CG.createCylinder(part, "", .45f, 1.2f, T.v3f(0, -.5f, .1f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
             g.setLocalRotation(facing);
-            CG.createSphere(part, "", .5f, T.v3f(0, -1.2f, .2f), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createSphere(part, "", .5f, T.v3f(0, -1.2f, .2f), T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
             facing = new Quaternion().fromAngleAxis(FastMath.PI/1.8f, Vector3f.UNIT_X);
-            g = CG.createCylinder(part, "", .45f, 1.2f, T.v3f(0, -1.8f, .1f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            g = CG.createCylinder(part, "", .45f, 1.2f, T.v3f(0, -1.8f, .1f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
             g.setLocalRotation(facing);
-            CG.createSphere(part, "", .5f, T.v3f(0, -2.3f, 0), T.getMaterial("BC_Tex"), Sphere.TextureMode.Projected);
-            CG.createBox(part, "", T.v3f(.4f, .2f, 1), T.v3f(0, -3f, .3f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            CG.createSphere(part, "", .5f, T.v3f(0, -2.3f, 0), T.getMaterialPath("BC_Tex"), Sphere.TextureMode.Projected);
+            CG.createBox(part, "", T.v3f(.4f, .2f, 1), T.v3f(0, -3f, .3f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
             return part;
         }
         

@@ -5,6 +5,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import java.util.logging.Level;
@@ -25,9 +26,17 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
         // Main Menu:
         if(action.equals("start")){
             app.getStateManager().attach(app.getListenState());
-            nifty.gotoScreen("empty");
+            nifty.gotoScreen("console");
         }else if(action.equals("quit")){
             app.stop();
+        }
+        // Console:
+        else if(action.equals("console.game")){
+            app.getStateManager().attach(app.getGameState());
+            nifty.gotoScreen("empty");
+        }else if(action.equals("console.stop")){
+            app.getStateManager().detach(app.getListenState());
+            nifty.gotoScreen("menu");
         }
     }
     
@@ -55,7 +64,13 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
     public void bind(Nifty nifty, Screen screen) {
         this.nifty = nifty;
         this.screen = screen;
-        //throw new UnsupportedOperationException("Not supported yet.");
+        if(screen.getScreenId().equals("menu")){
+            Label t = screen.findNiftyControl("menu.version", Label.class);
+            t.setText(app.getVersion());
+        }else if(screen.getScreenId().equals("console")){
+            Label t = screen.findNiftyControl("console.version", Label.class);
+            t.setText(app.getVersion());
+        }
     }
     
     public void onStartScreen() {

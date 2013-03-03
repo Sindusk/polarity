@@ -26,13 +26,11 @@ import sin.world.DecalManager;
 import sin.world.World;
 
 /**
- *
+ * Client Game State - AppState which controls the in-game functions for Polarity.
  * @author SinisteRing
  */
-public class ClientGameplayState extends AbstractAppState {
+public class ClientGameState extends AbstractAppState{
     private static GameClient app;
-    
-    private static boolean CLIENT_KEYS_CLEARED = false; // Boolean for stupid keys.
     
     // Classes used for logic:
     private Character character;    // Used for character (user) control.
@@ -51,7 +49,7 @@ public class ClientGameplayState extends AbstractAppState {
     private Node terrainNode = new Node("");    // Node for all world terrain.
     private Node tracerNode = new Node("");     // Node encompassing tracers, mainly for testing.
     
-    public ClientGameplayState(){
+    public ClientGameState(){
         //
     }
     
@@ -91,7 +89,7 @@ public class ClientGameplayState extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application theApp){
         // Basic initialization:
         super.initialize(stateManager, theApp);
-        ClientGameplayState.app = (GameClient) theApp;
+        app = (GameClient) theApp;
         
         // Create nodes:
         root = new Node("Gameplay_Root");

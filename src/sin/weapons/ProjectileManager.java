@@ -66,7 +66,7 @@ public class ProjectileManager {
             float dist = movement.distance(Vector3f.ZERO);
             T.addv3f(location, movement);
             projectile.setLocalTranslation(location);
-            CollisionResult target = T.getClosestCollision(new Ray(location, direction));
+            CollisionResult target = T.getClosestCollision(new Ray(location, direction), app.getCollisionNode());
             if(target != null){
                 this.collide(target, dist);
             }

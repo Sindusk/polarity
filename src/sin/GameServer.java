@@ -21,6 +21,7 @@ import com.jme3.system.AppSettings;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sin.appstates.ServerGameState;
 import sin.appstates.ServerListenState;
 import sin.appstates.ServerMenuState;
 import sin.netdata.ConnectData;
@@ -75,16 +76,24 @@ public class GameServer extends Application{
     
     // Global Constant Variables:
     private static final String SERVER_VERSION = "DEV 0.08";
-    private static final Logger logger = Logger.getLogger(GameServer.class.getName());
     
     // App States:
-    private ServerMenuState menuState;
+    private ServerGameState gameState;
     private ServerListenState listenState;
+    private ServerMenuState menuState;
     
     // Nodes:
     private Node root = new Node("Root");
     private Node gui = new Node("GUI");
     
+    // Getters for Nodes:
+    public Node getRoot(){
+        return root;
+    }
+    
+    public ServerGameState getGameState(){
+        return gameState;
+    }
     public ServerListenState getListenState(){
         return listenState;
     }
@@ -124,8 +133,9 @@ public class GameServer extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize App States:
-        menuState = new ServerMenuState();
+        gameState = new ServerGameState();
         listenState = new ServerListenState();
+        menuState = new ServerMenuState();
         
         // Attach App States:
         stateManager.attach(menuState);

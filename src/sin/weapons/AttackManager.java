@@ -90,7 +90,7 @@ public class AttackManager {
         }
         
         public void attack(Ray ray){
-            CollisionResult target = T.getClosestCollision(ray);
+            CollisionResult target = T.getClosestCollision(ray, app.getCollisionNode());
             if(target != null){
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
@@ -135,7 +135,7 @@ public class AttackManager {
             super(collision, range);
         }
         public void attack(Ray ray){
-            CollisionResult target = T.getClosestCollision(ray);
+            CollisionResult target = T.getClosestCollision(ray, app.getCollisionNode());
             if(target != null){
                 float d = getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){

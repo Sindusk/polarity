@@ -351,8 +351,8 @@ public class Weapons{
     public static class M4A1 extends RangedReloadWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            CG.createCylinder(model, "", .15f, 2f, T.v3f(0, 0, 3.2f), T.getMaterial("wall"), T.v2f(1, 1));
-            CG.createBox(model, "", T.v3f(.25f, .25f, 2.5f), T.v3f(0, 0, 1f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            CG.createCylinder(model, "", .15f, 2f, T.v3f(0, 0, 3.2f), T.getMaterialPath("wall"), T.v2f(1, 1));
+            CG.createBox(model, "", T.v3f(.25f, .25f, 2.5f), T.v3f(0, 0, 1f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
         }
         public M4A1(boolean left){
             super(Archetype.MODERN, Classification.ASSAULT, left);
@@ -370,8 +370,8 @@ public class Weapons{
     public static class AK47 extends RangedReloadWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            CG.createBox(model, "", T.v3f(.2f, .2f, 1.7f), T.v3f(0f, 0f, 2f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
-            CG.createBox(model, "", T.v3f(.15f, .2f, .3f), T.v3f(0f, .2f, 2f), T.getMaterial("brick"), T.v2f(1, 1));
+            CG.createBox(model, "", T.v3f(.2f, .2f, 1.7f), T.v3f(0f, 0f, 2f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
+            CG.createBox(model, "", T.v3f(.15f, .2f, .3f), T.v3f(0f, .2f, 2f), T.getMaterialPath("brick"), T.v2f(1, 1));
         }
         public AK47(boolean left){
             super(Archetype.MODERN, Classification.ASSAULT, left);
@@ -390,8 +390,8 @@ public class Weapons{
     public static class LaserPistol extends RangedRechargeWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
-            CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), T.getMaterial("wall"), T.v2f(1, 1));
+            CG.createBox(model, "", T.v3f(.2f, .2f, .9f), T.v3f(0, 0, 3.5f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
+            CG.createBox(model, "", T.v3f(.15f, .4f, .25f), T.v3f(0f, -.4f, 3f), T.getMaterialPath("wall"), T.v2f(1, 1));
         }
         public LaserPistol(boolean left){
             super(Archetype.ENERGY, Classification.PISTOL, left);
@@ -409,7 +409,7 @@ public class Weapons{
     public static class Raygun extends RangedRechargeWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.6f, .6f, .6f);
-            CG.createCylinder(model, "", .2f, 3f, T.v3f(0, 0, 2.5f), T.getMaterial("BC_Tex"), T.v2f(1, 1));
+            CG.createCylinder(model, "", .2f, 3f, T.v3f(0, 0, 2.5f), T.getMaterialPath("BC_Tex"), T.v2f(1, 1));
         }
         public Raygun(boolean left){
             super(Archetype.ENERGY, Classification.LASER, left);
@@ -428,7 +428,7 @@ public class Weapons{
     public static class RocketLauncher extends RangedReloadWeapon{
         protected final void CreateModel(){
             model.setLocalScale(.8f, .8f, .8f);
-            CG.createCylinder(model, "", .3f, 4f, T.v3f(0, 0, 2.5f), T.getMaterial("brick"), T.v2f(1, 1));
+            CG.createCylinder(model, "", .3f, 4f, T.v3f(0, 0, 2.5f), T.getMaterialPath("brick"), T.v2f(1, 1));
         }
         public RocketLauncher(boolean left){
             super(Archetype.EXPLOSIVE, Classification.ASSAULT, left);

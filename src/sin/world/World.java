@@ -28,7 +28,7 @@ public class World {
     private static final int HALL_LENGTH_MAX = 25;
     private static final int HALL_MAX_RADIUS = 35;
     private static final int HALL_SPREAD = 5;
-    private static final int HALL_WIDTH = 1;
+    private static final int HALL_WIDTH = 2;
     
     private static HashMap<Vector3f, String> world = new HashMap();
     private static ArrayList<GeometryData> map = new ArrayList();
@@ -107,8 +107,12 @@ public class World {
         if(xl == 0 && zl == 0){
             return;
         }
+        if(i < spaces){
+            loc = T.v3f(x+(i*xi), start.getY(), z+(i*zi));
+            generateWall(loc, xi, zi, spaces-i, left);
+        }
         loc = T.v3f(x+(i*xi)-(xl/2), start.getY(), z+(i*zi)-(zl/2));
-        map.add(geoWall(loc.getX()-((xi-zi)*mod/2), loc.getY(), loc.getZ()-((zi-xi)*mod/2), xl, zl, T.getMaterial("BC_Tex"), T.v2f(Math.max(FastMath.abs(xl), FastMath.abs(zl)), 1), true));
+        map.add(geoWall(loc.getX()-((xi-zi)*mod/2), loc.getY(), loc.getZ()-((zi-xi)*mod/2), xl, zl, T.getMaterialPath("BC_Tex"), T.v2f(Math.max(FastMath.abs(xl), FastMath.abs(zl)), 1), true));
     }
     public static void generateHallway(Vector3f start, float xi, float zi){
         Vector3f loc;
@@ -196,10 +200,10 @@ public class World {
         if(zs == 0){
             zs = HALL_WIDTH*2-1;
         }
-        map.add(geoFloor(xloc, start.getY(), zloc, xs, zs, T.getMaterial("lava_rock"), T.v2f(zs, xs), true));
+        map.add(geoFloor(xloc, start.getY(), zloc, xs, zs, T.getMaterialPath("lava_rock"), T.v2f(zs, xs), true));
     }
     public static void generateStart(){
-        map.add(geoFloor(0, 0, 0, 5, 5, T.getMaterial("brick"), T.v2f(5, 5), true));
+        map.add(geoFloor(0, 0, 0, 5, 5, T.getMaterialPath("brick"), T.v2f(5, 5), true));
         int x = -2;
         int z;
         while(x <= 2){
@@ -219,12 +223,12 @@ public class World {
         generateStart();
         generateHallway(start, xi, zi);
     }
-    public static void createGeometry(GeometryData d){
+    public static void createGeometry(Node node, GeometryData d){
         if(d.getType().equals("box")){
             if(d.getPhy()){
-                CG.createPhyBox(app.getTerrain(), d);
+                CG.createPhyBox(node, d);
             }else{
-                CG.createBox(app.getTerrain(), d);
+                CG.createBox(node, d);
             }
         }
     }
@@ -235,8 +239,8 @@ public class World {
     
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
-        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, -1, 0), T.getMaterial("lava_rock"), T.v2f(5, 5));
-        CG.createPhyBox(node, "wall", T.v3f(30, 20, 0.1f), T.v3f(0, 20, -60), T.getMaterial("BC_Tex"), T.v2f(15, 10));
+        CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, -1, 0), T.getMaterialPath("lava_rock"), T.v2f(5, 5));
+        CG.createPhyBox(node, "wall", T.v3f(30, 20, 0.1f), T.v3f(0, 20, -60), T.getMaterialPath("BC_Tex"), T.v2f(15, 10));
         //CG.createPhyBox(node, "platform", T.v3f(3, 3, 3), T.v3f(-50, 0, 0), ColorRGBA.Black);
         CG.createPhyBox(node, "savior", T.v3f(10, 0.1f, 10), T.v3f(0, -101, 0), ColorRGBA.Yellow);
     }
