@@ -23,6 +23,7 @@ import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.ShotData;
 import sin.netdata.SoundData;
+import sin.character.Character;
 import sin.character.PlayerManager;
 import sin.hud.HUD;
 import sin.netdata.GeometryData;
@@ -132,7 +133,7 @@ public class Networking {
 
         // Send updated movement data:
         if(timers[MOVE] >= MOVE_INTERVAL){
-            client.send(new MoveData(CLIENT_ID, app.getCharacter().getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
+            client.send(new MoveData(CLIENT_ID, Character.getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
     }
@@ -190,7 +191,7 @@ public class Networking {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     World.createGeometry(app.getTerrain(), w);
-                    app.getCharacter().kill();
+                    Character.kill();
                     return null;
                 }
             });
@@ -242,7 +243,7 @@ public class Networking {
                 final float damage = d.getDamage();
                 app.enqueue(new Callable<Void>(){
                     public Void call() throws Exception{
-                        app.getCharacter().damage(damage);
+                        Character.damage(damage);
                         return null;
                     }
                 });

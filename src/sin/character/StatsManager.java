@@ -2,7 +2,6 @@ package sin.character;
 
 import com.jme3.math.FastMath;
 import java.util.HashMap;
-import sin.GameClient;
 import sin.hud.BarManager;
 import sin.character.PlayerManager.Player;
 import sin.hud.HUD;
@@ -12,8 +11,6 @@ import sin.hud.HUD;
  * @author SinisteRing
  */
 public class StatsManager {
-    private static GameClient app;
-    
     private static PlayerStats characterStats = new PlayerStats();
     private static HashMap<Player, PlayerStats> playerStats = new HashMap();
     
@@ -49,13 +46,13 @@ public class StatsManager {
                     health += shields;
                     shields = 0;
                     if(health <= 0){
-                        app.getCharacter().kill();
+                        Character.kill();
                     }
                 }
             }else{
                 health -= damage;
                 if(health <= 0){
-                    app.getCharacter().kill();
+                    Character.kill();
                 }
             }
             update();
@@ -82,9 +79,5 @@ public class StatsManager {
     }
     public static void refreshCharacter(){
         characterStats.refresh();
-    }
-    
-    public static void initialize(GameClient app){
-        StatsManager.app = app;
     }
 }

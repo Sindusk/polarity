@@ -1,5 +1,6 @@
 package sin.world;
 
+import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
@@ -14,7 +15,6 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
-import sin.GameClient;
 import sin.netdata.GeometryData;
 import sin.tools.T;
 
@@ -23,7 +23,7 @@ import sin.tools.T;
  * @author SinisteRing
  */
 public class CG {
-    private static GameClient app;
+    private static BulletAppState bulletAppState;
 
     // Boxes:
     public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
@@ -61,7 +61,7 @@ public class CG {
         CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
         RigidBodyControl rbc = new RigidBodyControl(cs, 0);
         g.addControl(rbc);
-        app.getBulletAppState().getPhysicsSpace().add(rbc);
+        bulletAppState.getPhysicsSpace().add(rbc);
         return g;
     }
     public static Geometry createPhyBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
@@ -69,7 +69,7 @@ public class CG {
         CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
         RigidBodyControl rbc = new RigidBodyControl(cs, 0);
         g.addControl(rbc);
-        app.getBulletAppState().getPhysicsSpace().add(rbc);
+        bulletAppState.getPhysicsSpace().add(rbc);
         return g;
     }
     public static Geometry createPhyBox(Node node, GeometryData d){
@@ -112,7 +112,7 @@ public class CG {
         RigidBodyControl rbc = new RigidBodyControl(cs, 0);
         rbc.setKinematic(true);
         g.addControl(rbc);
-        app.getBulletAppState().getPhysicsSpace().add(rbc);
+        bulletAppState.getPhysicsSpace().add(rbc);
         return g;
     }
 
@@ -166,7 +166,7 @@ public class CG {
         return g;
     }
     
-    public static void initialize(GameClient app){
-        CG.app = app;
+    public static void initialize(BulletAppState bulletAppState){
+        CG.bulletAppState = bulletAppState;
     }
 }

@@ -4,8 +4,8 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import java.util.HashMap;
-import sin.GameClient;
 import sin.hud.HUD;
 
 /**
@@ -13,7 +13,7 @@ import sin.hud.HUD;
  * @author SinisteRing
  */
 public class RecoilManager{
-    public static GameClient app;
+    public static Camera cam;
     
     // Constant Variables:
     private static final float RECOIL_SENSITIVITY = 1;
@@ -41,9 +41,9 @@ public class RecoilManager{
         Matrix3f mat = new Matrix3f();
         mat.fromAngleNormalAxis(sensitivity * value, axis);
 
-        Vector3f up = app.getCamera().getUp();
-        Vector3f left = app.getCamera().getLeft();
-        Vector3f dir = app.getCamera().getDirection();
+        Vector3f up = cam.getUp();
+        Vector3f left = cam.getLeft();
+        Vector3f dir = cam.getDirection();
         Quaternion quat = new Quaternion();
         quat.lookAt(dir, up);
 
@@ -58,12 +58,12 @@ public class RecoilManager{
         float angleY = dir.angleBetween(Vector3f.UNIT_Y);
         float angleYDegree = angleY * 180 / FastMath.PI ;
         if(angleYDegree>=5 && angleYDegree<=175 && up.y>=0) {
-            app.getCamera().setAxes(q);
+            cam.setAxes(q);
         }
     }
 
     public static void RecoilUp(float mod){
-        app.getCamera().getRotation().multLocal(new Quaternion().fromAngleAxis(-RECOIL_UP_INC*mod, Vector3f.UNIT_X));
+        cam.getRotation().multLocal(new Quaternion().fromAngleAxis(-RECOIL_UP_INC*mod, Vector3f.UNIT_X));
 
         // Update variables:
         addRecoil(RH.UP, RECOIL_UP_INC*mod);
@@ -77,7 +77,7 @@ public class RecoilManager{
         setRecoil(RH.LEFT_TOTAL, getRecoil(RH.LEFT));
     }
     public static void DecoilUp(float mod){
-        app.getCamera().getRotation().multLocal(new Quaternion().fromAngleAxis(-mod, Vector3f.UNIT_X));
+        cam.getRotation().multLocal(new Quaternion().fromAngleAxis(-mod, Vector3f.UNIT_X));
     }
     public static void DecoilLeft(float mod){
         rotateCamera(mod, RECOIL_SENSITIVITY, Vector3f.UNIT_Y);
@@ -131,8 +131,10 @@ public class RecoilManager{
             }
         }
     
-    public static void initialize(GameClient app){
-        RecoilManager.app = app;
+    public static void initialize(Camera cam){
+        RecoilManager.cam = cam;
+        
+        // Initialize Handles:
         recoil.put(RH.UP, 0f);
         recoil.put(RH.UP_TOTAL, 0f);
         recoil.put(RH.LEFT, 0f);

@@ -15,13 +15,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.appstates.ClientGameState;
 import sin.appstates.ClientMenuState;
-import sin.input.InputHandler;
+import sin.input.ClientInputHandler;
 import sin.network.Networking;
-import sin.character.Character;
 import sin.character.PlayerManager;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.weapons.Weapons;
+import sin.world.CG;
 
 /**
 Copyright (c) 2003-2011 jMonkeyEngine
@@ -117,9 +117,6 @@ public class GameClient extends Application{
     }
     
     // Getters for helper classes:
-    public Character getCharacter(){
-        return gameplayState.getCharacter();
-    }
     public AppSettings getSettings(){
         return settings;
     }
@@ -135,6 +132,7 @@ public class GameClient extends Application{
         bulletAppState.setThreadingType(ThreadingType.PARALLEL);
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
+        CG.initialize(bulletAppState);
     }
     
     // Main:
@@ -162,7 +160,6 @@ public class GameClient extends Application{
         set.setTitle("Polarity Client");
         app.setSettings(set);
         app.start();
-        
     }
 
     // Initialization:
@@ -175,17 +172,18 @@ public class GameClient extends Application{
         viewPort.attachScene(root);
         guiViewPort.attachScene(gui);
         
-        // Initialize keybinds & Tools.
-        T.initialize(assetManager);
-        InputHandler.initialize(app, context);
+        // Viewport Init:
+        viewPort.setBackgroundColor(ColorRGBA.Black);
+        setPauseOnLostFocus(false);
+        
+        // Initialize Tools & Input:
+        T.initialize(assetManager, inputManager);
+        ClientInputHandler.initialize(app);
         
         // Initialize new HUD & remove debug HUD elements:
         Networking.initialize(app);
-        RecoilManager.initialize(app);
         Weapons.initialize(app);
         PlayerManager.initialize(app);
-        viewPort.setBackgroundColor(ColorRGBA.Black);
-        setPauseOnLostFocus(false);
         
         // Initialize App States:
         gameplayState = new ClientGameState();

@@ -12,6 +12,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.character.Character;
 import sin.hud.HUD;
 import sin.network.Networking;
 import sin.tools.T;
@@ -63,7 +64,7 @@ public class Weapons{
         public void apply(Vector3f target){
             float spread_mult = s_base;
             spread_mult += s_recoil*(RecoilManager.getRecoil(RH.UP)+RecoilManager.getRecoil(RH.LEFT));
-            if(!app.getCharacter().getPlayer().onGround()) {
+            if(!Character.getPlayer().onGround()) {
                 spread_mult += s_base*SPREAD_INC*.05;
             }
             float spread_sub = spread_mult/2;
@@ -214,7 +215,7 @@ public class Weapons{
             node.attachChild(model);
         }
         public void disable(){
-            app.getCharacter().getNode().detachChild(model);
+            Character.getNode().detachChild(model);
             firing = false;
         }
     }

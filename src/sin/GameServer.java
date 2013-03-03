@@ -1,19 +1,8 @@
 package sin;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
+import com.jme3.bullet.BulletAppState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.network.ConnectionListener;
-import com.jme3.network.Filters;
-import com.jme3.network.HostedConnection;
-import com.jme3.network.Message;
-import com.jme3.network.MessageListener;
-import com.jme3.network.Network;
-import com.jme3.network.Server;
-import com.jme3.network.serializing.Serializer;
-import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
@@ -24,17 +13,7 @@ import java.util.logging.Logger;
 import sin.appstates.ServerGameState;
 import sin.appstates.ServerListenState;
 import sin.appstates.ServerMenuState;
-import sin.netdata.ConnectData;
-import sin.netdata.DecalData;
-import sin.netdata.DisconnectData;
-import sin.netdata.ErrorData;
-import sin.netdata.GeometryData;
-import sin.netdata.IDData;
-import sin.netdata.MoveData;
-import sin.netdata.PingData;
-import sin.netdata.ProjectileData;
-import sin.netdata.ShotData;
-import sin.netdata.SoundData;
+import sin.input.ServerInputHandler;
 import sin.tools.T;
 import sin.world.*;
 
@@ -76,8 +55,10 @@ public class GameServer extends Application{
     
     // Global Constant Variables:
     private static final String SERVER_VERSION = "DEV 0.08";
+    private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
     
     // App States:
+    private BulletAppState bulletAppState;
     private ServerGameState gameState;
     private ServerListenState listenState;
     private ServerMenuState menuState;
@@ -87,18 +68,39 @@ public class GameServer extends Application{
     private Node gui = new Node("GUI");
     
     // Getters for Nodes:
+    public Node getGUI(){
+        return gui;
+    }
     public Node getRoot(){
         return root;
     }
     
+    // Getters for AppStates:
+    public BulletAppState getBulletAppState(){
+        return bulletAppState;
+    }
     public ServerGameState getGameState(){
         return gameState;
     }
     public ServerListenState getListenState(){
         return listenState;
     }
+    public ServerMenuState getMenuState(){
+        return menuState;
+    }
     public String getVersion(){
         return SERVER_VERSION;
+    }
+    
+    public void resetBulletAppState(){
+        if(stateManager.hasState(bulletAppState)){
+            stateManager.detach(bulletAppState);
+        }
+        bulletAppState = new BulletAppState();
+        bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
+        stateManager.attach(bulletAppState);
+        bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
+        CG.initialize(bulletAppState);
     }
     
     @Override
@@ -128,9 +130,13 @@ public class GameServer extends Application{
         viewPort.attachScene(root);
         guiViewPort.attachScene(gui);
         
-        // Extra stuff:
+        // Viewport Init:
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
+        
+        // Initialize Tools:
+        T.initialize(assetManager, inputManager);
+        ServerInputHandler.initialize(app);
         
         // Initialize App States:
         gameState = new ServerGameState();
@@ -139,6 +145,7 @@ public class GameServer extends Application{
         
         // Attach App States:
         stateManager.attach(menuState);
+        resetBulletAppState();
     }
 
     @Override

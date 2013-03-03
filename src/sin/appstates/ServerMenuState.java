@@ -22,6 +22,13 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
     private Nifty nifty;
     private Screen screen;
     
+    public Nifty getNifty(){
+        return nifty;
+    }
+    public Screen getScreen(){
+        return screen;
+    }
+    
     public void action(String action){
         // Main Menu:
         if(action.equals("start")){

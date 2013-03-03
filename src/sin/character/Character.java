@@ -18,32 +18,12 @@ public class Character {
     private static GameClient app;
     
     // Instance Variables:
-    private Weapon[][] weapons = new Weapon[2][2];
-    private int set = 0;
-    private CharacterControl player;
-    private Node node = new Node();
+    private static Weapon[][] weapons = new Weapon[2][2];
+    private static int set = 0;
+    private static CharacterControl player;
+    private static Node node = new Node();
     
-    public final void create(){
-        CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
-        player = new CharacterControl(capsuleShape, 0.05f);
-        player.setJumpSpeed(30);
-        player.setFallSpeed(30);
-        player.setGravity(70);
-        player.setPhysicsLocation(new Vector3f(0, 110, 0));
-        app.getBulletAppState().getPhysicsSpace().add(player);
-    }
-    public Character(Weapon a, Weapon b, Weapon c, Weapon d, float health, float shields){
-        weapons[0][0] = a;
-        weapons[0][1] = b;
-        weapons[1][0] = c;
-        weapons[1][1] = d;
-        weapons[0][0].enable(node);
-        weapons[0][1].enable(node);
-        StatsManager.createCharacter(health, shields);
-        this.create();
-    }
-    
-    public void setFiring(boolean left, boolean firing){
+    public static void setFiring(boolean left, boolean firing){
         if(left) {
             weapons[set][0].setFiring(firing);
         }
@@ -51,16 +31,16 @@ public class Character {
             weapons[set][1].setFiring(firing);
         }
     }
-    public Vector3f getLocation(){
+    public static Vector3f getLocation(){
         return player.getPhysicsLocation();
     }
-    public CharacterControl getPlayer(){
+    public static CharacterControl getPlayer(){
         return player;
     }
-    public Node getNode(){
+    public static Node getNode(){
         return node;
     }
-    public Weapon getWeapon(boolean left){
+    public static Weapon getWeapon(boolean left){
         if(left){
             return weapons[set][0];
         }else{
@@ -68,15 +48,15 @@ public class Character {
         }
     }
     
-    public void damage(float damage){
+    public static void damage(float damage){
         StatsManager.damage(damage);
     }
-    public void kill(){
+    public static void kill(){
         StatsManager.refreshCharacter();
         player.setPhysicsLocation(T.v3f(0, 10, 0));
         app.getCamera().lookAtDirection(T.v3f(1, 0, 0), Vector3f.UNIT_Y);
     }
-    public void reload(){
+    public static void reload(){
         if(weapons[set][0] instanceof RangedReloadWeapon){
             RangedReloadWeapon e = (RangedReloadWeapon) weapons[set][0];
             e.reload();
@@ -86,7 +66,7 @@ public class Character {
             e.reload();
         }
     }
-    public void swapGuns(){
+    public static void swapGuns(){
         weapons[set][0].disable();
         weapons[set][1].disable();
         if(set == 0){
@@ -98,11 +78,27 @@ public class Character {
         weapons[set][1].enable(node);
     }
     
-    public void update(float tpf){
+    public static void update(float tpf){
         MovementManager.move();
         weapons[set][0].tick(tpf);
         weapons[set][1].tick(tpf);
         RecoilManager.decoil(tpf);
+    }
+    public static void create(Weapon a, Weapon b, Weapon c, Weapon d, float health, float shields){
+        weapons[0][0] = a;
+        weapons[0][1] = b;
+        weapons[1][0] = c;
+        weapons[1][1] = d;
+        weapons[0][0].enable(node);
+        weapons[0][1].enable(node);
+        StatsManager.createCharacter(health, shields);
+        CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
+        player = new CharacterControl(capsuleShape, 0.05f);
+        player.setJumpSpeed(30);
+        player.setFallSpeed(30);
+        player.setGravity(70);
+        player.setPhysicsLocation(new Vector3f(0, 110, 0));
+        app.getBulletAppState().getPhysicsSpace().add(player);
     }
     
     public static void initialize(GameClient app){

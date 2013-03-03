@@ -5,6 +5,7 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import sin.GameClient;
+import sin.character.Character;
 import sin.netdata.DecalData;
 import sin.netdata.ShotData;
 import sin.network.Networking;
@@ -34,7 +35,7 @@ public class AttackManager {
         if(data[0].equals("player")){
             int id = Integer.parseInt(data[1]);
             damage = modDamage(data[2], damage);
-            HUD.addFloatingText(PlayerManager.getPlayer(id).getLocation().clone().addLocal(T.v3f(0, 4, 0)), app.getCharacter().getLocation(), damage);
+            HUD.addFloatingText(PlayerManager.getPlayer(id).getLocation().clone().addLocal(T.v3f(0, 4, 0)), Character.getLocation(), damage);
             Networking.send(new ShotData(Networking.getID(), id, damage));
         }else{
             DecalManager.create(target.getContactPoint());

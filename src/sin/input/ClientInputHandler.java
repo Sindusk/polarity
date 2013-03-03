@@ -8,9 +8,8 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector3f;
-import com.jme3.system.JmeContext;
 import sin.GameClient;
-import sin.hud.HUD;
+import sin.character.Character;
 import sin.character.MovementManager;
 import sin.character.MovementManager.MH;
 import sin.tools.T;
@@ -20,10 +19,10 @@ import sin.world.DecalManager;
 import sin.world.World;
 
 /**
- * InputHandler - Handles all input from users and organizes them based on conditions.
+ * ClientInputHandler - Handles all input from users and organizes them based on conditions.
  * @author SinisteRing
  */
-public class InputHandler{
+public class ClientInputHandler{
     private static GameClient app;
     
     // Constant Variables:
@@ -33,7 +32,7 @@ public class InputHandler{
         return app.getStateManager().hasState(app.getGameplayState()) && app.getMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
     }
     
-    private static ActionListener gameplayAction = new ActionListener(){
+    private static ActionListener gameAction = new ActionListener(){
         public void onAction(String bind, boolean down, float tpf){
             if(!inGameplay()){
                 return;
@@ -50,20 +49,20 @@ public class InputHandler{
             }else if(bind.equals("Move_Crouch")){
                 MovementManager.setMove(MH.CROUCH, down);
             }else if(bind.equals("Move_Jump") && down){
-                app.getCharacter().getPlayer().jump();
+                Character.getPlayer().jump();
             }
             // Actions:
             else if(bind.equals("Trigger_Right")){
-                app.getCharacter().setFiring(false, down);
+                Character.setFiring(false, down);
             }else if(bind.equals("Trigger_Left")){
-                app.getCharacter().setFiring(true, down);
+                Character.setFiring(true, down);
             }
             if(down){
                 // Weapon Swapping:
                 if(bind.equals("Swap")){
-                    app.getCharacter().swapGuns();
+                    Character.swapGuns();
                 }else if(bind.equals("Reload")){
-                    app.getCharacter().reload();
+                    Character.reload();
                 }
                 // Miscellaneous:
                 else if(bind.equals("Misc_Key_1")){
@@ -72,7 +71,7 @@ public class InputHandler{
                     TracerManager.clear();
                     DecalManager.clear();
                 }else if(bind.equals("Misc_Key_3")){
-                    app.getCharacter().getPlayer().setPhysicsLocation(T.v3f(0, 110, 0));
+                    Character.getPlayer().setPhysicsLocation(T.v3f(0, 110, 0));
                 }else if(bind.equals("Misc_Key_4")){
                     World.toggleWireframe();
                 }else if(bind.equals("Game_Menu")){
@@ -81,7 +80,7 @@ public class InputHandler{
             }
         }
     };
-    private static AnalogListener gameplayAnalog = new AnalogListener(){
+    private static AnalogListener gameAnalog = new AnalogListener(){
         public void onAnalog(String name, float value, float tpf) {
             if(!inGameplay()){
                 return;
@@ -99,49 +98,36 @@ public class InputHandler{
         }
     };
     
-    private static void createMapping(String name, KeyTrigger trigger){
-        app.getInputManager().addMapping(name, trigger);
-        app.getInputManager().addListener(gameplayAction, name);
-    }
-    private static void createMapping(String name, MouseButtonTrigger trigger){
-        app.getInputManager().addMapping(name, trigger);
-        app.getInputManager().addListener(gameplayAction, name);
-    }
-    private static void createMapping(String name, MouseAxisTrigger trigger){
-        app.getInputManager().addMapping(name, trigger);
-        app.getInputManager().addListener(gameplayAnalog, name);
-    }
-    
-    public static void initialize(GameClient app, JmeContext context){
-        InputHandler.app = app;
+    public static void initialize(GameClient app){
+        ClientInputHandler.app = app;
         // Camera:
-        createMapping("Cam_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
-        createMapping("Cam_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));
-        createMapping("Cam_Up", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
-        createMapping("Cam_Down", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+        T.createMapping(gameAnalog, "Cam_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+        T.createMapping(gameAnalog, "Cam_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+        T.createMapping(gameAnalog, "Cam_Up", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+        T.createMapping(gameAnalog, "Cam_Down", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
         // Movement:
-        createMapping("Move_Left", new KeyTrigger(KeyInput.KEY_A));
-        createMapping("Move_Right", new KeyTrigger(KeyInput.KEY_D));
-        createMapping("Move_Forward", new KeyTrigger(KeyInput.KEY_W));
-        createMapping("Move_Backward", new KeyTrigger(KeyInput.KEY_S));
-        createMapping("Move_Crouch", new KeyTrigger(KeyInput.KEY_LCONTROL));
-        createMapping("Move_Jump", new KeyTrigger(KeyInput.KEY_SPACE));
+        T.createMapping(gameAction, "Move_Left", new KeyTrigger(KeyInput.KEY_A));
+        T.createMapping(gameAction, "Move_Right", new KeyTrigger(KeyInput.KEY_D));
+        T.createMapping(gameAction, "Move_Forward", new KeyTrigger(KeyInput.KEY_W));
+        T.createMapping(gameAction, "Move_Backward", new KeyTrigger(KeyInput.KEY_S));
+        T.createMapping(gameAction, "Move_Crouch", new KeyTrigger(KeyInput.KEY_LCONTROL));
+        T.createMapping(gameAction, "Move_Jump", new KeyTrigger(KeyInput.KEY_SPACE));
         // Attacks:
-        createMapping("Trigger_Left", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        createMapping("Trigger_Right", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        T.createMapping(gameAction, "Trigger_Left", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        T.createMapping(gameAction, "Trigger_Right", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         // Actions:
-        createMapping("Reload", new KeyTrigger(KeyInput.KEY_R));
-        createMapping("Swap", new KeyTrigger(KeyInput.KEY_Q));
+        T.createMapping(gameAction, "Reload", new KeyTrigger(KeyInput.KEY_R));
+        T.createMapping(gameAction, "Swap", new KeyTrigger(KeyInput.KEY_Q));
         // Abilities:
-        createMapping("Ability_1", new KeyTrigger(KeyInput.KEY_1));
-        createMapping("Ability_2", new KeyTrigger(KeyInput.KEY_2));
-        createMapping("Ability_3", new KeyTrigger(KeyInput.KEY_3));
-        createMapping("Ability_4", new KeyTrigger(KeyInput.KEY_4));
+        T.createMapping(gameAction, "Ability_1", new KeyTrigger(KeyInput.KEY_1));
+        T.createMapping(gameAction, "Ability_2", new KeyTrigger(KeyInput.KEY_2));
+        T.createMapping(gameAction, "Ability_3", new KeyTrigger(KeyInput.KEY_3));
+        T.createMapping(gameAction, "Ability_4", new KeyTrigger(KeyInput.KEY_4));
         // Miscellaneous:
-        createMapping("Game_Menu", new KeyTrigger(KeyInput.KEY_ESCAPE));
-        createMapping("Misc_Key_1", new KeyTrigger(KeyInput.KEY_V));
-        createMapping("Misc_Key_2", new KeyTrigger(KeyInput.KEY_B));
-        createMapping("Misc_Key_3", new KeyTrigger(KeyInput.KEY_T));
-        createMapping("Misc_Key_4", new KeyTrigger(KeyInput.KEY_G));
+        T.createMapping(gameAction, "Game_Menu", new KeyTrigger(KeyInput.KEY_ESCAPE));
+        T.createMapping(gameAction, "Misc_Key_1", new KeyTrigger(KeyInput.KEY_V));
+        T.createMapping(gameAction, "Misc_Key_2", new KeyTrigger(KeyInput.KEY_B));
+        T.createMapping(gameAction, "Misc_Key_3", new KeyTrigger(KeyInput.KEY_T));
+        T.createMapping(gameAction, "Misc_Key_4", new KeyTrigger(KeyInput.KEY_G));
     }
 }

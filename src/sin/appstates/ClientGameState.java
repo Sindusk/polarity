@@ -21,7 +21,6 @@ import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.M4A1;
 import sin.weapons.Weapons.Raygun;
 import sin.weapons.Weapons.RocketLauncher;
-import sin.world.CG;
 import sin.world.DecalManager;
 import sin.world.World;
 
@@ -32,13 +31,9 @@ import sin.world.World;
 public class ClientGameState extends AbstractAppState{
     private static GameClient app;
     
-    // Classes used for logic:
-    private Character character;    // Used for character (user) control.
-    
     // All nodes used in the Gameplay:
-    private Node root;      // Root Node.
-    private Node gui;       // Node for 2D GUI.
-    private Node world;     // Node for 3D world.
+    private Node root;      // Root Node (3D).
+    private Node gui;       // GUI Node (2D).
     
     // Other nodes:
     private Node collisionNode = new Node("");  // Node encompassing anything able to be shot [single, world, player].
@@ -48,10 +43,9 @@ public class ClientGameState extends AbstractAppState{
     private Node projectileNode = new Node(""); // Node for all projectiles.
     private Node terrainNode = new Node("");    // Node for all world terrain.
     private Node tracerNode = new Node("");     // Node encompassing tracers, mainly for testing.
+    private Node world = new Node("");          // Node encompassing all world objects.
     
-    public ClientGameState(){
-        //
-    }
+    public ClientGameState(){}
     
     public Node getRoot(){
         return root;
@@ -81,10 +75,6 @@ public class ClientGameState extends AbstractAppState{
         return tracerNode;
     }
     
-    public Character getCharacter(){
-        return character;
-    }
-    
     @Override
     public void initialize(AppStateManager stateManager, Application theApp){
         // Basic initialization:
@@ -92,9 +82,8 @@ public class ClientGameState extends AbstractAppState{
         app = (GameClient) theApp;
         
         // Create nodes:
-        root = new Node("Gameplay_Root");
-        world = new Node("Gameplay_World");
-        gui = new Node("Gameplay_GUI");
+        root = new Node("Game_Root");
+        gui = new Node("Game_GUI");
         
         // Attach GUI and Root nodes:
         app.getInputManager().setCursorVisible(false);
@@ -103,27 +92,25 @@ public class ClientGameState extends AbstractAppState{
         
         // Initialize Projectiles:
         AmmoManager.initialize(app);
-        CG.initialize(app);
         Character.initialize(app);
         AttackManager.initialize(app);
         DecalManager.initialize(app);
         HUD.initialize(app, gui);
         Models.initialize(app);
-        MovementManager.initialize(app);
+        MovementManager.initialize(app.getCamera());
         NPCManager.initialize(app);
         ProjectileManager.initialize(app);
-        RecoilManager.initialize(app);
-        StatsManager.initialize(app);
+        RecoilManager.initialize(app.getCamera());
         TracerManager.initialize(app);
         World.initialize(app);
         
         // Initialize HUD & World:
         World.createSinglePlayerArea(singleNode);
         
-        character = new Character(
+        Character.create(
                 new M4A1(true), new RocketLauncher(false),
                 new Raygun(true), new AK47(false), 100, 100);
-        world.attachChild(character.getNode());
+        world.attachChild(Character.getNode());
         
         collisionNode.attachChild(singleNode);
         collisionNode.attachChild(playerNode);
@@ -160,7 +147,7 @@ public class ClientGameState extends AbstractAppState{
         app.getListener().setRotation(app.getCamera().getRotation());
         
         // Update character location & hud:
-        character.update(tpf);
+        Character.update(tpf);
         HUD.update(tpf);
         ProjectileManager.update(tpf);
         

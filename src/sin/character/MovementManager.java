@@ -1,8 +1,8 @@
 package sin.character;
 
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import java.util.HashMap;
-import sin.GameClient;
 import sin.tools.T;
 
 /**
@@ -10,7 +10,8 @@ import sin.tools.T;
  * @author SinisteRing
  */
 public class MovementManager {
-    private static GameClient app;
+    //private static GameClient app;
+    private static Camera cam;
     
     // Constant Variables:
     private static final float MOVE_SPEED = 0.50f;
@@ -37,7 +38,7 @@ public class MovementManager {
         double rad;
         // Calculate forward/backward points:
         if(getMove(MH.FORWARD) || getMove(MH.BACKWARD)){
-            dir = app.getCamera().getDirection();
+            dir = cam.getDirection();
             x = dir.getZ();
             z = dir.getX();
             angle = (float) Math.toDegrees(Math.atan2(x/2 - x, z/2 - z));
@@ -56,7 +57,7 @@ public class MovementManager {
         }
         // Calculate sidestep points:
         if(getMove(MH.LEFT) || getMove(MH.RIGHT)){
-            dir = app.getCamera().getLeft();
+            dir = cam.getLeft();
             x = dir.getZ();
             z = dir.getX();
             angle = (float) Math.toDegrees(Math.atan2(x/2 - x, z/2 - z));
@@ -82,23 +83,25 @@ public class MovementManager {
 
         // If crouching, lower view.
         if(getMove(MH.CROUCH)){
-            app.getCamera().setLocation(app.getCharacter().getPlayer().getPhysicsLocation().add(T.v3f(0, -1.5f, 0)));
+            cam.setLocation(Character.getPlayer().getPhysicsLocation().add(T.v3f(0, -1.5f, 0)));
             wd.setX(wd.getX()*CROUCH_PENALTY);
             wd.setZ(wd.getZ()*CROUCH_PENALTY);
         }else{
-            app.getCamera().setLocation(app.getCharacter().getPlayer().getPhysicsLocation());
+            cam.setLocation(Character.getPlayer().getPhysicsLocation());
         }
 
-        app.getCharacter().getPlayer().setWalkDirection(wd);
-        app.getCharacter().getNode().setLocalTranslation(app.getCamera().getLocation());
-        if(app.getCharacter().getLocation().getY() < -20){
-            app.getCharacter().kill();
+        Character.getPlayer().setWalkDirection(wd);
+        Character.getNode().setLocalTranslation(cam.getLocation());
+        if(Character.getLocation().getY() < -20){
+            Character.kill();
         }
         //UpdateWeaponUI();
     }
     
-    public static void initialize(GameClient app){
-        MovementManager.app = app;
+    public static void initialize(Camera cam){
+        MovementManager.cam = cam;
+        
+        // Initialize handles:
         setMove(MH.FORWARD, false);
         setMove(MH.RIGHT, false);
         setMove(MH.BACKWARD, false);

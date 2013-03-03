@@ -8,13 +8,14 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.character.Character;
 import sin.hud.BarManager.BH;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.world.CG;
 
 /**
- *
+ * HUD (Heads Up Display) - Controls GUI elements while in-game.
  * @author SinisteRing
  */
 public class HUD {
@@ -137,7 +138,7 @@ public class HUD {
             }
             i++;
         }
-        Vector3f ploc = app.getCharacter().getLocation();
+        Vector3f ploc = Character.getLocation();
         Vector3f pdir = app.getCamera().getDirection();
         String compass;
         if(FastMath.abs(pdir.getX()) > FastMath.abs(pdir.getZ())){
