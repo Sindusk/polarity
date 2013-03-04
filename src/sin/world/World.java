@@ -126,14 +126,8 @@ public class World {
         float xs = 0;
         float zs = 0;
         // Make sure both xi and zi have an absolute value of 1:
-        if(FastMath.abs(xi) > 1 || FastMath.abs(zi) > 1){
-            if(xi != 0){
-                xi /= FastMath.abs(xi);
-            }
-            if(zi != 0){
-                zi /= FastMath.abs(zi);
-            }
-        }
+        xi = T.sign(xi);
+        zi = T.sign(zi);
         while(i <= iMax){
             // Initialize loc to the next step:
             loc = T.v3f(x, start.getY(), z);
@@ -141,7 +135,6 @@ public class World {
             w = -HALL_WIDTH+1;
             while(w <= HALL_WIDTH-1){
                 if(world.get(loc.add(w*zi, 0, w*xi)) != null && world.get(loc.add(w*zi, 0, w*xi)).contains("h")){
-                    //T.log("loc "+loc+" broke it");
                     b = true;
                     break;
                 }
@@ -152,7 +145,6 @@ public class World {
             }
             w--;
             while(w >= -HALL_WIDTH+1){
-                //T.log("putting h in "+loc.add(w*zi, 0, w*xi));
                 world.put(loc.add(w*zi, 0, w*xi), "h");
                 w--;
             }
@@ -166,7 +158,7 @@ public class World {
                 }else if(rng < 0.26f){
                     generateHallway(loc, -zi*HALL_WIDTH, -xi*HALL_WIDTH);
                     spread = 0;
-                }else if(rng < 0.13f){
+                }else if(rng < 0.33f){
                     generateHallway(loc, zi*HALL_WIDTH, xi*HALL_WIDTH);
                     generateHallway(loc, -zi*HALL_WIDTH, -xi*HALL_WIDTH);
                     spread = 0;
@@ -192,8 +184,8 @@ public class World {
         generateWall(loc.add(-zi*(HALL_WIDTH*2), 0, -xi*(HALL_WIDTH*2)), -xi, -zi, i, true);
         
         // Generate the actual floor:
-        float xloc = x-((xs+xi)/2);
-        float zloc = z-((zs+zi)/2);
+        float xloc = x-((xs+xi)*0.5f);
+        float zloc = z-((zs+zi)*0.5f);
         if(xs == 0){
             xs = HALL_WIDTH*2-1;
         }

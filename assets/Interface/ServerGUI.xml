@@ -51,5 +51,28 @@
         </layer>
     </screen>
     
+    <screen id="game.menu" controller="sin.appstates.ServerMenuState">
+        <layer id="background" backgroundColor="#0005" childLayout="vertical">
+            <panel height="8%" />
+            <text text="Game Menu" height="5%" font="Interface/Fonts/Batman26.fnt" color="#000f" align="center" />
+            <panel height="12%" />
+            <panel id="game.return" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                <effect>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                </effect>
+                <text font="Interface/Fonts/Batman26.fnt" text="Return" />
+                <interact onClick="action(game.return)"/>
+            </panel>
+            <panel height="3%" />
+            <panel id="game.mainmenu" height="7%" width="30%" backgroundColor="#800f" childLayout="center" align="center" visibleToMouse="true">
+                <effect>
+                    <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
+                </effect>
+                <text font="Interface/Fonts/Batman26.fnt" text="Main Menu" />
+                <interact onClick="action(game.mainmenu)"/>
+            </panel>
+        </layer>
+    </screen>
+    
     <screen id="empty"></screen>
 </nifty>

@@ -29,6 +29,15 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
         return screen;
     }
     
+    public void toggleGameMenu(){
+        if(nifty.getCurrentScreen().getScreenId().equals("game.menu")){
+            nifty.gotoScreen("empty");
+            app.getInputManager().setCursorVisible(false);
+        }else{
+            nifty.gotoScreen("game.menu");
+            app.getInputManager().setCursorVisible(true);
+        }
+    }
     public void action(String action){
         // Main Menu:
         if(action.equals("start")){
@@ -40,10 +49,19 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
         // Console:
         else if(action.equals("console.game")){
             app.getStateManager().attach(app.getGameState());
+            app.getInputManager().setCursorVisible(false);
             nifty.gotoScreen("empty");
         }else if(action.equals("console.stop")){
             app.getStateManager().detach(app.getListenState());
             nifty.gotoScreen("menu");
+        }
+        // Game Menu:
+        else if(action.equals("game.return")){
+            nifty.gotoScreen("empty");
+            app.getInputManager().setCursorVisible(false);
+        }else if(action.equals("game.mainmenu")){
+            app.getStateManager().detach(app.getGameState());
+            nifty.gotoScreen("console");
         }
     }
     

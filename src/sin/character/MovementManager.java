@@ -1,5 +1,6 @@
 package sin.character;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import java.util.HashMap;
@@ -10,7 +11,6 @@ import sin.tools.T;
  * @author SinisteRing
  */
 public class MovementManager {
-    //private static GameClient app;
     private static Camera cam;
     
     // Constant Variables:
@@ -33,21 +33,17 @@ public class MovementManager {
     public static void move(){
         // Initialize temporary variables:
         Vector3f dir;
-        Vector3f wd = T.v3f(0, 0, 0);
-        float x, z, angle;
-        double rad;
+        Vector3f wd = new Vector3f(0, 0, 0);
+        float angle;
         // Calculate forward/backward points:
         if(getMove(MH.FORWARD) || getMove(MH.BACKWARD)){
             dir = cam.getDirection();
-            x = dir.getZ();
-            z = dir.getX();
-            angle = (float) Math.toDegrees(Math.atan2(x/2 - x, z/2 - z));
+            angle = (float) Math.atan2(-dir.getZ()*0.5, -dir.getX()*0.5);
             if(angle < 0){
-                angle += 360;
+                angle += FastMath.TWO_PI;
             }
-            rad = Math.toRadians(angle);
-            float xWard = (float) -Math.cos(rad) * MOVE_SPEED;
-            float zWard = (float) -Math.sin(rad) * MOVE_SPEED;
+            float xWard = (float) -Math.cos(angle) * MOVE_SPEED;
+            float zWard = (float) -Math.sin(angle) * MOVE_SPEED;
             if(getMove(MH.FORWARD)) {
                 wd.addLocal(xWard, 0, zWard);
             }
@@ -58,15 +54,12 @@ public class MovementManager {
         // Calculate sidestep points:
         if(getMove(MH.LEFT) || getMove(MH.RIGHT)){
             dir = cam.getLeft();
-            x = dir.getZ();
-            z = dir.getX();
-            angle = (float) Math.toDegrees(Math.atan2(x/2 - x, z/2 - z));
+            angle = (float) Math.atan2(-dir.getZ()*0.5, -dir.getX()*0.5);
             if(angle < 0){
-                angle += 360;
+                angle += FastMath.TWO_PI;
             }
-            rad = Math.toRadians(angle);
-            float xSide = (float) -Math.cos(rad) * MOVE_SPEED;
-            float zSide = (float) -Math.sin(rad) * MOVE_SPEED;
+            float xSide = (float) -Math.cos(angle) * MOVE_SPEED;
+            float zSide = (float) -Math.sin(angle) * MOVE_SPEED;
             if(getMove(MH.LEFT)) {
                 wd.addLocal(xSide, 0, zSide);
             }
@@ -77,8 +70,8 @@ public class MovementManager {
 
         // If moving at a diagonal, reduce movement.
         if((getMove(MH.FORWARD) || getMove(MH.BACKWARD)) && (getMove(MH.LEFT) || getMove(MH.RIGHT))){
-            wd.setX(wd.getX()/1.414f);
-            wd.setZ(wd.getZ()/1.414f);
+            wd.setX(wd.getX()*T.ROOT_HALF);
+            wd.setZ(wd.getZ()*T.ROOT_HALF);
         }
 
         // If crouching, lower view.
@@ -95,7 +88,6 @@ public class MovementManager {
         if(Character.getLocation().getY() < -20){
             Character.kill();
         }
-        //UpdateWeaponUI();
     }
     
     public static void initialize(Camera cam){

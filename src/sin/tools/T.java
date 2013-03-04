@@ -38,9 +38,11 @@ public class T {
     public static InputManager inputManager;
     
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
+    public static final float ROOT_HALF = 1.0f/FastMath.sqrt(2);
     
     private static HashMap<Projectile, HashMap<String, Float>> UpdateMap = new HashMap();
     
+    // Logan's Functions:
     private static Vector3f spiral(Projectile p, float t){
         Vector3f dirVec = p.getDirection(); //your perpendicular plane is x=0
         Vector3f camUp = p.getUp();
@@ -50,8 +52,21 @@ public class T {
         Vector3f velocity = rotY.mult(FastMath.cos(rotationAngle)).addLocal(rotX.mult(FastMath.sin(rotationAngle)));
         return velocity;
     }
-    
-    // Projectile Action Parsing:
+    public static int sign(float x){
+        if (x != x) {
+            throw new IllegalArgumentException("NaN");
+        }
+        if (x == 0) {
+            return 0;
+        }
+        x *= Float.POSITIVE_INFINITY;
+        if (x == Float.POSITIVE_INFINITY) {
+            return +1;
+        }else{
+            return -1;
+        }
+     }
+    // Parsing Helpers:
     private static String[] getArgs(String s){
         return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
     }
@@ -59,6 +74,7 @@ public class T {
         return Float.parseFloat(s);
     }
     
+    // Attack Parsing:
     public static void InitializeUpdate(Projectile p){
         String[] actions = p.getUpdate().split(":");
         String[] args;
