@@ -5,6 +5,8 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
 import sin.GameServer;
+import sin.character.MovementManager;
+import sin.tools.Tile;
 import sin.weapons.RecoilManager;
 import sin.world.CG;
 import sin.world.World;
@@ -33,7 +35,8 @@ public class ServerGameState extends AbstractAppState{
         app.getGUI().attachChild(gui);
         
         // Initialize classes:
-        CG.initialize(app.getBulletAppState());
+        MovementManager.initialize(app.getCamera());
+        MovementManager.setGrounded(false);
         RecoilManager.initialize(app.getCamera());
         
         // Create world:
@@ -42,5 +45,10 @@ public class ServerGameState extends AbstractAppState{
             World.createGeometry(root, World.getMap().get(i));
             i++;
         }
+    }
+    
+    @Override
+    public void update(float tpf){
+        MovementManager.move(tpf);
     }
 }

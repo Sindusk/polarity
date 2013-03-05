@@ -47,7 +47,8 @@ public class ServerInputHandler{
                 MovementManager.setMove(MH.BACKWARD, down);
             }else if(bind.equals("Move_Crouch")){
                 MovementManager.setMove(MH.CROUCH, down);
-            }else if(bind.equals("Move_Jump") && down){
+            }else if(bind.equals("Move_Jump")){
+                MovementManager.setMove(MH.JUMP, down);
                 //app.getCharacter().getPlayer().jump();
             }
             // Actions:

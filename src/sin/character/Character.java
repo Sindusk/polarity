@@ -20,7 +20,7 @@ public class Character {
     // Instance Variables:
     private static Weapon[][] weapons = new Weapon[2][2];
     private static int set = 0;
-    private static CharacterControl player;
+    private static CharacterControl control;
     private static Node node = new Node();
     
     public static void setFiring(boolean left, boolean firing){
@@ -32,10 +32,10 @@ public class Character {
         }
     }
     public static Vector3f getLocation(){
-        return player.getPhysicsLocation();
+        return control.getPhysicsLocation();
     }
-    public static CharacterControl getPlayer(){
-        return player;
+    public static CharacterControl getControl(){
+        return control;
     }
     public static Node getNode(){
         return node;
@@ -53,7 +53,7 @@ public class Character {
     }
     public static void kill(){
         StatsManager.refreshCharacter();
-        player.setPhysicsLocation(T.v3f(0, 10, 0));
+        control.setPhysicsLocation(T.v3f(0, 10, 0));
         app.getCamera().lookAtDirection(T.v3f(1, 0, 0), Vector3f.UNIT_Y);
     }
     public static void reload(){
@@ -79,7 +79,7 @@ public class Character {
     }
     
     public static void update(float tpf){
-        MovementManager.move();
+        MovementManager.move(tpf);
         weapons[set][0].tick(tpf);
         weapons[set][1].tick(tpf);
         RecoilManager.decoil(tpf);
@@ -93,12 +93,12 @@ public class Character {
         weapons[0][1].enable(node);
         StatsManager.createCharacter(health, shields);
         CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
-        player = new CharacterControl(capsuleShape, 0.05f);
-        player.setJumpSpeed(30);
-        player.setFallSpeed(30);
-        player.setGravity(70);
-        player.setPhysicsLocation(new Vector3f(0, 110, 0));
-        app.getBulletAppState().getPhysicsSpace().add(player);
+        control = new CharacterControl(capsuleShape, 0.05f);
+        control.setJumpSpeed(30);
+        control.setFallSpeed(30);
+        control.setGravity(70);
+        control.setPhysicsLocation(new Vector3f(0, 110, 0));
+        app.getBulletAppState().getPhysicsSpace().add(control);
     }
     
     public static void initialize(GameClient app){

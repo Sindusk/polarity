@@ -133,7 +133,7 @@ public class Networking {
 
         // Send updated movement data:
         if(timers[MOVE] >= MOVE_INTERVAL){
-            client.send(new MoveData(CLIENT_ID, Character.getPlayer().getPhysicsLocation(), app.getCamera().getRotation()));
+            client.send(new MoveData(CLIENT_ID, Character.getControl().getPhysicsLocation(), app.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
     }
@@ -208,7 +208,7 @@ public class Networking {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     //app.getPlayer(id).move(loc, rot);
-                    PlayerManager.update(id, loc, rot);
+                    PlayerManager.updatePlayer(id, loc, rot);
                     return null;
                 }
             });

@@ -46,7 +46,7 @@ public class PlayerManager{
         return player[index];
     }
     
-    public static void update(int id, Vector3f loc, Quaternion rot){
+    public static void updatePlayer(int id, Vector3f loc, Quaternion rot){
         player[id].update(loc, rot);
     }
     public static boolean add(int id, Vector3f loc){

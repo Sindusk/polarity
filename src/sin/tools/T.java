@@ -213,6 +213,9 @@ public class T {
     public static void log(String s){
         System.out.println("[POLARITY] "+s);
     }
+    public static void log(float f){
+        System.out.println("[POLARITY] "+f);
+    }
     public static void log(Throwable t){
         Logger.getLogger("polarity").log(Level.SEVERE, "{0}", t);
     }

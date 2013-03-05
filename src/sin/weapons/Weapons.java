@@ -64,7 +64,7 @@ public class Weapons{
         public void apply(Vector3f target){
             float spread_mult = s_base;
             spread_mult += s_recoil*(RecoilManager.getRecoil(RH.UP)+RecoilManager.getRecoil(RH.LEFT));
-            if(!Character.getPlayer().onGround()) {
+            if(!Character.getControl().onGround()) {
                 spread_mult += s_base*SPREAD_INC*.05;
             }
             float spread_sub = spread_mult/2;

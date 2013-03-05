@@ -9,6 +9,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.material.RenderState.BlendMode;
+import com.jme3.math.Vector3f;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
@@ -21,14 +22,14 @@ import java.util.EnumMap;
 public class Tile {
     private boolean areWeWrapping = false;
     public int wrapHeight = 1;
-    public int height;
+    //public int height;
     public Type type;
     private Geometry myCore;
     public FloatBuffer VertexAlpha;
     public static final int NO_WRAP = 0;
     public static EnumMap<Type, Material> Materials = new EnumMap<Type, Material>(Type.class);
-    public static final float HEIGHTSCALE = 0.25f;
-    private static final float INVHEIGHTSCALE = 1 / HEIGHTSCALE;
+    //public static final float HEIGHTSCALE = 0.25f;
+    //private static final float INVHEIGHTSCALE = 1 / HEIGHTSCALE;
     private static boolean initialized = false;
     private static FloatBuffer VERTEX_DATA;
     private static FloatBuffer NORMALS_DATA;
@@ -39,7 +40,7 @@ public class Tile {
     public enum Type {
 
         Air,
-        Grass(T.getMaterialPath("BC_Tex"), HEIGHTSCALE / 0.25f);
+        Grass(T.getMaterialPath("BC_Tex"), 0.25f);
         public final String texturePath;
         public final float wrapDimensions;
 
@@ -134,14 +135,6 @@ public class Tile {
         }
     }
 
-    public static float HeightScale() {
-        return HEIGHTSCALE;
-    }
-
-    public static float InverseHeightScale() {
-        return INVHEIGHTSCALE;
-    }
-
     public final Geometry GetGeometry() {
         return myCore;
     }
@@ -161,19 +154,24 @@ public class Tile {
     public final void setLocalTranslation(float x, float y, float z) {
         myCore.setLocalTranslation(x, y, z);
     }
+    public final void setLocalTranslation(Vector3f trans){
+        myCore.setLocalTranslation(trans);
+    }
 
     public final void setLocalScale(float x, float y, float z) {
         myCore.setLocalScale(x, y, z);
+    }
+    public final void setLocalScale(Vector3f size){
+        myCore.setLocalScale(size);
     }
 
     public final void removeFromParent() {
         myCore.removeFromParent();
     }
 
-    public Tile(int x, int y, int z, int height, Type type, int wrapHeight, Node toAttach) {
+    public Tile(Vector3f size, Vector3f trans, Type type, int wrapHeight, Node toAttach) {
         super();
         this.wrapHeight = wrapHeight;
-        this.height = height;
         this.type = type;
         myCore = new Geometry("Tile");
         myCore.setMesh(new Mesh());
@@ -183,8 +181,8 @@ public class Tile {
         updateGeometry();
         setMaterial(Materials.get(type));
         toAttach.attachChild(this.myCore);
-        setLocalTranslation(x, y, HEIGHTSCALE * z);
-        setLocalScale(1, 1, HEIGHTSCALE * height);
+        setLocalTranslation(trans);
+        setLocalScale(size);
     }
 
     public void ChangeType(Type type) {
@@ -212,7 +210,7 @@ public class Tile {
         return VertexAlpha.get(3);
     }
 
-    public void SetAlpha(float alpha) {
+    public void setAlpha(float alpha) {
         if (alpha < 0) {
             alpha = 0;
         }
@@ -303,8 +301,7 @@ public class Tile {
                 1, 1, 1, 0,};
             VertexAlpha = BufferUtils.createFloatBuffer(LID_COLOR_DATA);
             mesh.setBuffer(VertexBuffer.Type.Color, 4, VertexAlpha);
-            SetAlpha(1);
-
+            setAlpha(1);
         }
     }
 

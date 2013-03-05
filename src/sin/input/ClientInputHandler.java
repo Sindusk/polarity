@@ -49,7 +49,7 @@ public class ClientInputHandler{
             }else if(bind.equals("Move_Crouch")){
                 MovementManager.setMove(MH.CROUCH, down);
             }else if(bind.equals("Move_Jump") && down){
-                Character.getPlayer().jump();
+                Character.getControl().jump();
             }
             // Actions:
             else if(bind.equals("Trigger_Right")){
@@ -71,7 +71,7 @@ public class ClientInputHandler{
                     TracerManager.clear();
                     DecalManager.clear();
                 }else if(bind.equals("Misc_Key_3")){
-                    Character.getPlayer().setPhysicsLocation(T.v3f(0, 110, 0));
+                    Character.getControl().setPhysicsLocation(T.v3f(0, 110, 0));
                 }else if(bind.equals("Misc_Key_4")){
                     World.toggleWireframe();
                 }else if(bind.equals("Game_Menu")){

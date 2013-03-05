@@ -12,6 +12,7 @@ import sin.character.Character;
 import sin.character.MovementManager;
 import sin.character.StatsManager;
 import sin.npc.NPCManager;
+import sin.tools.Tile;
 import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
@@ -101,6 +102,7 @@ public class ClientGameState extends AbstractAppState{
         NPCManager.initialize(app);
         ProjectileManager.initialize(app);
         RecoilManager.initialize(app.getCamera());
+        Tile.initialize(app.getAssetManager());
         TracerManager.initialize(app);
         World.initialize(app);
         

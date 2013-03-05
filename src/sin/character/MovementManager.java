@@ -18,19 +18,46 @@ public class MovementManager {
     private static final float CROUCH_PENALTY = 0.6f;
     
     private static HashMap<MH, Boolean> movement = new HashMap();
+    private static boolean grounded = true;
     
     public static enum MH{
-        FORWARD, RIGHT, BACKWARD, LEFT, CROUCH
+        FORWARD, RIGHT, BACKWARD, LEFT, CROUCH, JUMP
     }
     
     public static boolean getMove(MH handle){
         return movement.get(handle);
     }
+    
+    public static void setGrounded(boolean b){
+        grounded = b;
+    }
     public static void setMove(MH handle, boolean b){
         movement.put(handle, b);
     }
     
-    public static void move(){
+    public static void moveFlying(float tpf){
+        Vector3f dir = new Vector3f(0, 0, 0);
+        if(getMove(MH.FORWARD)){
+            dir.addLocal(cam.getDirection());
+        }
+        if(getMove(MH.BACKWARD)){
+            dir.addLocal(cam.getDirection().mult(-1));
+        }
+        if(getMove(MH.LEFT)){
+            dir.addLocal(cam.getLeft());
+        }
+        if(getMove(MH.RIGHT)){
+            dir.addLocal(cam.getLeft().mult(-1));
+        }
+        if(getMove(MH.CROUCH)){
+            dir.addLocal(0, -tpf*1000, 0);
+        }
+        if(getMove(MH.JUMP)){
+            dir.addLocal(0, tpf*1000, 0);
+        }
+        cam.setLocation(cam.getLocation().add(dir.mult(tpf*100.0f)));
+    }
+    public static void moveGrounded(){
         // Initialize temporary variables:
         Vector3f dir;
         Vector3f wd = new Vector3f(0, 0, 0);
@@ -67,26 +94,33 @@ public class MovementManager {
                 wd.addLocal(-xSide, 0, -zSide);
             }
         }
-
+        
         // If moving at a diagonal, reduce movement.
         if((getMove(MH.FORWARD) || getMove(MH.BACKWARD)) && (getMove(MH.LEFT) || getMove(MH.RIGHT))){
             wd.setX(wd.getX()*T.ROOT_HALF);
             wd.setZ(wd.getZ()*T.ROOT_HALF);
         }
-
+        
         // If crouching, lower view.
         if(getMove(MH.CROUCH)){
-            cam.setLocation(Character.getPlayer().getPhysicsLocation().add(T.v3f(0, -1.5f, 0)));
+            cam.setLocation(Character.getControl().getPhysicsLocation().add(new Vector3f(0, -1.5f, 0)));
             wd.setX(wd.getX()*CROUCH_PENALTY);
             wd.setZ(wd.getZ()*CROUCH_PENALTY);
         }else{
-            cam.setLocation(Character.getPlayer().getPhysicsLocation());
+            cam.setLocation(Character.getControl().getPhysicsLocation());
         }
-
-        Character.getPlayer().setWalkDirection(wd);
+        
+        Character.getControl().setWalkDirection(wd);
         Character.getNode().setLocalTranslation(cam.getLocation());
         if(Character.getLocation().getY() < -20){
             Character.kill();
+        }
+    }
+    public static void move(float tpf){
+        if(grounded){
+            moveGrounded();
+        }else{
+            moveFlying(tpf);
         }
     }
     
@@ -99,5 +133,6 @@ public class MovementManager {
         setMove(MH.BACKWARD, false);
         setMove(MH.LEFT, false);
         setMove(MH.CROUCH, false);
+        setMove(MH.JUMP, false);
     }
 }
