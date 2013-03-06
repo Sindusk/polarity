@@ -29,6 +29,8 @@ import sin.hud.HUD;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.GeometryData;
+import sin.netdata.NPCData;
+import sin.npc.NPCManager;
 import sin.tools.A;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
@@ -77,6 +79,8 @@ public class Networking {
         client.addMessageListener(new ClientListener(), CommandData.class);
         Serializer.registerClass(ConnectData.class);
         client.addMessageListener(new ClientListener(), ConnectData.class);
+        Serializer.registerClass(DamageData.class);
+        client.addMessageListener(new ClientListener(), DamageData.class);
         Serializer.registerClass(DecalData.class);
         client.addMessageListener(new ClientListener(), DecalData.class);
         Serializer.registerClass(DisconnectData.class);
@@ -89,12 +93,12 @@ public class Networking {
         client.addMessageListener(new ClientListener(), IDData.class);
         Serializer.registerClass(MoveData.class);
         client.addMessageListener(new ClientListener(), MoveData.class);
+        Serializer.registerClass(NPCData.class);
+        client.addMessageListener(new ClientListener(), NPCData.class);
         Serializer.registerClass(PingData.class);
         client.addMessageListener(new ClientListener(), PingData.class);
         Serializer.registerClass(ProjectileData.class);
         client.addMessageListener(new ClientListener(), ProjectileData.class);
-        Serializer.registerClass(DamageData.class);
-        client.addMessageListener(new ClientListener(), DamageData.class);
         Serializer.registerClass(SoundData.class);
         client.addMessageListener(new ClientListener(), SoundData.class);
     }
@@ -241,6 +245,15 @@ public class Networking {
                 }
             });
         }
+        private void NPCMessage(NPCData d){
+            final NPCData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    NPCManager.add(m.getID(), m.getType(), m.getLocation());
+                    return null;
+                }
+            });
+        }
         private void PingMessage(){
             final float pingTime = app.getTimer().getTimeInSeconds() - time;
             app.enqueue(new Callable<Void>(){
@@ -296,6 +309,8 @@ public class Networking {
                 IDMessage((IDData) m);
             }else if(m instanceof MoveData){
                 MoveMessage((MoveData) m);
+            }else if(m instanceof NPCData){
+                NPCMessage((NPCData) m);
             }else if(m instanceof PingData){
                 PingMessage();
             }else if(m instanceof ProjectileData){

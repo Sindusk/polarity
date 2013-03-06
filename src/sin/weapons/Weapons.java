@@ -434,7 +434,7 @@ public class Weapons{
         public RocketLauncher(boolean left){
             super(Archetype.EXPLOSIVE, Classification.ASSAULT, left);
             name = "Rocket Launcher";
-            audio = new WeaponAudio(name, 0.5f);
+            audio = new WeaponAudio(name, 0.3f);
             ammo = new ReloadAmmo(1, 1.3f, left);
             damage = new RangedProjectileAttack("", "aoe(25, 3.4):destroy", 150f, 150f);
             recoils = new Recoils(180, 240, 30, -30);

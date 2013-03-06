@@ -5,7 +5,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.animation.Models;
 import sin.hud.HUD;
 import sin.network.Networking;
 import sin.character.Character;
@@ -88,9 +87,7 @@ public class ClientGameState extends AbstractAppState{
         AttackManager.initialize(app.getCamera(), collisionNode);
         Character.initialize(app);
         HUD.initialize(app, gui);
-        Models.initialize(app);
         MovementManager.initialize(app.getCamera());
-        NPCManager.initialize(app);
         ProjectileManager.initialize(collisionNode);
         RecoilManager.initialize(app.getCamera());
         TracerManager.initialize(app);
@@ -103,8 +100,9 @@ public class ClientGameState extends AbstractAppState{
                 new M4A1(true), new RocketLauncher(false),
                 new Raygun(true), new AK47(false), 100, 100);
         
-        collisionNode.attachChild(singleNode);
+        collisionNode.attachChild(NPCManager.getNode());
         collisionNode.attachChild(PlayerManager.getNode());
+        collisionNode.attachChild(singleNode);
         collisionNode.attachChild(terrainNode);
         world.attachChild(Character.getNode());
         world.attachChild(collisionNode);

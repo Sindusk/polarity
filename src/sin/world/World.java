@@ -10,6 +10,7 @@ import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import sin.netdata.GeometryData;
+import sin.npc.NPCManager;
 import sin.tools.A;
 import sin.tools.T;
 
@@ -144,7 +145,7 @@ public class World {
             corners[1] = new Vector3f((-zi*(HALL_WIDTH-1))+x, start.getY(), (-xi*(HALL_WIDTH-1))+z); // Bottom Right
             Vector3f left = corners[0].clone();
             Vector3f right = corners[1].clone();
-            ArrayList<HallData> d = new ArrayList();
+            ArrayList<HallData> d = new ArrayList(1);
             while(i <= iMax){
                 if(world.get(left) != null && world.get(left).contains("h")){
                     b = true;
@@ -205,10 +206,11 @@ public class World {
             generateWall(left.add(xi, 0, zi), -zi, -xi, HALL_WIDTH*2-1, false);
             generateWall(left.add(zi, 0, xi), -xi, -zi, i+1, false);
             generateWall(right.add(-zi, 0, -xi), -xi, -zi, i+1, true);
-
+            
             // Generate the actual floor:
             float xloc = (corners[3].getX()+corners[1].getX())*0.5f;
             float zloc = (corners[3].getZ()+corners[1].getZ())*0.5f;
+            NPCManager.addNew("grunt", new Vector3f(xloc, start.getY(), zloc).mult(ZS).add(0, 5, 0));
             center = new Vector3f(xloc, start.getY(), zloc);
             floor = geoFloor(center, xs, zs, T.getMaterialPath("lava_rock"), T.v2f(zs, xs), true);
             map.add(floor);

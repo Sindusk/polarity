@@ -43,6 +43,11 @@ public class A {
             int id = Integer.parseInt(data[1]);
             damage = modDamage(data[2], damage);
             S.getServer().broadcast(new DamageData(attacker, id, damage));
+        }else if(data[0].equals("npc")){
+            String type = data[1];
+            int id = Integer.parseInt(data[2]);
+            damage = modDamage(data[3], damage);
+            T.log("Player "+attacker+" shot NPC "+type+" ["+id+"] for "+damage+" damage.");
         }else{
             DecalManager.create(target.getContactPoint());
             S.getServer().broadcast(new DecalData(target.getContactPoint()));
@@ -52,13 +57,14 @@ public class A {
         int i = 0;
         Player[] players = PlayerManager.getPlayers();
         while(i < players.length){
-            if(players[i] != null && players[i].getLocation().distance(target.getContactPoint()) <= radius){
-                S.getServer().broadcast(new DamageData(attacker, i, damage));
+            if(players[i] != null){
+                float dist = players[i].getLocation().distance(target.getContactPoint());
+                if(dist <= radius){
+                    S.getServer().broadcast(new DamageData(attacker, i, damage*(radius-dist)));
+                }
             }
             i++;
         }
-        DecalManager.create(target.getContactPoint());
-        Networking.send(new DecalData(target.getContactPoint()));
     }
     
     // Logan's Functions:

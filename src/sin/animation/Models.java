@@ -1,25 +1,21 @@
 package sin.animation;
 
-import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
 import java.util.HashMap;
-import sin.GameClient;
 import sin.tools.T;
 import sin.world.CG;
-import sin.world.World;
 
 /**
  * Models - Creates and manages all Model classes.
  * @author SinisteRing
  */
 public class Models {
-    public static GameClient app;
-    
     public static abstract class ModelTemplate{
         protected HashMap<String, Node> parts = new HashMap();
         private Node node = new Node();
@@ -40,16 +36,21 @@ public class Models {
             return parts.get(name);
         }
         
+        public void setLocalTranslation(Vector3f trans){
+            node.setLocalTranslation(trans);
+        }
         public void addPart(Node part, String name, Vector3f trans){
             part.setLocalTranslation(trans);
             node.attachChild(part);
             parts.put(name, part);
             part.setName(handle+":"+name);
         }
+        
+        public void destroy(){
+            this.getNode().removeFromParent();
+        }
     }
     public static class PlayerModel extends ModelTemplate{
-        // Instance Variables:
-        
         public static Node genHead(){
             Node part = new Node();
             CG.createSphere(part, "", .7f, T.v3f(0, .5f, 0), T.getMaterialPath("wall"), Sphere.TextureMode.Polar);
@@ -117,12 +118,23 @@ public class Models {
             parts.get("arm.left").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
             parts.get("arm.right").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
         }
-        public void destroy(){
-            this.getNode().removeFromParent();
-        }
     }
-    
-    public static void initialize(GameClient app){
-        Models.app = app;
+    public static class NPCModel extends ModelTemplate{
+        public static Node genHead(){
+            Node part = new Node();
+            CG.createBox(part, "", new Vector3f(1.2f, 1, 1.8f), Vector3f.ZERO, T.getMaterialPath("BC_Tex"), new Vector2f(1, 1));
+            return part;
+        }
+        public static Node genBody(){
+            Node part = new Node();
+            CG.createBox(part, "", new Vector3f(1, 3, 1), Vector3f.ZERO, T.getMaterialPath("brick"), new Vector2f(1, 1));
+            return part;
+        }
+        
+        public NPCModel(Node node, String type, int id){
+            super(node, "npc:"+type+":"+id);
+            this.addPart(genHead(), "head", new Vector3f(0, 3, 0));
+            this.addPart(genBody(), "body", Vector3f.ZERO);
+        }
     }
 }

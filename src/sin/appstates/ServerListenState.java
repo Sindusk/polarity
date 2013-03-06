@@ -28,7 +28,9 @@ import sin.netdata.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
+import sin.netdata.NPCData;
 import sin.netdata.SoundData;
+import sin.npc.NPCManager;
 import sin.tools.A;
 import sin.tools.S;
 import sin.tools.T;
@@ -123,6 +125,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
                 PlayerManager.getPlayer(id).setConnection(connection);
                 server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
                 sendGeometry(connection);
+                NPCManager.sendData(connection);
             }
         }
         private void MoveMessage(MoveData d){
@@ -193,6 +196,8 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         server.addMessageListener(listener, CommandData.class);
         Serializer.registerClass(ConnectData.class);
         server.addMessageListener(listener, ConnectData.class);
+        Serializer.registerClass(DamageData.class);
+        server.addMessageListener(listener, DamageData.class);
         Serializer.registerClass(DecalData.class);
         server.addMessageListener(listener, DecalData.class);
         Serializer.registerClass(DisconnectData.class);
@@ -205,12 +210,12 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         server.addMessageListener(listener, IDData.class);
         Serializer.registerClass(MoveData.class);
         server.addMessageListener(listener, MoveData.class);
+        Serializer.registerClass(NPCData.class);
+        server.addMessageListener(listener, NPCData.class);
         Serializer.registerClass(PingData.class);
         server.addMessageListener(listener, PingData.class);
         Serializer.registerClass(ProjectileData.class);
         server.addMessageListener(listener, ProjectileData.class);
-        Serializer.registerClass(DamageData.class);
-        server.addMessageListener(listener, DamageData.class);
         Serializer.registerClass(SoundData.class);
         server.addMessageListener(listener, SoundData.class);
     }
@@ -236,6 +241,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         }
         
         // Initialize Nodes:
+        collisionNode.attachChild(NPCManager.getNode());
         collisionNode.attachChild(PlayerManager.getNode());
         world.attachChild(ProjectileManager.getNode());
         world.attachChild(DecalManager.getNode());
