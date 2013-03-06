@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import sin.netdata.GeometryData;
 import sin.tools.T;
-import sin.tools.Tile;
-import sin.tools.Tile.Type;
 
 /**
  * World - Used for geometry creation and world generation.
@@ -258,6 +256,5 @@ public class World {
         CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, -1, 0), T.getMaterialPath("lava_rock"), T.v2f(5, 5));
         CG.createPhyBox(node, "wall", T.v3f(30, 20, 0.1f), T.v3f(0, 20, -60), T.getMaterialPath("BC_Tex"), T.v2f(15, 10));
         CG.createPhyBox(node, "savior", T.v3f(10, 0.1f, 10), T.v3f(0, -101, 0), ColorRGBA.Yellow);
-        Tile t = new Tile(new Vector3f(3, 3, 3), new Vector3f(10, 5, 0), Type.Grass, 1, node);
     }
 }

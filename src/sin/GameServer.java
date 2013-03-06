@@ -3,6 +3,7 @@ package sin;
 import com.jme3.app.Application;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.ColorRGBA;
+import com.jme3.network.Message;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
@@ -104,6 +105,9 @@ public class GameServer extends Application{
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
         CG.initialize(bulletAppState);
+    }
+    public void send(Message m){
+        listenState.send(m);
     }
     
     @Override

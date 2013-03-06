@@ -1,9 +1,6 @@
 package sin.tools;
 
-import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.BulletAppState.ThreadingType;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapFont;
@@ -25,7 +22,7 @@ import com.jme3.texture.Texture;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sin.weapons.AttackManager;
+import sin.character.PlayerManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;
 
@@ -66,6 +63,7 @@ public class T {
             return -1;
         }
      }
+    
     // Parsing Helpers:
     private static String[] getArgs(String s){
         return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
@@ -75,7 +73,7 @@ public class T {
     }
     
     // Attack Parsing:
-    public static void InitializeUpdate(Projectile p){
+    public static void initializeUpdate(Projectile p){
         String[] actions = p.getUpdate().split(":");
         String[] args;
         UpdateMap.put(p, new HashMap());
@@ -89,7 +87,36 @@ public class T {
             i++;
         }
     }
-    public static void ParseUpdate(Projectile p, float tpf){
+    public static void parseCollision(int attacker, String collision, CollisionResult target){
+        String[] actions = collision.split(":");
+        String[] args;
+        int i = 0;
+        while(i < actions.length){
+            if(actions[i].contains("damage")){
+                args = getArgs(actions[i]);
+                A.damage(attacker, target, getValueF(args[0]));
+            }else if(actions[i].contains("aoe")){
+                args = getArgs(actions[i]);
+                A.damageAoE(attacker, target, getValueF(args[0]), getValueF(args[1]));
+            }
+            i++;
+        }
+    }
+    public static void parseCollision(Projectile p, CollisionResult target){
+        parseCollision(p.getOwner(), p.getCollision(), target);
+        if(p.getCollision().contains("destroy")){
+            p.destroy();
+        }
+    }
+    public static void parseCommand(String command){
+        String[] action = command.split(":");
+        if(action[0].equals("player")){
+            if(action[1].equals("destroy")){
+                PlayerManager.getPlayer(Integer.parseInt(action[2])).destroy();
+            }
+        }
+    }
+    public static void parseUpdate(Projectile p, float tpf){
         if(p.getUpdate().isEmpty()){
             return;
         }
@@ -106,7 +133,7 @@ public class T {
                 }
                 if(timer > getValueF(args[1])){
                     float rot = UpdateMap.get(p).get(i+"spiral.rot");
-                    ProjectileManager.addNew(p.getLocation().clone(), spiral(p, rot), T.v3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy");
+                    ProjectileManager.addNew(p.getOwner(), p.getLocation().clone(), spiral(p, rot), T.v3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy");
                     rot += getValueF(args[2]);
                     UpdateMap.get(p).put(i+"spiral.rot", rot);
                     timer = 0;
@@ -116,27 +143,6 @@ public class T {
                 UpdateMap.get(p).put(i+"spiral.timer", timer);
             }
             i++;
-        }
-    }
-    public static void ParseCollision(String collision, CollisionResult target){
-        String[] actions = collision.split(":");
-        String[] args;
-        int i = 0;
-        while(i < actions.length){
-            if(actions[i].contains("damage")){
-                args = getArgs(actions[i]);
-                AttackManager.damage(target, getValueF(args[0]));
-            }else if(actions[i].contains("aoe")){
-                args = getArgs(actions[i]);
-                AttackManager.damageAoE(target, getValueF(args[0]), getValueF(args[1]));
-            }
-            i++;
-        }
-    }
-    public static void ParseCollision(Projectile p, CollisionResult target){
-        ParseCollision(p.getCollision(), target);
-        if(p.getCollision().contains("destroy")){
-            p.destroy();
         }
     }
     

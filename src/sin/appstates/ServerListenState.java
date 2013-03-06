@@ -3,7 +3,6 @@ package sin.appstates;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.math.Vector3f;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
@@ -17,7 +16,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 import sin.GameServer;
 import sin.character.PlayerManager;
-import sin.character.PlayerManager.Player;
+import sin.netdata.CommandData;
 import sin.netdata.ConnectData;
 import sin.netdata.DecalData;
 import sin.netdata.DisconnectData;
@@ -27,7 +26,7 @@ import sin.netdata.IDData;
 import sin.netdata.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
-import sin.netdata.ShotData;
+import sin.netdata.DamageData;
 import sin.netdata.SoundData;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
@@ -60,12 +59,15 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         T.log("Player "+id+" has disconnected.");
     }
     
-    private void sendGeometry(HostedConnection c){
+    public void sendGeometry(HostedConnection c){
         int i = 0;
         while(i < World.getMap().size()){
             c.send(World.getMap().get(i));
             i++;
         }
+    }
+    public void send(Message m){
+        server.broadcast(m);
     }
     
     private class ServerListener implements MessageListener<HostedConnection>{
@@ -112,17 +114,30 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         }
         private void MoveMessage(MoveData d){
             server.broadcast(Filters.notEqualTo(connection), d);
-            PlayerManager.getPlayer(d.getID()).update(d.getLocation(), d.getRotation());
+            final MoveData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    PlayerManager.updatePlayer(m);
+                    return null;
+                }
+            });
+            //PlayerManager.getPlayer(d.getID()).update(d.getLocation(), d.getRotation());
         }
         private void PingMessage(PingData d){
             connection.send(d);
         }
         private void ProjectileMessage(ProjectileData d){
-            ProjectileManager.add(d);
+            final ProjectileData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    ProjectileManager.add(m);
+                    return null;
+                }
+            });
             server.broadcast(Filters.notEqualTo(connection), d);
         }
-        private void ShotMessage(ShotData d){
-            //System.out.println("Handling ShotData from client "+d.getID()+"...");
+        private void DamageMessage(DamageData d){
+            //System.out.println("Handling DamageData from client "+d.getID()+"...");
             System.out.println("Player "+d.getID()+" shot Player "+d.getPlayer()+" for "+d.getDamage()+" damage.");
             server.broadcast(d);
         }
@@ -136,6 +151,8 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             server = connection.getServer();
             if(m instanceof ConnectData){
                 ConnectMessage((ConnectData) m);
+            }else if(m instanceof DamageData){
+                DamageMessage((DamageData) m);
             }else if(m instanceof DecalData){
                 DecalMessage((DecalData) m);
             }else if(m instanceof ErrorData){
@@ -148,8 +165,6 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
                 PingMessage((PingData) m);
             }else if(m instanceof ProjectileData){
                 ProjectileMessage((ProjectileData) m);
-            }else if(m instanceof ShotData){
-                ShotMessage((ShotData) m);
             }else if(m instanceof SoundData){
                 SoundMessage((SoundData) m);
             }
@@ -157,6 +172,8 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
     }
     
     private void registerSerials(){
+        Serializer.registerClass(CommandData.class);
+        server.addMessageListener(listener, CommandData.class);
         Serializer.registerClass(ConnectData.class);
         server.addMessageListener(listener, ConnectData.class);
         Serializer.registerClass(DecalData.class);
@@ -175,8 +192,8 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         server.addMessageListener(listener, PingData.class);
         Serializer.registerClass(ProjectileData.class);
         server.addMessageListener(listener, ProjectileData.class);
-        Serializer.registerClass(ShotData.class);
-        server.addMessageListener(listener, ShotData.class);
+        Serializer.registerClass(DamageData.class);
+        server.addMessageListener(listener, DamageData.class);
         Serializer.registerClass(SoundData.class);
         server.addMessageListener(listener, SoundData.class);
     }
@@ -222,7 +239,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
     public void update(float tpf){
         super.update(tpf);  // Execute AppTasks.
         
-        ProjectileManager.update(tpf);
+        ProjectileManager.update(tpf, true);
     }
     
     @Override

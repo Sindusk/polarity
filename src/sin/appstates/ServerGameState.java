@@ -3,13 +3,9 @@ package sin.appstates;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.scene.Node;
 import sin.GameServer;
 import sin.character.MovementManager;
-import sin.tools.Tile;
 import sin.weapons.RecoilManager;
-import sin.world.CG;
-import sin.world.World;
 
 /**
  *
@@ -34,6 +30,8 @@ public class ServerGameState extends AbstractAppState{
     
     @Override
     public void update(float tpf){
+        super.update(tpf);
+        
         MovementManager.move(tpf);
     }
     

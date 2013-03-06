@@ -21,11 +21,12 @@ import sin.netdata.IDData;
 import sin.netdata.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
-import sin.netdata.ShotData;
+import sin.netdata.DamageData;
 import sin.netdata.SoundData;
 import sin.character.Character;
 import sin.character.PlayerManager;
 import sin.hud.HUD;
+import sin.netdata.CommandData;
 import sin.netdata.GeometryData;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
@@ -68,6 +69,8 @@ public class Networking {
     }
     
     private static void registerSerials(){
+        Serializer.registerClass(CommandData.class);
+        client.addMessageListener(new ClientListener(), CommandData.class);
         Serializer.registerClass(ConnectData.class);
         client.addMessageListener(new ClientListener(), ConnectData.class);
         Serializer.registerClass(DecalData.class);
@@ -86,8 +89,8 @@ public class Networking {
         client.addMessageListener(new ClientListener(), PingData.class);
         Serializer.registerClass(ProjectileData.class);
         client.addMessageListener(new ClientListener(), ProjectileData.class);
-        Serializer.registerClass(ShotData.class);
-        client.addMessageListener(new ClientListener(), ShotData.class);
+        Serializer.registerClass(DamageData.class);
+        client.addMessageListener(new ClientListener(), DamageData.class);
         Serializer.registerClass(SoundData.class);
         client.addMessageListener(new ClientListener(), SoundData.class);
     }
@@ -149,7 +152,10 @@ public class Networking {
     
     private static class ClientListener implements MessageListener<Client>, ClientStateListener {
         private Client client;
-
+        
+        private void CommandMessage(CommandData d){
+            T.parseCommand(d.getCommand());
+        }
         private void ConnectMessage(ConnectData d){
             final int id = d.getID();
             //if(!PlayerManager.getPlayer(d.getID()).isUsed()){
@@ -230,7 +236,7 @@ public class Networking {
                 }
             });
         }
-        private void ShotMessage(ShotData d){
+        private void ShotMessage(DamageData d){
             if(d.getPlayer() == CLIENT_ID){
                 //System.out.println("Took "+d.getDamage()+" damage.");
                 final float damage = d.getDamage();
@@ -261,7 +267,9 @@ public class Networking {
 
         public void messageReceived(Client source, Message m) {
             client = source;
-            if(m instanceof ConnectData){
+            if(m instanceof CommandData){
+                CommandMessage((CommandData) m);
+            }else if(m instanceof ConnectData){
                 ConnectMessage((ConnectData) m);
             }else if(m instanceof DecalData){
                 DecalMessage((DecalData) m);
@@ -279,8 +287,8 @@ public class Networking {
                 PingMessage();
             }else if(m instanceof ProjectileData){
                 ProjectileMessage((ProjectileData) m);
-            }else if(m instanceof ShotData){
-                ShotMessage((ShotData) m);
+            }else if(m instanceof DamageData){
+                ShotMessage((DamageData) m);
             }else if(m instanceof SoundData){
                 SoundMessage((SoundData) m);
             }

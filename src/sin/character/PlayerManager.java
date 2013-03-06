@@ -6,6 +6,7 @@ import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
 import sin.animation.Models.PlayerModel;
 import sin.netdata.ConnectData;
+import sin.netdata.MoveData;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -68,6 +69,9 @@ public class PlayerManager{
     }
     public static void updatePlayer(int id, Vector3f loc, Quaternion rot){
         player[id].update(loc, rot);
+    }
+    public static void updatePlayer(MoveData d){
+        player[d.getID()].update(d.getLocation(), d.getRotation());
     }
     
     private static int findEmptyPlayer(){

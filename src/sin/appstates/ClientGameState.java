@@ -12,7 +12,6 @@ import sin.character.Character;
 import sin.character.MovementManager;
 import sin.character.PlayerManager;
 import sin.npc.NPCManager;
-import sin.tools.Tile;
 import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
@@ -86,8 +85,8 @@ public class ClientGameState extends AbstractAppState{
         
         // Initialize Projectiles:
         AmmoManager.initialize(app);
+        AttackManager.initialize(app.getCamera(), collisionNode);
         Character.initialize(app);
-        AttackManager.initialize(app);
         DecalManager.initialize(app);
         HUD.initialize(app, gui);
         Models.initialize(app);
@@ -95,7 +94,6 @@ public class ClientGameState extends AbstractAppState{
         NPCManager.initialize(app);
         ProjectileManager.initialize(collisionNode);
         RecoilManager.initialize(app.getCamera());
-        Tile.initialize(app.getAssetManager());
         TracerManager.initialize(app);
         Weapons.initialize(app);
         
@@ -143,7 +141,7 @@ public class ClientGameState extends AbstractAppState{
         // Update character location & hud:
         Character.update(tpf);
         HUD.update(tpf);
-        ProjectileManager.update(tpf);
+        ProjectileManager.update(tpf, false);
         
         // Update network if connected:
         if(Networking.isConnected()) {

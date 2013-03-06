@@ -3,68 +3,19 @@ package sin.weapons;
 import sin.world.TracerManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
-import com.jme3.math.Vector3f;
-import sin.GameClient;
-import sin.character.Character;
-import sin.netdata.DecalData;
-import sin.netdata.ShotData;
+import com.jme3.renderer.Camera;
+import com.jme3.scene.Node;
 import sin.network.Networking;
-import sin.character.PlayerManager;
-import sin.hud.HUD;
+import sin.tools.A;
 import sin.tools.T;
-import sin.world.DecalManager;
 
 /**
  * AttackManager - Used for aiding the damage functions for weaponry.
  * @author SinisteRing
  */
 public class AttackManager {
-    private static GameClient app;
-    
-    public static float modDamage(String part, float dmg){
-        if(part.equals("head")){
-            dmg *= 1.5f;
-        }
-        return dmg;
-    }
-    public static void damage(CollisionResult target, float damage){
-        String data[] = getPartData(target);
-        if(data == null){
-            return;
-        }
-        if(data[0].equals("player")){
-            int id = Integer.parseInt(data[1]);
-            damage = modDamage(data[2], damage);
-            HUD.addFloatingText(PlayerManager.getPlayer(id).getLocation().clone().addLocal(T.v3f(0, 4, 0)), Character.getLocation(), damage);
-            Networking.send(new ShotData(Networking.getID(), id, damage));
-        }else{
-            DecalManager.create(target.getContactPoint());
-            Networking.send(new DecalData(target.getContactPoint()));
-        }
-    }
-    public static void damageAoE(CollisionResult target, float radius, float damage){
-        DecalManager.create(target.getContactPoint());
-        Networking.send(new DecalData(target.getContactPoint()));
-    }
-    
-    public static float getDistance(Vector3f player, Vector3f target){
-        return target.distance(player);
-    }
-    public static String[] getPartData(CollisionResult target){
-        return target.getGeometry().getParent().getName().split(":");
-    }
-    public static int getHitbox(String name){
-        if(name.contains("head")) {
-            return 0;
-        }else if(name.contains("torso")) {
-            return 1;
-        }else if(name.contains("arm")) {
-            return 2;
-        }else if(name.contains("leg")) {
-            return 3;
-        }
-        return -1;
-    }
+    private static Camera cam;
+    private static Node collisionNode;
     
     public static abstract class AttackTemplate{
         private String collision;
@@ -91,11 +42,11 @@ public class AttackManager {
         }
         
         public void attack(Ray ray){
-            CollisionResult target = T.getClosestCollision(ray, app.getCollisionNode());
+            CollisionResult target = T.getClosestCollision(ray, collisionNode);
             if(target != null){
-                float d = getDistance(ray.getOrigin(), target.getContactPoint());
+                float d = A.getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
-                    T.ParseCollision(this.getCollision(), target);
+                    T.parseCollision(Networking.getID(), this.getCollision(), target);
                 }
             }
         }
@@ -128,7 +79,7 @@ public class AttackManager {
             this.update = update;
         }
         public void attack(Ray ray){
-            ProjectileManager.addNew(ray.getOrigin(), ray.getDirection(), app.getCamera().getUp(), this.getRange(), this.getSpeed(), update, this.getCollision());
+            ProjectileManager.addNew(Networking.getID(), ray.getOrigin(), ray.getDirection(), cam.getUp(), this.getRange(), this.getSpeed(), update, this.getCollision());
         }
     }
     public static class RangedRayAttack extends RangedAttack{
@@ -136,12 +87,12 @@ public class AttackManager {
             super(collision, range);
         }
         public void attack(Ray ray){
-            CollisionResult target = T.getClosestCollision(ray, app.getCollisionNode());
+            CollisionResult target = T.getClosestCollision(ray, collisionNode);
             if(target != null){
-                float d = getDistance(ray.getOrigin(), target.getContactPoint());
+                float d = A.getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
                     TracerManager.add(ray.getOrigin(), target.getContactPoint());
-                    T.ParseCollision(this.getCollision(), target);
+                    T.parseCollision(Networking.getID(), this.getCollision(), target);
                 }else{
                     TracerManager.add(ray, this.getRange());
                 }
@@ -151,7 +102,8 @@ public class AttackManager {
         }
     }
     
-    public static void initialize(GameClient app){
-        AttackManager.app = app;
+    public static void initialize(Camera cam, Node collisionNode){
+        AttackManager.cam = cam;
+        AttackManager.collisionNode = collisionNode;
     }
 }

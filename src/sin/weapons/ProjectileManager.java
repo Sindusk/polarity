@@ -23,6 +23,7 @@ public class ProjectileManager {
     
     public static class Projectile{
         private Node projectile = new Node("Projectile");
+        private int owner;
         private Vector3f location;
         private Vector3f direction;
         private Vector3f up;
@@ -35,6 +36,9 @@ public class ProjectileManager {
         
         public Projectile(){}
         
+        public int getOwner(){
+            return owner;
+        }
         public Vector3f getLocation(){
             return location;
         }
@@ -56,25 +60,28 @@ public class ProjectileManager {
         
         private void collide(CollisionResult target, float dist){
             if(target.getContactPoint().distance(location) <= dist*2){
-                T.ParseCollision(this, target);
+                T.parseCollision(this, target);
             }
         }
-        public void update(float tpf){
+        public void update(float tpf, boolean doActions){
             Vector3f movement = direction.clone().mult(speed*tpf);
             float dist = movement.distance(Vector3f.ZERO);
             T.addv3f(location, movement);
             projectile.setLocalTranslation(location);
-            CollisionResult target = T.getClosestCollision(new Ray(location, direction), collisionNode);
-            if(target != null){
-                this.collide(target, dist);
-            }
             distance += dist;
             if(distance > maxDistance){
                 this.destroy();
             }
-            T.ParseUpdate(this, tpf);
+            if(doActions){
+                CollisionResult target = T.getClosestCollision(new Ray(location, direction), collisionNode);
+                if(target != null){
+                    this.collide(target, dist);
+                }
+                T.parseUpdate(this, tpf);
+            }
         }
-        public void create(Vector3f location, Vector3f direction, Vector3f up, float speed, float distance, String update, String collision){
+        public void create(int owner, Vector3f location, Vector3f direction, Vector3f up, float speed, float distance, String update, String collision){
+            this.owner = owner;
             this.location = location;
             this.direction = direction;
             this.up = up;
@@ -93,7 +100,7 @@ public class ProjectileManager {
             T.addv3f(location, direction);
             projectile.setLocalTranslation(location);
             used = true;
-            T.InitializeUpdate(this);
+            T.initializeUpdate(this);
         }
         public void destroy(){
             distance = 0;
@@ -106,14 +113,14 @@ public class ProjectileManager {
         return node;
     }
     
-    public static void update(float tpf){
+    public static void update(float tpf, boolean doActions){
         int i = 0;
         while(i < projectiles.length){
             if(projectiles[i] == null){
                 break;
             }
             if(projectiles[i].isUsed()){
-                projectiles[i].update(tpf);
+                projectiles[i].update(tpf, doActions);
             }
             i++;
         }
@@ -128,25 +135,25 @@ public class ProjectileManager {
         }
         return -1;
     }
-    public static void add(Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
+    public static void add(int owner, Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
         int i = findEmptyProjectile();
         if(i != -1){
             if(projectiles[i] == null){
                 projectiles[i] = new Projectile();
             }
-            projectiles[i].create(loc, dir, up, speed, dist, update, collision);
+            projectiles[i].create(owner, loc, dir, up, speed, dist, update, collision);
         }else{
             T.log("Projectile System Overload!");
         }
     }
     public static void add(ProjectileData d){
-        add(d.getLocation(), d.getDirection(), d.getUp(), d.getDistance(), d.getSpeed(), d.getUpdate(), d.getCollision());
+        add(d.getOwner(), d.getLocation(), d.getDirection(), d.getUp(), d.getDistance(), d.getSpeed(), d.getUpdate(), d.getCollision());
     }
-    public static void addNew(Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
+    public static void addNew(int owner, Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
         if(Networking.isConnected()){
-            Networking.send(new ProjectileData(loc, dir, up, dist, speed, update, collision));
+            Networking.send(new ProjectileData(owner, loc, dir, up, dist, speed, update, collision));
         }
-        add(loc, dir, up, dist, speed, update, collision);
+        add(owner, loc, dir, up, dist, speed, update, collision);
     }
     
     public static void initialize(Node collisionNode){

@@ -10,6 +10,7 @@ import com.jme3.network.serializing.Serializable;
  */
 @Serializable
 public class ProjectileData extends AbstractMessage {
+    private int owner;
     private Vector3f loc;
     private Vector3f dir;
     private Vector3f up;
@@ -18,7 +19,8 @@ public class ProjectileData extends AbstractMessage {
     private String update;
     private String collision;
     public ProjectileData(){}
-    public ProjectileData(Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
+    public ProjectileData(int owner, Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
+        this.owner = owner;
         this.loc = loc;
         this.dir = dir;
         this.up = up;
@@ -26,6 +28,9 @@ public class ProjectileData extends AbstractMessage {
         this.speed = speed;
         this.update = update;
         this.collision = collision;
+    }
+    public int getOwner(){
+        return owner;
     }
     public Vector3f getLocation(){
         return loc;
