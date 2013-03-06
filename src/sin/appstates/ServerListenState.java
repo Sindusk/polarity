@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 import sin.GameServer;
 import sin.character.PlayerManager;
+import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.ConnectData;
 import sin.netdata.DecalData;
@@ -28,8 +29,11 @@ import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
 import sin.netdata.SoundData;
+import sin.tools.A;
+import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
+import sin.world.DecalManager;
 import sin.world.World;
 
 /**
@@ -73,6 +77,15 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
     private class ServerListener implements MessageListener<HostedConnection>{
         private HostedConnection connection;
         
+        private void AttackMessage(AttackData d){
+            final AttackData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    A.rayAttack(m);
+                    return null;
+                }
+            });
+        }
         private void ConnectMessage(ConnectData d){
             T.log("Connecting new player...");
             if(d.GetVersion().equals(app.getVersion())){
@@ -149,7 +162,9 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         public void messageReceived(HostedConnection source, Message m) {
             connection = source;
             server = connection.getServer();
-            if(m instanceof ConnectData){
+            if(m instanceof AttackData){
+                AttackMessage((AttackData) m);
+            }if(m instanceof ConnectData){
                 ConnectMessage((ConnectData) m);
             }else if(m instanceof DamageData){
                 DamageMessage((DamageData) m);
@@ -172,6 +187,8 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
     }
     
     private void registerSerials(){
+        Serializer.registerClass(AttackData.class);
+        server.addMessageListener(listener, AttackData.class);
         Serializer.registerClass(CommandData.class);
         server.addMessageListener(listener, CommandData.class);
         Serializer.registerClass(ConnectData.class);
@@ -210,20 +227,23 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         // Create server to listen:
         try {
             server = Network.createServer(6143);
+            listener = new ServerListener();
+            registerSerials();
+            server.addConnectionListener(this);
+            server.start();
         }catch (IOException ex){
             T.log(ex);
         }
-        listener = new ServerListener();
-        registerSerials();
-        server.addConnectionListener(this);
-        server.start();
         
         // Initialize Nodes:
         collisionNode.attachChild(PlayerManager.getNode());
         world.attachChild(ProjectileManager.getNode());
+        world.attachChild(DecalManager.getNode());
         world.attachChild(collisionNode);
         
         // Initialize classes:
+        S.setCollisionNode(collisionNode);
+        S.setServer(server);
         ProjectileManager.initialize(collisionNode);
         
         // Create world:

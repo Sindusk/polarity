@@ -7,6 +7,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.netdata.ProjectileData;
 import sin.network.Networking;
+import sin.tools.A;
 import sin.tools.T;
 import sin.world.CG;
 
@@ -23,6 +24,7 @@ public class ProjectileManager {
     
     public static class Projectile{
         private Node projectile = new Node("Projectile");
+        private int id;
         private int owner;
         private Vector3f location;
         private Vector3f direction;
@@ -36,6 +38,9 @@ public class ProjectileManager {
         
         public Projectile(){}
         
+        public int getID(){
+            return id;
+        }
         public int getOwner(){
             return owner;
         }
@@ -60,7 +65,7 @@ public class ProjectileManager {
         
         private void collide(CollisionResult target, float dist){
             if(target.getContactPoint().distance(location) <= dist*2){
-                T.parseCollision(this, target);
+                A.parseCollision(this, target);
             }
         }
         public void update(float tpf, boolean doActions){
@@ -73,14 +78,15 @@ public class ProjectileManager {
                 this.destroy();
             }
             if(doActions){
-                CollisionResult target = T.getClosestCollision(new Ray(location, direction), collisionNode);
+                CollisionResult target = A.getClosestCollision(new Ray(location, direction), collisionNode);
                 if(target != null){
                     this.collide(target, dist);
                 }
-                T.parseUpdate(this, tpf);
+                A.parseUpdate(this, tpf);
             }
         }
-        public void create(int owner, Vector3f location, Vector3f direction, Vector3f up, float speed, float distance, String update, String collision){
+        public void create(int id, int owner, Vector3f location, Vector3f direction, Vector3f up, float speed, float distance, String update, String collision){
+            this.id = id;
             this.owner = owner;
             this.location = location;
             this.direction = direction;
@@ -100,7 +106,7 @@ public class ProjectileManager {
             T.addv3f(location, direction);
             projectile.setLocalTranslation(location);
             used = true;
-            T.initializeUpdate(this);
+            A.initializeUpdate(this);
         }
         public void destroy(){
             distance = 0;
@@ -111,6 +117,9 @@ public class ProjectileManager {
     
     public static Node getNode(){
         return node;
+    }
+    public static Projectile getProjectile(int id){
+        return projectiles[id];
     }
     
     public static void update(float tpf, boolean doActions){
@@ -141,7 +150,7 @@ public class ProjectileManager {
             if(projectiles[i] == null){
                 projectiles[i] = new Projectile();
             }
-            projectiles[i].create(owner, loc, dir, up, speed, dist, update, collision);
+            projectiles[i].create(i, owner, loc, dir, up, speed, dist, update, collision);
         }else{
             T.log("Projectile System Overload!");
         }

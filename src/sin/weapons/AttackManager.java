@@ -5,6 +5,7 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import sin.netdata.AttackData;
 import sin.network.Networking;
 import sin.tools.A;
 import sin.tools.T;
@@ -37,18 +38,13 @@ public class AttackManager {
             this.range = range;
         }
         
-        private float getRange(){
+        public float getRange(){
             return range;
         }
         
         public void attack(Ray ray){
-            CollisionResult target = T.getClosestCollision(ray, collisionNode);
-            if(target != null){
-                float d = A.getDistance(ray.getOrigin(), target.getContactPoint());
-                if(d < this.getRange()){
-                    T.parseCollision(Networking.getID(), this.getCollision(), target);
-                }
-            }
+            //A.rayAttack(ray, this.getRange(), this.getCollision());
+            Networking.send(new AttackData(Networking.getID(), ray, this.getRange(), this.getCollision()));
         }
     }
     public static abstract class RangedAttack extends AttackTemplate{
@@ -87,7 +83,8 @@ public class AttackManager {
             super(collision, range);
         }
         public void attack(Ray ray){
-            CollisionResult target = T.getClosestCollision(ray, collisionNode);
+            Networking.send(new AttackData(Networking.getID(), ray, this.getRange(), this.getCollision()));
+            /*CollisionResult target = A.getClosestCollision(ray, collisionNode);
             if(target != null){
                 float d = A.getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
@@ -98,7 +95,7 @@ public class AttackManager {
                 }
             }else{
                 TracerManager.add(ray, this.getRange());
-            }
+            }*/
         }
     }
     

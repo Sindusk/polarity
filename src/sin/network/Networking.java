@@ -26,8 +26,10 @@ import sin.netdata.SoundData;
 import sin.character.Character;
 import sin.character.PlayerManager;
 import sin.hud.HUD;
+import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.GeometryData;
+import sin.tools.A;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
 import sin.world.DecalManager;
@@ -69,6 +71,8 @@ public class Networking {
     }
     
     private static void registerSerials(){
+        Serializer.registerClass(AttackData.class);
+        client.addMessageListener(new ClientListener(), AttackData.class);
         Serializer.registerClass(CommandData.class);
         client.addMessageListener(new ClientListener(), CommandData.class);
         Serializer.registerClass(ConnectData.class);
@@ -154,7 +158,13 @@ public class Networking {
         private Client client;
         
         private void CommandMessage(CommandData d){
-            T.parseCommand(d.getCommand());
+            final CommandData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    A.parseCommand(m.getCommand());
+                    return null;
+                }
+            });
         }
         private void ConnectMessage(ConnectData d){
             final int id = d.getID();
@@ -169,6 +179,19 @@ public class Networking {
                 }
             });
             //}
+        }
+        private void DamageMessage(DamageData d){
+            final DamageData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    if(m.getPlayer() == CLIENT_ID){
+                        Character.damage(m.getDamage());
+                    }else{
+                        HUD.addFloatingText(PlayerManager.getPlayer(m.getPlayer()).getLocation().clone().addLocal(T.v3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                    }
+                    return null;
+                }
+            });
         }
         private void DecalMessage(DecalData d){
             final Vector3f loc = d.getLocation();
@@ -236,18 +259,6 @@ public class Networking {
                 }
             });
         }
-        private void ShotMessage(DamageData d){
-            if(d.getPlayer() == CLIENT_ID){
-                //System.out.println("Took "+d.getDamage()+" damage.");
-                final float damage = d.getDamage();
-                app.enqueue(new Callable<Void>(){
-                    public Void call() throws Exception{
-                        Character.damage(damage);
-                        return null;
-                    }
-                });
-            }
-        }
         private void SoundMessage(SoundData d){
             if(d.getID() == CLIENT_ID) {
                 return;
@@ -271,6 +282,8 @@ public class Networking {
                 CommandMessage((CommandData) m);
             }else if(m instanceof ConnectData){
                 ConnectMessage((ConnectData) m);
+            }else if(m instanceof DamageData){
+                DamageMessage((DamageData) m);
             }else if(m instanceof DecalData){
                 DecalMessage((DecalData) m);
             }else if(m instanceof DisconnectData){
@@ -287,8 +300,6 @@ public class Networking {
                 PingMessage();
             }else if(m instanceof ProjectileData){
                 ProjectileMessage((ProjectileData) m);
-            }else if(m instanceof DamageData){
-                ShotMessage((DamageData) m);
             }else if(m instanceof SoundData){
                 SoundMessage((SoundData) m);
             }

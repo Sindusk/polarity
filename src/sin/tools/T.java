@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.character.PlayerManager;
+import sin.netdata.CommandData;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;
 
@@ -36,115 +37,6 @@ public class T {
     
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
     public static final float ROOT_HALF = 1.0f/FastMath.sqrt(2);
-    
-    private static HashMap<Projectile, HashMap<String, Float>> UpdateMap = new HashMap();
-    
-    // Logan's Functions:
-    private static Vector3f spiral(Projectile p, float t){
-        Vector3f dirVec = p.getDirection(); //your perpendicular plane is x=0
-        Vector3f camUp = p.getUp();
-        Vector3f rotY = camUp.subtract(camUp.project(dirVec)).normalizeLocal();
-        Vector3f rotX = dirVec.cross(rotY).normalizeLocal();
-        float rotationAngle = FastMath.PI*t;
-        Vector3f velocity = rotY.mult(FastMath.cos(rotationAngle)).addLocal(rotX.mult(FastMath.sin(rotationAngle)));
-        return velocity;
-    }
-    public static int sign(float x){
-        if (x != x) {
-            throw new IllegalArgumentException("NaN");
-        }
-        if (x == 0) {
-            return 0;
-        }
-        x *= Float.POSITIVE_INFINITY;
-        if (x == Float.POSITIVE_INFINITY) {
-            return +1;
-        }else{
-            return -1;
-        }
-     }
-    
-    // Parsing Helpers:
-    private static String[] getArgs(String s){
-        return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
-    }
-    private static float getValueF(String s){
-        return Float.parseFloat(s);
-    }
-    
-    // Attack Parsing:
-    public static void initializeUpdate(Projectile p){
-        String[] actions = p.getUpdate().split(":");
-        String[] args;
-        UpdateMap.put(p, new HashMap());
-        int i = 0;
-        while(i < actions.length){
-            if(actions[i].contains("spiral")){
-                args = getArgs(actions[i]);
-                UpdateMap.get(p).put(i+"spiral.timer", 0f);
-                UpdateMap.get(p).put(i+"spiral.rot", getValueF(args[0]));
-            }
-            i++;
-        }
-    }
-    public static void parseCollision(int attacker, String collision, CollisionResult target){
-        String[] actions = collision.split(":");
-        String[] args;
-        int i = 0;
-        while(i < actions.length){
-            if(actions[i].contains("damage")){
-                args = getArgs(actions[i]);
-                A.damage(attacker, target, getValueF(args[0]));
-            }else if(actions[i].contains("aoe")){
-                args = getArgs(actions[i]);
-                A.damageAoE(attacker, target, getValueF(args[0]), getValueF(args[1]));
-            }
-            i++;
-        }
-    }
-    public static void parseCollision(Projectile p, CollisionResult target){
-        parseCollision(p.getOwner(), p.getCollision(), target);
-        if(p.getCollision().contains("destroy")){
-            p.destroy();
-        }
-    }
-    public static void parseCommand(String command){
-        String[] action = command.split(":");
-        if(action[0].equals("player")){
-            if(action[1].equals("destroy")){
-                PlayerManager.getPlayer(Integer.parseInt(action[2])).destroy();
-            }
-        }
-    }
-    public static void parseUpdate(Projectile p, float tpf){
-        if(p.getUpdate().isEmpty()){
-            return;
-        }
-        String[] actions = p.getUpdate().split(":");
-        String[] args;
-        int i = 0;
-        while(i < actions.length){
-            if(actions[i].contains("spiral")){
-                args = getArgs(actions[i]);
-                HashMap<String, Float> meow = UpdateMap.get(p);
-                float timer = 0;
-                if(meow.get(i+"spiral.timer") != null){
-                    timer = meow.get(i+"spiral.timer");
-                }
-                if(timer > getValueF(args[1])){
-                    float rot = UpdateMap.get(p).get(i+"spiral.rot");
-                    ProjectileManager.addNew(p.getOwner(), p.getLocation().clone(), spiral(p, rot), T.v3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy");
-                    rot += getValueF(args[2]);
-                    UpdateMap.get(p).put(i+"spiral.rot", rot);
-                    timer = 0;
-                }else{
-                    timer += tpf;
-                }
-                UpdateMap.get(p).put(i+"spiral.timer", timer);
-            }
-            i++;
-        }
-    }
     
     // Asset Management:
     public static BitmapFont getFont(String fnt){
@@ -167,17 +59,6 @@ public class T {
     }
     public static String getMaterialPath(String tex){
         return "Textures/Material/"+tex+".png";
-    }
-    
-    // Geometry and Collisions:
-    public static CollisionResult getClosestCollision(Ray ray, Node node){
-        CollisionResults results = new CollisionResults();
-        node.collideWith(ray, results);
-        if(results.size() > 0){
-            return results.getClosestCollision();
-        }else{
-            return null;
-        }
     }
     
     // Key Mappings:

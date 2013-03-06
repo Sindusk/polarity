@@ -12,14 +12,12 @@ import sin.GameClient;
  * @author SinisteRing
  */
 public class DecalManager{
-    private static GameClient app;
-    
     // Constant Variables:
     private static final int   DECAL_NUM = 150;
     private static final float DECAL_SIZE = 0.2f;
 
     // Instance Variables:
-    private static Node node = new Node("Decals");
+    private static Node node = new Node("DecalNode");
     //private static Decal[] decal = new Decal[DECAL_NUM];
     private static Integer numDecals = 0;
     private static HashMap<Integer, Decal> decals = new HashMap();
@@ -60,9 +58,5 @@ public class DecalManager{
             i++;
         }
         numDecals = 0;
-    }
-    
-    public static void initialize(GameClient app){
-        DecalManager.app = app;
     }
 }

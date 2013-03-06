@@ -57,6 +57,9 @@ public class PlayerManager{
     public static Player getPlayer(int index){
         return player[index];
     }
+    public static Player[] getPlayers(){
+        return player;
+    }
     
     public static void sendData(HostedConnection conn){
         int i = 0;

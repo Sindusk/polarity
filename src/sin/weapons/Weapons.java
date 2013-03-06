@@ -436,7 +436,7 @@ public class Weapons{
             name = "Rocket Launcher";
             audio = new WeaponAudio(name, 0.5f);
             ammo = new ReloadAmmo(1, 1.3f, left);
-            damage = new RangedProjectileAttack("", "aoe(3, 3.4):destroy", 150f, 150f);
+            damage = new RangedProjectileAttack("", "aoe(25, 3.4):destroy", 150f, 150f);
             recoils = new Recoils(180, 240, 30, -30);
             spread = new Spread(0, 0);
             automatic = false;

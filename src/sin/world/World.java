@@ -10,6 +10,7 @@ import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import sin.netdata.GeometryData;
+import sin.tools.A;
 import sin.tools.T;
 
 /**
@@ -136,8 +137,8 @@ public class World {
             int iMax = FastMath.nextRandomInt(HALL_LENGTH_MIN, HALL_LENGTH_MAX);
             boolean b = false;
             // Make sure both xi and zi have an absolute value of 1:
-            xi = T.sign(xi);
-            zi = T.sign(zi);
+            xi = A.sign(xi);
+            zi = A.sign(zi);
             // Assign the first 2 corners:
             corners[0] = new Vector3f((zi*(HALL_WIDTH-1))+x, start.getY(), (xi*(HALL_WIDTH-1))+z); // Bottom Left
             corners[1] = new Vector3f((-zi*(HALL_WIDTH-1))+x, start.getY(), (-xi*(HALL_WIDTH-1))+z); // Bottom Right
