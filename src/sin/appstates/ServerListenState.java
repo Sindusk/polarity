@@ -3,7 +3,6 @@ package sin.appstates;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
@@ -13,8 +12,12 @@ import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
+import com.jme3.scene.Node;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import sin.GameServer;
+import sin.character.PlayerManager;
+import sin.character.PlayerManager.Player;
 import sin.netdata.ConnectData;
 import sin.netdata.DecalData;
 import sin.netdata.DisconnectData;
@@ -27,6 +30,7 @@ import sin.netdata.ProjectileData;
 import sin.netdata.ShotData;
 import sin.netdata.SoundData;
 import sin.tools.T;
+import sin.weapons.ProjectileManager;
 import sin.world.World;
 
 /**
@@ -36,36 +40,26 @@ import sin.world.World;
 public class ServerListenState extends AbstractAppState implements ConnectionListener{
     public static GameServer app;
     
-    private Player[] players = new Player[16];
     private Server server;
     private ServerListener listener;
+    
+    // Nodes:
+    private Node collisionNode = new Node("CollisionNode");
+    private Node world = new Node("World");
     
     public void connectionAdded(Server server, HostedConnection conn) {
         // Nothing needed here.
     }
     public void connectionRemoved(Server server, HostedConnection conn) {
-        int i = 0;
-        while(i < players.length){
-            if(conn == players[i].getConnection()){
-                server.broadcast(new DisconnectData(i));
-                players[i].disconnect();
-                conn.close("Disconnected.");
-                T.log("Player "+i+" has disconnected.");
-            }
-            i++;
+        int id = PlayerManager.remove(conn);
+        if(id == -1){
+            return;
         }
+        server.broadcast(new DisconnectData(id));
+        conn.close("Disconnected");
+        T.log("Player "+id+" has disconnected.");
     }
     
-    private int FindEmptyID(){
-        int i = 0;
-        while(i < players.length){
-            if(!players[i].isConnected()){
-                return i;
-            }
-            i++;
-        }
-        return -1;
-    }
     private void sendGeometry(HostedConnection c){
         int i = 0;
         while(i < World.getMap().size()){
@@ -78,14 +72,20 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         private HostedConnection connection;
         
         private void ConnectMessage(ConnectData d){
-            T.log("Connecting player "+d.getID());
+            T.log("Connecting new player...");
             if(d.GetVersion().equals(app.getVersion())){
-                int id = FindEmptyID();
-                if(id == -1){
-                    T.log("Server full. Player "+d.getID()+" was denied connection.");
-                    connection.send(new ErrorData(-1, "Server Full.", true));
-                }
-                connection.send(new IDData(id, false));
+                app.enqueue(new Callable<Void>(){
+                    public Void call() throws Exception{
+                        int id = PlayerManager.addNew();
+                        if(id == -1){
+                            T.log("Server full. Player was denied connection.");
+                            connection.send(new ErrorData(-1, "Server Full.", true));
+                        }else{
+                            connection.send(new IDData(id, false));
+                        }
+                        return null;
+                    }
+                });
             }else{
                 T.log("Client has incorrect version. Player "+d.getID()+" was denied connection.");
                 connection.close("Invalid Version.");
@@ -97,41 +97,28 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         private void ErrorMessage(ErrorData d){
             System.out.println("Handling ErrorData [ID: "+d.getID()+"]...");
             connection.close("Client Disconnection.");
-            players[d.getID()].disconnect();
+            PlayerManager.getPlayer(d.getID()).destroy();
         }
         private void IDMessage(IDData d){
-            if(!players[d.getID()].isConnected()){
+            if(PlayerManager.getPlayer(d.getID()).isConnected()){
                 T.log("Player "+d.getID()+" [Version: "+app.getVersion()+"] connected successfully.");
                 int id = d.getID();
-                int i = 0;
-                while(i < players.length){
-                    if(players[i].isConnected() && i != id) {
-                        connection.send(new ConnectData(i));
-                    }
-                    i++;
-                }
-                players[id].connect();
-                players[id].setConnection(connection);
+                PlayerManager.sendData(connection);
+                PlayerManager.add(id);
+                PlayerManager.getPlayer(id).setConnection(connection);
                 server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
                 sendGeometry(connection);
-            }else{
-                int id = FindEmptyID();
-                if(id == -1){
-                    connection.send(new ErrorData(-1, "Server Full.", true));
-                    connection.close("Server Full");
-                }
-                connection.send(new IDData(id, false));
             }
         }
         private void MoveMessage(MoveData d){
-            //System.out.println("Handling MoveData from client "+d.getID()+"...");
             server.broadcast(Filters.notEqualTo(connection), d);
-            players[d.getID()].setLocation(d.getLocation(), d.getRotation());
+            PlayerManager.getPlayer(d.getID()).update(d.getLocation(), d.getRotation());
         }
         private void PingMessage(PingData d){
             connection.send(d);
         }
         private void ProjectileMessage(ProjectileData d){
+            ProjectileManager.add(d);
             server.broadcast(Filters.notEqualTo(connection), d);
         }
         private void ShotMessage(ShotData d){
@@ -168,44 +155,6 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             }
         }
     }
-    private static class Player{
-        private boolean connected = false;
-        private float health = 100;
-        private float shields = 100;
-        private HostedConnection connection;
-        //private Vector3f loc;
-        //private Quaternion rot;
-        public Player(){
-            //loc = v3f(0, 0, 0);
-        }
-        
-        public void setLocation(Vector3f loc, Quaternion rot){
-            //this.loc = loc;
-            //this.rot = rot;
-        }
-        public void setConnection(HostedConnection connection){
-            this.connection = connection;
-        }
-        public boolean isConnected(){
-            return connected;
-        }
-        public HostedConnection getConnection(){
-            return connection;
-        }
-        public float getHealth(){
-            return health;
-        }
-        public float getShields(){
-            return shields;
-        }
-        
-        public void connect(){
-            connected = true;
-        }
-        public void disconnect(){
-            connected = false;
-        }
-    }
     
     private void registerSerials(){
         Serializer.registerClass(ConnectData.class);
@@ -232,11 +181,16 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         server.addMessageListener(listener, SoundData.class);
     }
     
+    public Node getWorld(){
+        return world;
+    }
+    
     @Override
-    public void initialize(AppStateManager stateManager, Application app){
-        super.initialize(stateManager, app);
-        ServerListenState.app = (GameServer) app;
+    public void initialize(AppStateManager stateManager, Application theApp){
+        super.initialize(stateManager, theApp);
+        ServerListenState.app = (GameServer) theApp;
         
+        // Create server to listen:
         try {
             server = Network.createServer(6143);
         }catch (IOException ex){
@@ -246,12 +200,29 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         registerSerials();
         server.addConnectionListener(this);
         server.start();
+        
+        // Initialize Nodes:
+        collisionNode.attachChild(PlayerManager.getNode());
+        world.attachChild(ProjectileManager.getNode());
+        world.attachChild(collisionNode);
+        
+        // Initialize classes:
+        ProjectileManager.initialize(collisionNode);
+        
+        // Create world:
+        World.generateWorldData();
         int i = 0;
-        while(i < players.length){
-            players[i] = new Player();
+        while(i < World.getMap().size()){
+            World.createGeometry(collisionNode, World.getMap().get(i));
             i++;
         }
-        World.generateWorldData();
+    }
+    
+    @Override
+    public void update(float tpf){
+        super.update(tpf);  // Execute AppTasks.
+        
+        ProjectileManager.update(tpf);
     }
     
     @Override

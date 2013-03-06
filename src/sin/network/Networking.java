@@ -156,7 +156,7 @@ public class Networking {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     //app.getPlayer(id).create();
-                    if(!PlayerManager.add(id, Vector3f.ZERO)){
+                    if(!PlayerManager.add(id)){
                         T.log("Player already connected.");
                     }
                     return null;
@@ -207,7 +207,6 @@ public class Networking {
             final Quaternion rot = d.getRotation();
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    //app.getPlayer(id).move(loc, rot);
                     PlayerManager.updatePlayer(id, loc, rot);
                     return null;
                 }
@@ -223,16 +222,10 @@ public class Networking {
             });
         }
         private void ProjectileMessage(ProjectileData d){
-            final Vector3f loc = d.getLocation();
-            final Vector3f dir = d.getDirection();
-            final Vector3f up = d.getUp();
-            final float dist = d.getDistance();
-            final float speed = d.getSpeed();
-            final String update = d.getUpdate();
-            final String collision = d.getCollision();
+            final ProjectileData m = d;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    ProjectileManager.add(loc, dir, up, dist, speed, update, collision);
+                    ProjectileManager.add(m);
                     return null;
                 }
             });

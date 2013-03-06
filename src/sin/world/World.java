@@ -1,17 +1,14 @@
 package sin.world;
 
-import com.jme3.bullet.BulletAppState;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
-import sin.GameClient;
 import sin.netdata.GeometryData;
 import sin.tools.T;
 import sin.tools.Tile;
@@ -22,14 +19,14 @@ import sin.tools.Tile.Type;
  * @author SinisteRing
  */
 public class World {
-    private static GameClient app;
+    //private static GameClient app;
     
     // Constant Variables:
     private static final float WW = 0.1f;   // Wall Width
     private static final float ZS = 10;     // Zone Size
     private static final int HALL_LENGTH_MIN = 20;
     private static final int HALL_LENGTH_MAX = 25;
-    private static final int HALL_MAX_RADIUS = 15;
+    private static final int HALL_MAX_RADIUS = 25;
     private static final int HALL_SPREAD = 5;
     private static final int HALL_WIDTH = 2;
     
@@ -39,10 +36,6 @@ public class World {
     private static ArrayList<Hallway> hallways = new ArrayList();
     private static ArrayList<Wall> walls = new ArrayList();
     private static boolean wireframe = false;
-    
-    public static BulletAppState getBulletAppState(){
-        return app.getBulletAppState();
-    }
     
     public static ArrayList<GeometryData> getMap(){
         return map;
@@ -102,7 +95,6 @@ public class World {
             while(i < spaces){
                 loc = new Vector3f(x+(i*xi), start.getY(), z+(i*zi));
                 if(world.get(loc) != null && world.get(loc).contains("h")){
-                    T.log(loc+" is taken");
                     if(left && (xl != 0 || zl != 0)){
                         xl -= xi;
                         zl -= zi;
@@ -117,10 +109,6 @@ public class World {
             if(xl == 0 && zl == 0){
                 return;
             }
-            if(i < spaces){
-                //loc = T.v3f(x+(i*xi), start.getY(), z+(i*zi));
-                //generateWall(loc, xi, zi, spaces-i, left);
-            }
             loc = T.v3f(x+(i*xi)-(xl/2), start.getY(), z+(i*zi)-(zl/2));
             map.add(geoWall(loc.getX()-((xi-zi)*mod/2), loc.getY(), loc.getZ()-((zi-xi)*mod/2), xl, zl, T.getMaterialPath("BC_Tex"), T.v2f(Math.max(FastMath.abs(xl), FastMath.abs(zl)), 1), true));
         }
@@ -129,6 +117,17 @@ public class World {
         Vector3f[] corners = new Vector3f[4];
         Vector3f center;
         GeometryData floor;
+        
+        private static class HallData{
+            public Vector3f start;
+            public float xi;
+            public float zi;
+            public HallData(Vector3f start, float xi, float zi){
+                this.start = start;
+                this.xi = xi;
+                this.zi = zi;
+            }
+        }
         
         public Hallway(Vector3f start, float xi, float zi){
             float x = start.getX()+xi;
@@ -146,6 +145,7 @@ public class World {
             corners[1] = new Vector3f((-zi*(HALL_WIDTH-1))+x, start.getY(), (-xi*(HALL_WIDTH-1))+z); // Bottom Right
             Vector3f left = corners[0].clone();
             Vector3f right = corners[1].clone();
+            ArrayList<HallData> d = new ArrayList();
             while(i <= iMax){
                 if(world.get(left) != null && world.get(left).contains("h")){
                     b = true;
@@ -167,14 +167,14 @@ public class World {
                 rng = FastMath.nextRandomFloat();
                 if(dist < HALL_MAX_RADIUS && spread > HALL_SPREAD && i < iMax){
                     if(rng < 0.13f){
-                        generateHallway(left, zi, xi);
+                        d.add(new HallData(left.clone(), zi, xi));
                         spread = 0;
                     }else if(rng < 0.26f){
-                        generateHallway(right, -zi, -xi);
+                        d.add(new HallData(right.clone(), -zi, -xi));
                         spread = 0;
                     }else if(rng < 0.33f){
-                        generateHallway(left, zi, xi);
-                        generateHallway(right, -zi, -xi);
+                        d.add(new HallData(left.clone(), zi, xi));
+                        d.add(new HallData(right.clone(), -zi, -xi));
                         spread = 0;
                     }
                 }
@@ -185,10 +185,15 @@ public class World {
                 left.addLocal(xi, 0, zi);
                 right.addLocal(xi, 0, zi);
             }
-            //left.addLocal(-xi, 0, -zi);
-            //right.addLocal(-xi, 0, -zi);
             corners[2] = right.clone(); // Top Right
             corners[3] = left.clone();  // Top Left
+            
+            // Generate hallways:
+            int j = 0;
+            while(j < d.size()){
+                generateHallway(d.get(j).start, d.get(j).xi, d.get(j).zi);
+                j++;
+            }
 
             // Return if there's no hallway to generate (0 in size):
             float xs = FastMath.abs(corners[1].getX()-corners[3].getX())+1;
@@ -248,19 +253,11 @@ public class World {
         }
     }
     
-    public static void clear(){
-        app.getTerrain().detachAllChildren();
-    }
-    
     public static void createSinglePlayerArea(Node node){
         node.setLocalTranslation(0, 100, 0);
         CG.createPhyBox(node, "floor", T.v3f(50, 0.1f, 50), T.v3f(0, -1, 0), T.getMaterialPath("lava_rock"), T.v2f(5, 5));
         CG.createPhyBox(node, "wall", T.v3f(30, 20, 0.1f), T.v3f(0, 20, -60), T.getMaterialPath("BC_Tex"), T.v2f(15, 10));
         CG.createPhyBox(node, "savior", T.v3f(10, 0.1f, 10), T.v3f(0, -101, 0), ColorRGBA.Yellow);
         Tile t = new Tile(new Vector3f(3, 3, 3), new Vector3f(10, 5, 0), Type.Grass, 1, node);
-    }
-    
-    public static void initialize(GameClient app){
-        World.app = app;
     }
 }

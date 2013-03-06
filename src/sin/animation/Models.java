@@ -1,8 +1,6 @@
 package sin.animation;
 
-import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -51,7 +49,6 @@ public class Models {
     }
     public static class PlayerModel extends ModelTemplate{
         // Instance Variables:
-        private RigidBodyControl rbc;
         
         public static Node genHead(){
             Node part = new Node();
@@ -121,9 +118,7 @@ public class Models {
             parts.get("arm.right").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
         }
         public void destroy(){
-            this.getNode().removeControl(rbc);
             this.getNode().removeFromParent();
-            World.getBulletAppState().getPhysicsSpace().remove(rbc);
         }
     }
     

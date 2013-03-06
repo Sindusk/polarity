@@ -5,7 +5,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
-import sin.GameClient;
 import sin.netdata.ProjectileData;
 import sin.network.Networking;
 import sin.tools.T;
@@ -16,13 +15,14 @@ import sin.world.CG;
  * @author SinisteRing
  */
 public class ProjectileManager {
-    private static GameClient app;
+    private static Node node = new Node("ProjectileNode");
+    private static Node collisionNode;
     
     // Array for handling all projectiles:
     private static Projectile[] projectiles = new Projectile[500];
     
     public static class Projectile{
-        private Node projectile = new Node();
+        private Node projectile = new Node("Projectile");
         private Vector3f location;
         private Vector3f direction;
         private Vector3f up;
@@ -33,9 +33,7 @@ public class ProjectileManager {
         private String update;
         private String collision;
         
-        public Projectile(){
-            //
-        }
+        public Projectile(){}
         
         public Vector3f getLocation(){
             return location;
@@ -66,7 +64,7 @@ public class ProjectileManager {
             float dist = movement.distance(Vector3f.ZERO);
             T.addv3f(location, movement);
             projectile.setLocalTranslation(location);
-            CollisionResult target = T.getClosestCollision(new Ray(location, direction), app.getCollisionNode());
+            CollisionResult target = T.getClosestCollision(new Ray(location, direction), collisionNode);
             if(target != null){
                 this.collide(target, dist);
             }
@@ -86,9 +84,9 @@ public class ProjectileManager {
             this.collision = collision;
             
             // Create the Projectile if it has not been created:
-            if(!app.getTerrain().hasChild(projectile)){
+            if(!node.hasChild(projectile)){
                 CG.createSphere(projectile, "", 0.4f, Vector3f.ZERO, ColorRGBA.Magenta);
-                app.getProjectileNode().attachChild(projectile);
+                node.attachChild(projectile);
             }
             
             // Move the projectile away from the shooter slightly:
@@ -102,6 +100,10 @@ public class ProjectileManager {
             projectile.removeFromParent();
             used = false;
         }
+    }
+    
+    public static Node getNode(){
+        return node;
     }
     
     public static void update(float tpf){
@@ -137,6 +139,9 @@ public class ProjectileManager {
             T.log("Projectile System Overload!");
         }
     }
+    public static void add(ProjectileData d){
+        add(d.getLocation(), d.getDirection(), d.getUp(), d.getDistance(), d.getSpeed(), d.getUpdate(), d.getCollision());
+    }
     public static void addNew(Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
         if(Networking.isConnected()){
             Networking.send(new ProjectileData(loc, dir, up, dist, speed, update, collision));
@@ -144,7 +149,7 @@ public class ProjectileManager {
         add(loc, dir, up, dist, speed, update, collision);
     }
     
-    public static void initialize(GameClient app){
-        ProjectileManager.app = app;
+    public static void initialize(Node collisionNode){
+        ProjectileManager.collisionNode = collisionNode;
     }
 }

@@ -74,6 +74,9 @@ public class GameServer extends Application{
     public Node getRoot(){
         return root;
     }
+    public Node getWorld(){
+        return listenState.getWorld();
+    }
     
     // Getters for AppStates:
     public BulletAppState getBulletAppState(){

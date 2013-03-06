@@ -19,7 +19,6 @@ import sin.input.ClientInputHandler;
 import sin.network.Networking;
 import sin.character.PlayerManager;
 import sin.tools.T;
-import sin.weapons.RecoilManager;
 import sin.weapons.Weapons;
 import sin.world.CG;
 
@@ -91,12 +90,6 @@ public class GameClient extends Application{
     }
     public Node getSingleNode(){
         return gameplayState.getSingleNode();
-    }
-    public Node getPlayerNode(){
-        return gameplayState.getPlayerNode();
-    }
-    public Node getProjectileNode(){
-        return gameplayState.getProjectileNode();
     }
     public Node getTerrain(){
         return gameplayState.getTerrainNode();
@@ -180,10 +173,8 @@ public class GameClient extends Application{
         T.initialize(assetManager, inputManager);
         ClientInputHandler.initialize(app);
         
-        // Initialize new HUD & remove debug HUD elements:
+        // Initialize Networking:
         Networking.initialize(app);
-        Weapons.initialize(app);
-        PlayerManager.initialize(app);
         
         // Initialize App States:
         gameplayState = new ClientGameState();
