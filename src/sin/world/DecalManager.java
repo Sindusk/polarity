@@ -13,21 +13,17 @@ import sin.GameClient;
  */
 public class DecalManager{
     // Constant Variables:
-    private static final int   DECAL_NUM = 150;
     private static final float DECAL_SIZE = 0.2f;
 
     // Instance Variables:
     private static Node node = new Node("DecalNode");
-    //private static Decal[] decal = new Decal[DECAL_NUM];
     private static Integer numDecals = 0;
     private static HashMap<Integer, Decal> decals = new HashMap();
     
     private static class Decal{
         private Geometry decal;
         
-        public Decal(){
-            // Constructor
-        }
+        public Decal(){}
         
         public void create(Vector3f loc){
             if(decal == null){
@@ -50,6 +46,9 @@ public class DecalManager{
         d.create(loc);
         decals.put(numDecals, d);
         numDecals++;
+        if(numDecals > 200){
+            clear();
+        }
     }
     public static void clear(){
         int i = 0;

@@ -5,10 +5,10 @@ import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
 import sin.animation.Models.PlayerModel;
+import sin.character.StatsManager.PlayerStats;
 import sin.netdata.ConnectData;
 import sin.netdata.MoveData;
 import sin.network.Networking;
-import sin.tools.S;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -19,6 +19,7 @@ public class PlayerManager{
     private static Player[] player = new Player[16];
     
     public static class Player{
+        private PlayerStats stats = new PlayerStats(100, 100, 100, 100);
         private PlayerModel model;
         private Vector3f locA = Vector3f.ZERO;
         private Vector3f locB = Vector3f.ZERO;
@@ -46,6 +47,10 @@ public class PlayerManager{
             this.locB = loc;
             this.rot = rot;
             this.interp = 0;
+        }
+        
+        public void damage(float damage){
+            stats.damage(damage);
         }
         
         public void update(float tpf){

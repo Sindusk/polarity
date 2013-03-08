@@ -7,13 +7,17 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import java.util.HashMap;
+import sin.character.Character;
 import sin.character.PlayerManager;
 import sin.character.PlayerManager.Player;
+import sin.hud.FloatingTextManager;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.DamageData;
 import sin.netdata.DecalData;
 import sin.netdata.ProjectileData;
+import sin.network.Networking;
+import sin.npc.NPCManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;
 import sin.world.DecalManager;
@@ -40,13 +44,16 @@ public class A {
         if(data[0].equals("player")){
             int id = Integer.parseInt(data[1]);
             damage = modDamage(data[2], damage);
+            // Send Data:
             S.getServer().broadcast(new DamageData(attacker, "player", id, damage));
+            PlayerManager.getPlayer(id).damage(damage);
         }else if(data[0].equals("npc")){
             String type = data[1];
             int id = Integer.parseInt(data[2]);
             damage = modDamage(data[3], damage);
+            // Send Data:
             S.getServer().broadcast(new DamageData(attacker, "npc:"+type, id, damage));
-            T.log("Player "+attacker+" shot NPC "+type+" ["+id+"] for "+damage+" damage.");
+            NPCManager.damageNPC(id, type, damage);
         }else{
             DecalManager.create(target.getContactPoint());
             S.getServer().broadcast(new DecalData(target.getContactPoint()));
@@ -176,6 +183,21 @@ public class A {
                 UpdateMap.get(p).put(i+"spiral.timer", timer);
             }
             i++;
+        }
+    }
+    
+    public static void handleDamage(DamageData m){
+        if(m.getTarget() == Networking.getID()){
+            Character.damage(m.getDamage());
+        }else{
+            String args[] = m.getType().split(":");
+            if(args[0].equals("player")){
+                FloatingTextManager.add(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+            }else if(args[0].equals("npc")){
+                FloatingTextManager.add(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+            }else{
+                T.log("Invalid Damage Data!");
+            }
         }
     }
     

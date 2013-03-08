@@ -28,8 +28,11 @@ import sin.netdata.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
-import sin.netdata.NPCData;
+import sin.netdata.npc.EntityData;
 import sin.netdata.SoundData;
+import sin.netdata.npc.GruntData;
+import sin.netdata.npc.EntityDeathData;
+import sin.netdata.npc.OrganismData;
 import sin.npc.NPCManager;
 import sin.tools.A;
 import sin.tools.S;
@@ -160,6 +163,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         public void messageReceived(HostedConnection source, Message m) {
             connection = source;
             server = connection.getServer();
+            
             if(m instanceof AttackData){
                 AttackMessage((AttackData) m);
             }if(m instanceof ConnectData){
@@ -203,14 +207,22 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         server.addMessageListener(listener, IDData.class);
         Serializer.registerClass(MoveData.class);
         server.addMessageListener(listener, MoveData.class);
-        Serializer.registerClass(NPCData.class);
-        server.addMessageListener(listener, NPCData.class);
         Serializer.registerClass(PingData.class);
         server.addMessageListener(listener, PingData.class);
         Serializer.registerClass(ProjectileData.class);
         server.addMessageListener(listener, ProjectileData.class);
         Serializer.registerClass(SoundData.class);
         server.addMessageListener(listener, SoundData.class);
+        
+        // NPC Data:
+        Serializer.registerClass(GruntData.class);
+        server.addMessageListener(listener, GruntData.class);
+        Serializer.registerClass(EntityData.class);
+        server.addMessageListener(listener, EntityData.class);
+        Serializer.registerClass(EntityDeathData.class);
+        server.addMessageListener(listener, EntityDeathData.class);
+        Serializer.registerClass(OrganismData.class);
+        server.addMessageListener(listener, OrganismData.class);
     }
     
     public Node getWorld(){

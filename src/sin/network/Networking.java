@@ -24,12 +24,14 @@ import sin.netdata.DamageData;
 import sin.netdata.SoundData;
 import sin.character.Character;
 import sin.character.PlayerManager;
-import sin.hud.FloatingTextManager;
 import sin.hud.HUD;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.GeometryData;
-import sin.netdata.NPCData;
+import sin.netdata.npc.GruntData;
+import sin.netdata.npc.EntityData;
+import sin.netdata.npc.EntityDeathData;
+import sin.netdata.npc.OrganismData;
 import sin.npc.NPCManager;
 import sin.tools.A;
 import sin.tools.S;
@@ -64,9 +66,7 @@ public class Networking {
     private static float[] timers = new float[2];
     private static float time;
     
-    public Networking(){
-        //
-    }
+    public Networking(){}
     
     public static boolean isConnected(){
         return CLIENT_CONNECTED;
@@ -96,15 +96,24 @@ public class Networking {
         client.addMessageListener(new ClientListener(), IDData.class);
         Serializer.registerClass(MoveData.class);
         client.addMessageListener(new ClientListener(), MoveData.class);
-        Serializer.registerClass(NPCData.class);
-        client.addMessageListener(new ClientListener(), NPCData.class);
         Serializer.registerClass(PingData.class);
         client.addMessageListener(new ClientListener(), PingData.class);
         Serializer.registerClass(ProjectileData.class);
         client.addMessageListener(new ClientListener(), ProjectileData.class);
         Serializer.registerClass(SoundData.class);
         client.addMessageListener(new ClientListener(), SoundData.class);
+        
+        // NPC Serials:
+        Serializer.registerClass(GruntData.class);
+        client.addMessageListener(new ClientListener(), GruntData.class);
+        Serializer.registerClass(EntityData.class);
+        client.addMessageListener(new ClientListener(), EntityData.class);
+        Serializer.registerClass(EntityDeathData.class);
+        client.addMessageListener(new ClientListener(), EntityDeathData.class);
+        Serializer.registerClass(OrganismData.class);
+        client.addMessageListener(new ClientListener(), OrganismData.class);
     }
+    
     public static boolean connect(String ip){
         try {
             client = Network.connectToServer(ip, 6143);
@@ -188,18 +197,7 @@ public class Networking {
             final DamageData m = d;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    if(m.getTarget() == CLIENT_ID){
-                        Character.damage(m.getDamage());
-                    }else{
-                        String args[] = m.getType().split(":");
-                        if(args[0].equals("player")){
-                            FloatingTextManager.add(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
-                        }else if(args[0].equals("npc")){
-                            FloatingTextManager.add(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
-                        }else{
-                            T.log("Invalid Damage Data!");
-                        }
-                    }
+                    A.handleDamage(m);
                     return null;
                 }
             });
@@ -219,6 +217,24 @@ public class Networking {
                 public Void call() throws Exception{
                     //app.getPlayer(id).destroy();
                     PlayerManager.remove(id);
+                    return null;
+                }
+            });
+        }
+        private void EntityMessage(EntityData d){
+            final EntityData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    NPCManager.add(m);
+                    return null;
+                }
+            });
+        }
+        private void EntityDeathMessage(EntityDeathData d){
+            final EntityDeathData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    NPCManager.destroyNPC(m);
                     return null;
                 }
             });
@@ -246,15 +262,6 @@ public class Networking {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     PlayerManager.updatePlayerLocation(m);
-                    return null;
-                }
-            });
-        }
-        private void NPCMessage(NPCData d){
-            final NPCData m = d;
-            app.enqueue(new Callable<Void>(){
-                public Void call() throws Exception{
-                    NPCManager.add(m.getID(), m.getType(), m.getLocation());
                     return null;
                 }
             });
@@ -306,6 +313,10 @@ public class Networking {
                 DecalMessage((DecalData) m);
             }else if(m instanceof DisconnectData){
                 DisconnectMessage((DisconnectData) m);
+            }else if(m instanceof EntityData){
+                EntityMessage((EntityData) m);
+            }else if(m instanceof EntityDeathData){
+                EntityDeathMessage((EntityDeathData) m);
             }else if(m instanceof ErrorData){
                 ErrorMessage((ErrorData) m);
             }else if(m instanceof GeometryData){
@@ -314,8 +325,6 @@ public class Networking {
                 IDMessage((IDData) m);
             }else if(m instanceof MoveData){
                 MoveMessage((MoveData) m);
-            }else if(m instanceof NPCData){
-                NPCMessage((NPCData) m);
             }else if(m instanceof PingData){
                 PingMessage();
             }else if(m instanceof ProjectileData){

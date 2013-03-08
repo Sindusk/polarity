@@ -15,7 +15,6 @@ import sin.npc.NPCManager;
 import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
-import sin.weapons.RecoilManager;
 import sin.weapons.Weapons;
 import sin.world.TracerManager;
 import sin.weapons.Weapons.AK47;

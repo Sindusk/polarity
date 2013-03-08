@@ -119,7 +119,7 @@ public class Models {
             parts.get("arm.right").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
         }
     }
-    public static class NPCModel extends ModelTemplate{
+    public static class EntityModel extends ModelTemplate{
         public static Node genHead(){
             Node part = new Node();
             CG.createBox(part, "", new Vector3f(1.2f, 1, 1.8f), Vector3f.ZERO, T.getMaterialPath("BC_Tex"), new Vector2f(1, 1));
@@ -131,7 +131,7 @@ public class Models {
             return part;
         }
         
-        public NPCModel(int id, Node node, String type){
+        public EntityModel(int id, Node node, String type){
             super(node, "npc:"+type+":"+id);
             this.addPart(genHead(), "head", new Vector3f(0, 3, 0));
             this.addPart(genBody(), "body", Vector3f.ZERO);

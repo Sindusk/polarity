@@ -1,83 +1,69 @@
 package sin.character;
 
 import com.jme3.math.FastMath;
-import java.util.HashMap;
-import sin.hud.BarManager;
-import sin.character.PlayerManager.Player;
-import sin.hud.HUD;
 
 /**
  * StatsManager - Used for the managment of player stats.
  * @author SinisteRing
  */
 public class StatsManager {
-    private static PlayerStats characterStats = new PlayerStats();
-    private static HashMap<Player, PlayerStats> playerStats = new HashMap();
-    
-    public static class PlayerStats{
-        // Instance Variables:
+    public static class StatsTemplate{
         private float health;
-        private float health_max;
+        private float maxHealth;
+        
+        public StatsTemplate(float health, float maxHealth){
+            this.health = health;
+            this.maxHealth = maxHealth;
+        }
+        
+        public float getHealth(){
+            return health;
+        }
+        
+        public boolean damage(float damage){
+            health -= damage;
+            if(health <= 0){
+                health = 0;
+                return true;
+            }
+            return false;
+        }
+        public void refresh(){
+            health = maxHealth;
+        }
+    }
+    public static class PlayerStats extends StatsTemplate{
+        // Instance Variables:
         private float shields;
-        private float shields_max;
-
-        public PlayerStats(){
-            // Constructor
+        private float maxShields;
+        
+        public PlayerStats(float health, float maxHealth, float shields, float maxShields){
+            super(health, maxHealth);
+            this.shields = shields;
+            this.maxShields = maxShields;
         }
-        public PlayerStats(float health_max, float shields_max){
-            this.health = health_max;
-            this.health_max = health_max;
-            this.shields = shields_max;
-            this.shields_max = shields_max;
-            HUD.setBarMax(BarManager.BH.HEALTH, (int) health_max);
-            HUD.setBarMax(BarManager.BH.SHIELDS, (int) shields_max);
-            HUD.updateBar(BarManager.BH.HEALTH, (int) FastMath.ceil(health));
-            HUD.updateBar(BarManager.BH.SHIELDS, (int) FastMath.ceil(shields));
+        
+        public float getShields(){
+            return shields;
         }
-
-        public void update(){
-            HUD.updateBar(BarManager.BH.HEALTH, (int) FastMath.ceil(health));
-            HUD.updateBar(BarManager.BH.SHIELDS, (int) FastMath.ceil(shields));
-        }
-        public void damage(float damage){
+        
+        @Override
+        public boolean damage(float damage){
             if(shields > 0){
                 shields -= damage;
                 if(shields <= 0){
-                    health += shields;
                     shields = 0;
-                    if(health <= 0){
-                        Character.kill();
-                    }
+                    return super.damage(FastMath.abs(shields));
                 }
             }else{
-                health -= damage;
-                if(health <= 0){
-                    Character.kill();
-                }
+                return super.damage(damage);
             }
-            update();
+            return false;
         }
+        @Override
         public void refresh(){
-            health = health_max;
-            shields = shields_max;
-            update();
+            super.refresh();
+            shields = maxShields;
         }
-    }
-    
-    public static void damage(float amount){
-        characterStats.damage(amount);
-        characterStats.update();
-    }
-    public static void damage(Player p, float amount){
-        playerStats.get(p).damage(amount);
-    }
-    public static void add(Player p, float health, float shields){
-        playerStats.put(p, new PlayerStats(health, shields));
-    }
-    public static void createCharacter(float health, float shields){
-        characterStats = new PlayerStats(health, shields);
-    }
-    public static void refreshCharacter(){
-        characterStats.refresh();
     }
 }
