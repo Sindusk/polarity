@@ -5,7 +5,6 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
-import com.jme3.network.Server;
 import com.jme3.scene.Node;
 import java.util.HashMap;
 import sin.character.PlayerManager;
@@ -15,7 +14,6 @@ import sin.netdata.CommandData;
 import sin.netdata.DamageData;
 import sin.netdata.DecalData;
 import sin.netdata.ProjectileData;
-import sin.network.Networking;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;
 import sin.world.DecalManager;
@@ -42,11 +40,12 @@ public class A {
         if(data[0].equals("player")){
             int id = Integer.parseInt(data[1]);
             damage = modDamage(data[2], damage);
-            S.getServer().broadcast(new DamageData(attacker, id, damage));
+            S.getServer().broadcast(new DamageData(attacker, "player", id, damage));
         }else if(data[0].equals("npc")){
             String type = data[1];
             int id = Integer.parseInt(data[2]);
             damage = modDamage(data[3], damage);
+            S.getServer().broadcast(new DamageData(attacker, "npc:"+type, id, damage));
             T.log("Player "+attacker+" shot NPC "+type+" ["+id+"] for "+damage+" damage.");
         }else{
             DecalManager.create(target.getContactPoint());
@@ -60,7 +59,7 @@ public class A {
             if(players[i] != null){
                 float dist = players[i].getLocation().distance(target.getContactPoint());
                 if(dist <= radius){
-                    S.getServer().broadcast(new DamageData(attacker, i, damage*(radius-dist)));
+                    S.getServer().broadcast(new DamageData(attacker, "player", i, damage*(radius-dist)));
                 }
             }
             i++;

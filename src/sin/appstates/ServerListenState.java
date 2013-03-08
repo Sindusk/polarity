@@ -133,7 +133,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             final MoveData m = d;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    PlayerManager.updatePlayer(m);
+                    PlayerManager.updatePlayerLocation(m);
                     return null;
                 }
             });
@@ -152,11 +152,6 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             });
             server.broadcast(Filters.notEqualTo(connection), d);
         }
-        private void DamageMessage(DamageData d){
-            //System.out.println("Handling DamageData from client "+d.getID()+"...");
-            System.out.println("Player "+d.getID()+" shot Player "+d.getPlayer()+" for "+d.getDamage()+" damage.");
-            server.broadcast(d);
-        }
         private void SoundMessage(SoundData d){
             //System.out.println("Handling SoundData from client "+d.getID());
             server.broadcast(d);
@@ -169,8 +164,6 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
                 AttackMessage((AttackData) m);
             }if(m instanceof ConnectData){
                 ConnectMessage((ConnectData) m);
-            }else if(m instanceof DamageData){
-                DamageMessage((DamageData) m);
             }else if(m instanceof DecalData){
                 DecalMessage((DecalData) m);
             }else if(m instanceof ErrorData){
@@ -265,6 +258,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
     public void update(float tpf){
         super.update(tpf);  // Execute AppTasks.
         
+        PlayerManager.update(tpf);
         ProjectileManager.update(tpf, true);
     }
     

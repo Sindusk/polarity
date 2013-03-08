@@ -99,7 +99,7 @@ public class Models {
             return part;
         }
         
-        public PlayerModel(Node node, int id){
+        public PlayerModel(int id, Node node){
             super(node, "player:"+id);
             this.addPart(genHead(), "head", T.v3f(0, 1.75f, 0));
             this.addPart(genTorso(), "torso", Vector3f.ZERO);
@@ -109,10 +109,10 @@ public class Models {
             this.addPart(genLeg(), "leg.right", T.v3f(0.5f, -1, 0));
         }
         
-        public void update(Vector3f loc, Quaternion rot){
+        public void update(Vector3f locA, Vector3f locB, Quaternion rot, float tpf, float interp){
             float[] angles = new float[3];
             rot.toAngles(angles);
-            this.getNode().setLocalTranslation(loc);
+            this.getNode().setLocalTranslation(locA.clone().interpolate(locB, interp));
             this.getNode().setLocalRotation(new Quaternion().fromAngles(0, angles[1], 0));
             parts.get("head").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
             parts.get("arm.left").setLocalRotation(new Quaternion().fromAngles(angles[0], 0, 0));
@@ -131,7 +131,7 @@ public class Models {
             return part;
         }
         
-        public NPCModel(Node node, String type, int id){
+        public NPCModel(int id, Node node, String type){
             super(node, "npc:"+type+":"+id);
             this.addPart(genHead(), "head", new Vector3f(0, 3, 0));
             this.addPart(genBody(), "body", Vector3f.ZERO);

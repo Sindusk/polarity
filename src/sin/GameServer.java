@@ -15,6 +15,7 @@ import sin.appstates.ServerGameState;
 import sin.appstates.ServerListenState;
 import sin.appstates.ServerMenuState;
 import sin.input.ServerInputHandler;
+import sin.tools.S;
 import sin.tools.T;
 import sin.world.*;
 
@@ -142,6 +143,7 @@ public class GameServer extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize Tools:
+        S.setCamera(cam);
         T.initialize(assetManager, inputManager);
         ServerInputHandler.initialize(app);
         

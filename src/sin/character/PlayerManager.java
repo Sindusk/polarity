@@ -7,6 +7,7 @@ import com.jme3.scene.Node;
 import sin.animation.Models.PlayerModel;
 import sin.netdata.ConnectData;
 import sin.netdata.MoveData;
+import sin.tools.S;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -18,8 +19,11 @@ public class PlayerManager{
     
     public static class Player{
         private PlayerModel model;
-        private Vector3f loc;
+        private Vector3f locA = Vector3f.ZERO;
+        private Vector3f locB = Vector3f.ZERO;
+        private Quaternion rot = new Quaternion();
         private HostedConnection conn;
+        private float interp = 0;
         private boolean connected = false;
 
         public Player(){}
@@ -31,18 +35,24 @@ public class PlayerManager{
             return conn;
         }
         public Vector3f getLocation(){
-            return loc;
+            return locB;
         }
         public void setConnection(HostedConnection conn){
             this.conn = conn;
         }
+        public void setLocation(Vector3f loc, Quaternion rot){
+            this.locA = this.locB.clone();
+            this.locB = loc;
+            this.rot = rot;
+            this.interp = 0;
+        }
         
-        public void update(Vector3f loc, Quaternion rot){
-            this.loc = loc;
-            model.update(loc, rot);
+        public void update(float tpf){
+            model.update(locA, locB, rot, tpf, interp);
+            interp += tpf*S.MOVE_INVERSE;
         }
         public void create(int id){
-            this.model = new PlayerModel(node, id);
+            this.model = new PlayerModel(id, node);
             connected = true;
         }
         public void destroy(){
@@ -70,11 +80,17 @@ public class PlayerManager{
             i++;
         }
     }
-    public static void updatePlayer(int id, Vector3f loc, Quaternion rot){
-        player[id].update(loc, rot);
+    public static void updatePlayerLocation(MoveData d){
+        player[d.getID()].setLocation(d.getLocation(), d.getRotation());
     }
-    public static void updatePlayer(MoveData d){
-        player[d.getID()].update(d.getLocation(), d.getRotation());
+    public static void update(float tpf){
+        int i = 0;
+        while(i < player.length){
+            if(player[i] != null && player[i].isConnected()){
+                player[i].update(tpf);
+            }
+            i++;
+        }
     }
     
     private static int findEmptyPlayer(){
@@ -87,15 +103,13 @@ public class PlayerManager{
         }
         return -1;
     }
-    public static boolean add(int id){
+    public static void add(int id){
         if(player[id] == null || !player[id].isConnected()){
             if(player[id] == null){
                 player[id] = new Player();
             }
             player[id].create(id);
-            return true;
         }
-        return false;
     }
     public static int addNew(){
         int id = findEmptyPlayer();

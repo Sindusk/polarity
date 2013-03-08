@@ -2,7 +2,6 @@ package sin.network;
 
 import com.jme3.audio.AudioNode;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
@@ -32,6 +31,7 @@ import sin.netdata.GeometryData;
 import sin.netdata.NPCData;
 import sin.npc.NPCManager;
 import sin.tools.A;
+import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
 import sin.world.DecalManager;
@@ -48,9 +48,6 @@ public class Networking {
     // Networking Variables:
     private static boolean CLIENT_CONNECTED = false;
     private static int     CLIENT_ID = -1;
-    // Constant Variables:
-    private static final float PING_INTERVAL = 1;
-    private static final float MOVE_INTERVAL = 0.1f;
 
     // Index Holders:
     private static final int PING = 0;
@@ -136,14 +133,14 @@ public class Networking {
         }
 
         // Ping:
-        if(timers[PING] >= PING_INTERVAL && !pinging){
+        if(timers[PING] >= S.PING_INTERVAL && !pinging){
             time = app.getTimer().getTimeInSeconds();
             client.send(new PingData());
             timers[PING] = 0;
         }
 
         // Send updated movement data:
-        if(timers[MOVE] >= MOVE_INTERVAL){
+        if(timers[MOVE] >= S.MOVE_INTERVAL){
             client.send(new MoveData(CLIENT_ID, Character.getControl().getPhysicsLocation(), app.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
@@ -176,8 +173,8 @@ public class Networking {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     //app.getPlayer(id).create();
-                    if(!PlayerManager.add(id)){
-                        T.log("Player already connected.");
+                    if(id != CLIENT_ID){
+                        PlayerManager.add(id);
                     }
                     return null;
                 }
@@ -188,10 +185,17 @@ public class Networking {
             final DamageData m = d;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    if(m.getPlayer() == CLIENT_ID){
+                    if(m.getTarget() == CLIENT_ID){
                         Character.damage(m.getDamage());
                     }else{
-                        HUD.addFloatingText(PlayerManager.getPlayer(m.getPlayer()).getLocation().clone().addLocal(T.v3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                        String args[] = m.getType().split(":");
+                        if(args[0].equals("player")){
+                            HUD.addFloatingText(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                        }else if(args[0].equals("npc")){
+                            HUD.addFloatingText(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                        }else{
+                            T.log("Invalid Damage Data!");
+                        }
                     }
                     return null;
                 }
@@ -235,12 +239,10 @@ public class Networking {
             client.send(new IDData(CLIENT_ID, true));
         }
         private void MoveMessage(MoveData d){
-            final int id = d.getID();
-            final Vector3f loc = d.getLocation();
-            final Quaternion rot = d.getRotation();
+            final MoveData m = d;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    PlayerManager.updatePlayer(id, loc, rot);
+                    PlayerManager.updatePlayerLocation(m);
                     return null;
                 }
             });

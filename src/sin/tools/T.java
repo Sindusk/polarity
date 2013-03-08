@@ -1,8 +1,6 @@
 package sin.tools;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapFont;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
@@ -14,18 +12,11 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.texture.Texture;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sin.character.PlayerManager;
-import sin.netdata.CommandData;
-import sin.weapons.ProjectileManager;
-import sin.weapons.ProjectileManager.Projectile;
 
 /**
  * T (Tools) - Provides miscellaneous tools for various functions.

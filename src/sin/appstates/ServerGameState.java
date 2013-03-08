@@ -25,7 +25,6 @@ public class ServerGameState extends AbstractAppState{
         // Initialize classes:
         MovementManager.initialize(app.getCamera());
         MovementManager.setGrounded(false);
-        RecoilManager.initialize(app.getCamera());
     }
     
     @Override

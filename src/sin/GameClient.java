@@ -17,9 +17,9 @@ import sin.appstates.ClientGameState;
 import sin.appstates.ClientMenuState;
 import sin.input.ClientInputHandler;
 import sin.network.Networking;
-import sin.character.PlayerManager;
+import sin.tools.S;
 import sin.tools.T;
-import sin.weapons.Weapons;
+import sin.weapons.RecoilManager;
 import sin.world.CG;
 
 /**
@@ -170,8 +170,10 @@ public class GameClient extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize Tools & Input:
+        S.setCamera(cam);
         T.initialize(assetManager, inputManager);
         ClientInputHandler.initialize(app);
+        RecoilManager.initialize();
         
         // Initialize Networking:
         Networking.initialize(app);

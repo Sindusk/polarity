@@ -9,21 +9,26 @@ import com.jme3.network.serializing.Serializable;
  */
 @Serializable
 public class DamageData extends AbstractMessage {
-    private int id;
-    private int player;
+    private int attacker;
+    private String type;
+    private int target;
     private float damage;
     public DamageData(){}
-    public DamageData(int id, int player, float damage){
-        this.id = id;
-        this.player = player;
+    public DamageData(int attacker, String type, int target, float damage){
+        this.attacker = attacker;
+        this.type = type;
+        this.target = target;
         this.damage = damage;
         this.setReliable(true);
     }
-    public int getID(){
-        return id;
+    public int getAttacker(){
+        return attacker;
     }
-    public int getPlayer(){
-        return player;
+    public String getType(){
+        return type;
+    }
+    public int getTarget(){
+        return target;
     }
     public float getDamage(){
         return damage;

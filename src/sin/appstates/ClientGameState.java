@@ -89,7 +89,6 @@ public class ClientGameState extends AbstractAppState{
         HUD.initialize(app, gui);
         MovementManager.initialize(app.getCamera());
         ProjectileManager.initialize(collisionNode);
-        RecoilManager.initialize(app.getCamera());
         TracerManager.initialize(app);
         Weapons.initialize(app);
         
@@ -138,6 +137,7 @@ public class ClientGameState extends AbstractAppState{
         // Update character location & hud:
         Character.update(tpf);
         HUD.update(tpf);
+        PlayerManager.update(tpf);
         ProjectileManager.update(tpf, false);
         
         // Update network if connected:

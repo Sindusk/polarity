@@ -7,14 +7,13 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import java.util.HashMap;
 import sin.hud.HUD;
+import sin.tools.S;
 
 /**
  * RecoilManager - Used for all recoil management.
  * @author SinisteRing
  */
 public class RecoilManager{
-    public static Camera cam;
-    
     // Constant Variables:
     private static final float RECOIL_SENSITIVITY = 1;
     private static final float RECOIL_UP_INC = FastMath.PI*0.0001f;
@@ -41,9 +40,9 @@ public class RecoilManager{
         Matrix3f mat = new Matrix3f();
         mat.fromAngleNormalAxis(sensitivity * value, axis);
 
-        Vector3f up = cam.getUp();
-        Vector3f left = cam.getLeft();
-        Vector3f dir = cam.getDirection();
+        Vector3f up = S.getCamera().getUp();
+        Vector3f left = S.getCamera().getLeft();
+        Vector3f dir = S.getCamera().getDirection();
         Quaternion quat = new Quaternion();
         quat.lookAt(dir, up);
 
@@ -58,12 +57,12 @@ public class RecoilManager{
         float angleY = dir.angleBetween(Vector3f.UNIT_Y);
         float angleYDegree = angleY * 180 / FastMath.PI ;
         if(angleYDegree>=5 && angleYDegree<=175 && up.y>=0) {
-            cam.setAxes(q);
+            S.getCamera().setAxes(q);
         }
     }
 
     public static void RecoilUp(float mod){
-        cam.getRotation().multLocal(new Quaternion().fromAngleAxis(-RECOIL_UP_INC*mod, Vector3f.UNIT_X));
+        S.getCamera().getRotation().multLocal(new Quaternion().fromAngleAxis(-RECOIL_UP_INC*mod, Vector3f.UNIT_X));
 
         // Update variables:
         addRecoil(RH.UP, RECOIL_UP_INC*mod);
@@ -77,7 +76,7 @@ public class RecoilManager{
         setRecoil(RH.LEFT_TOTAL, getRecoil(RH.LEFT));
     }
     public static void DecoilUp(float mod){
-        cam.getRotation().multLocal(new Quaternion().fromAngleAxis(-mod, Vector3f.UNIT_X));
+        S.getCamera().getRotation().multLocal(new Quaternion().fromAngleAxis(-mod, Vector3f.UNIT_X));
     }
     public static void DecoilLeft(float mod){
         rotateCamera(mod, RECOIL_SENSITIVITY, Vector3f.UNIT_Y);
@@ -96,48 +95,45 @@ public class RecoilManager{
         RecoilLeft(left);
     }
     public static void decoil(float tpf){
-            if(getRecoil(RH.UP) != 0){
-                float decoil_up = RECOIL_UP_INC*tpf;
-                float decoil_up_perc = getRecoil(RH.UP_TOTAL)*DECOIL_UP_PERC_MULT*tpf;
-                if(getRecoil(RH.UP) < 0){
-                    decoil_up *= -1;
-                    //decoil_up_perc *= -1;
-                }
-                decoil_up += decoil_up_perc;
-                if(FastMath.abs(getRecoil(RH.UP)) < FastMath.abs(decoil_up)){
-                    decoil_up = getRecoil(RH.UP);
-                    setRecoil(RH.UP, 0);
-                }else{
-                    addRecoil(RH.UP, -decoil_up);
-                }
-                DecoilUp(-decoil_up);
+        if(getRecoil(RH.UP) != 0){
+            float decoil_up = RECOIL_UP_INC*tpf;
+            float decoil_up_perc = getRecoil(RH.UP_TOTAL)*DECOIL_UP_PERC_MULT*tpf;
+            if(getRecoil(RH.UP) < 0){
+                decoil_up *= -1;
+                //decoil_up_perc *= -1;
             }
-
-            if(getRecoil(RH.LEFT) != 0){
-                float decoil_left = RECOIL_LEFT_INC*tpf;
-                float decoil_left_perc = getRecoil(RH.LEFT_TOTAL)*DECOIL_LEFT_PERC_MULT*tpf;
-                if(getRecoil(RH.LEFT) < 0){
-                    decoil_left *= -1;
-                    //decoil_left_perc *= -1;
-                }
-                decoil_left += decoil_left_perc;
-                if(FastMath.abs(getRecoil(RH.LEFT)) < FastMath.abs(decoil_left)){
-                    decoil_left = getRecoil(RH.LEFT);
-                    setRecoil(RH.LEFT, 0);
-                }else{
-                    addRecoil(RH.LEFT, -decoil_left);
-                }
-                DecoilLeft(-decoil_left);
+            decoil_up += decoil_up_perc;
+            if(FastMath.abs(getRecoil(RH.UP)) < FastMath.abs(decoil_up)){
+                decoil_up = getRecoil(RH.UP);
+                setRecoil(RH.UP, 0);
+            }else{
+                addRecoil(RH.UP, -decoil_up);
             }
+            DecoilUp(-decoil_up);
         }
+
+        if(getRecoil(RH.LEFT) != 0){
+            float decoil_left = RECOIL_LEFT_INC*tpf;
+            float decoil_left_perc = getRecoil(RH.LEFT_TOTAL)*DECOIL_LEFT_PERC_MULT*tpf;
+            if(getRecoil(RH.LEFT) < 0){
+                decoil_left *= -1;
+                //decoil_left_perc *= -1;
+            }
+            decoil_left += decoil_left_perc;
+            if(FastMath.abs(getRecoil(RH.LEFT)) < FastMath.abs(decoil_left)){
+                decoil_left = getRecoil(RH.LEFT);
+                setRecoil(RH.LEFT, 0);
+            }else{
+                addRecoil(RH.LEFT, -decoil_left);
+            }
+            DecoilLeft(-decoil_left);
+        }
+    }
     
-    public static void initialize(Camera cam){
-        RecoilManager.cam = cam;
-        
-        // Initialize Handles:
-        recoil.put(RH.UP, 0f);
-        recoil.put(RH.UP_TOTAL, 0f);
+    public static void initialize(){
         recoil.put(RH.LEFT, 0f);
         recoil.put(RH.LEFT_TOTAL, 0f);
+        recoil.put(RH.UP, 0f);
+        recoil.put(RH.UP_TOTAL, 0f);
     }
 }
