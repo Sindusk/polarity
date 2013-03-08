@@ -7,6 +7,7 @@ import com.jme3.scene.Node;
 import sin.animation.Models.PlayerModel;
 import sin.netdata.ConnectData;
 import sin.netdata.MoveData;
+import sin.network.Networking;
 import sin.tools.S;
 
 /**
@@ -49,7 +50,7 @@ public class PlayerManager{
         
         public void update(float tpf){
             model.update(locA, locB, rot, tpf, interp);
-            interp += tpf*S.MOVE_INVERSE;
+            interp += tpf*Networking.MOVE_INVERSE;
         }
         public void create(int id){
             this.model = new PlayerModel(id, node);
@@ -81,7 +82,9 @@ public class PlayerManager{
         }
     }
     public static void updatePlayerLocation(MoveData d){
-        player[d.getID()].setLocation(d.getLocation(), d.getRotation());
+        if(player[d.getID()] != null){
+            player[d.getID()].setLocation(d.getLocation(), d.getRotation());
+        }
     }
     public static void update(float tpf){
         int i = 0;

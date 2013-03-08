@@ -3,20 +3,18 @@ package sin.tools;
 import com.jme3.network.Server;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import com.jme3.system.Timer;
 
 /**
  *
  * @author SinisteRing
  */
 public class S {
-    // Constants:
-    public static final float PING_INTERVAL = 1;
-    public static final float MOVE_INTERVAL = 0.05f;
-    public static final float MOVE_INVERSE = 1.0f/MOVE_INTERVAL;
-    
     private static Camera camera;
     private static Node collisionNode;
     private static Server server;
+    private static String version;
+    private static Timer timer;
     
     public static Camera getCamera(){
         return camera;
@@ -27,6 +25,12 @@ public class S {
     public static Server getServer(){
         return server;
     }
+    public static String getVersion(){
+        return version;
+    }
+    public static Timer getTimer(){
+        return timer;
+    }
     
     public static void setCamera(Camera camera){
         S.camera = camera;
@@ -36,5 +40,11 @@ public class S {
     }
     public static void setServer(Server server){
         S.server = server;
+    }
+    public static void setVersion(String version){
+        S.version = version;
+    }
+    public static void setTimer(Timer timer){
+        S.timer = timer;
     }
 }

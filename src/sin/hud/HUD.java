@@ -4,7 +4,6 @@ import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
@@ -21,60 +20,14 @@ import sin.world.CG;
 public class HUD {
     private static GameClient app;
     
-    private static class FloatingText{
-        // Constant Variables:
-        private static final float SIZE = 1;
-        private static final float TIME = 0.5f;
-
-        // Instance Variables:
-        private BitmapText text;
-        private boolean used;
-        private float timer;
-
-        public FloatingText(){
-            text = new BitmapText(T.getFont("OCRAStd"));
-            //text.setLocalTranslation(loc);
-            //text.setText(Float.toString(value));
-            text.setColor(ColorRGBA.Magenta);
-            text.setSize(SIZE);
-            text.setQueueBucket(RenderQueue.Bucket.Transparent);
-            app.getMiscNode().attachChild(text);
-            used = false;
-            timer = 0;
-        }
-
-        public void addTime(float tpf){
-            timer -= tpf;
-            if(timer <= 0){
-                this.destroy();
-            }else{
-                text.setLocalTranslation(text.getLocalTranslation().addLocal(T.v3f(0, tpf*2, 0)));
-            }
-        }
-        public void create(Vector3f loc, Vector3f lookAt, float value){
-            text.setLocalTranslation(loc);
-            text.setText(Integer.toString((int) FastMath.floor(value)));
-            text.lookAt(lookAt, Vector3f.UNIT_Y);
-            timer = TIME;
-            used = true;
-        }
-        private void destroy(){
-            timer = 0;
-            used = false;
-            text.setLocalTranslation(T.EMPTY_SPACE);
-        }
-    }
-
     // Constant Variables:
     private static final float CROSSHAIR_LENGTH = 16;
     private static final float CROSSHAIR_OFFSET = 5;
     private static final float CROSSHAIR_WIDTH = 3.2f;
-    private static final int FTEXT_NUM = 50;
 
     // Instance Variables:
     private static Node node = new Node("GUI");      // Node used to attach/detach GUI and HUD elements.
     private static float cx, cy;
-    private static FloatingText[] texts = new FloatingText[FTEXT_NUM];
     private static BitmapText ping;
     private static BitmapText loc;
     private static BitmapText fps;
@@ -100,16 +53,6 @@ public class HUD {
         crosshair[2].setLocalTranslation(T.v3f(mod, 0));
         crosshair[3].setLocalTranslation(T.v3f(0, mod));
     }
-    public static void addFloatingText(Vector3f loc, Vector3f lookAt, float damage){
-        int i = 0;
-        while(i < texts.length){
-            if(!texts[i].used){
-                texts[i].create(loc, lookAt, damage);
-                return;
-            }
-            i++;
-        }
-    }
 
     public static void setBarMax(BH handle, int value){
         BarManager.setBarMax(handle, value);
@@ -131,13 +74,7 @@ public class HUD {
     }
 
     public static void update(float tpf){
-        int i = 0;
-        while(i < texts.length){
-            if(texts[i].used){
-                texts[i].addTime(tpf);
-            }
-            i++;
-        }
+        FloatingTextManager.update(tpf);
         Vector3f ploc = Character.getLocation();
         Vector3f pdir = app.getCamera().getDirection();
         String compass;
@@ -202,12 +139,5 @@ public class HUD {
         fps.setLocalTranslation(T.v3f(20, cy*2-100));
         fps.setText("");
         node.attachChild(fps);
-
-        // Initialize floating texts:
-        int i = 0;
-        while(i < texts.length){
-            texts[i] = new FloatingText();
-            i++;
-        }
     }
 }

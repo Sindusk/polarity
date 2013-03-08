@@ -169,14 +169,15 @@ public class GameClient extends Application{
         viewPort.setBackgroundColor(ColorRGBA.Black);
         setPauseOnLostFocus(false);
         
-        // Initialize Tools & Input:
+        // Initialize Tools & Classes:
         S.setCamera(cam);
+        S.setTimer(timer);
+        S.setVersion(CLIENT_VERSION);
         T.initialize(assetManager, inputManager);
-        ClientInputHandler.initialize(app);
-        RecoilManager.initialize();
         
-        // Initialize Networking:
+        ClientInputHandler.initialize(app);
         Networking.initialize(app);
+        RecoilManager.initialize();
         
         // Initialize App States:
         gameplayState = new ClientGameState();

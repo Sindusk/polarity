@@ -10,6 +10,7 @@ import sin.network.Networking;
 import sin.character.Character;
 import sin.character.MovementManager;
 import sin.character.PlayerManager;
+import sin.hud.FloatingTextManager;
 import sin.npc.NPCManager;
 import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
@@ -106,6 +107,7 @@ public class ClientGameState extends AbstractAppState{
         world.attachChild(Character.getNode());
         world.attachChild(collisionNode);
         world.attachChild(DecalManager.getNode());
+        world.attachChild(FloatingTextManager.getNode());
         world.attachChild(miscNode);
         world.attachChild(ProjectileManager.getNode());
         root.attachChild(world);

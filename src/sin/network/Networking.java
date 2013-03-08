@@ -24,6 +24,7 @@ import sin.netdata.DamageData;
 import sin.netdata.SoundData;
 import sin.character.Character;
 import sin.character.PlayerManager;
+import sin.hud.FloatingTextManager;
 import sin.hud.HUD;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
@@ -44,6 +45,11 @@ import sin.world.World;
 public class Networking {
     private static GameClient app;
     private static Client client = null;  // For SpiderMonkey connectivity.
+    
+    // Constants:
+    public static final float PING_INTERVAL = 1;
+    public static final float MOVE_INTERVAL = 0.05f;
+    public static final float MOVE_INVERSE = 1.0f/MOVE_INTERVAL;
     
     // Networking Variables:
     private static boolean CLIENT_CONNECTED = false;
@@ -105,7 +111,7 @@ public class Networking {
             Networking.registerSerials();
             client.addClientStateListener(new ClientListener());
             client.start();
-            client.send(new ConnectData(app.getVersion()));
+            client.send(new ConnectData(S.getVersion()));
             timers[PING] = 1;
             timers[MOVE] = 0;
             return true;
@@ -133,15 +139,15 @@ public class Networking {
         }
 
         // Ping:
-        if(timers[PING] >= S.PING_INTERVAL && !pinging){
-            time = app.getTimer().getTimeInSeconds();
+        if(timers[PING] >= PING_INTERVAL && !pinging){
+            time = S.getTimer().getTimeInSeconds();
             client.send(new PingData());
             timers[PING] = 0;
         }
 
         // Send updated movement data:
-        if(timers[MOVE] >= S.MOVE_INTERVAL){
-            client.send(new MoveData(CLIENT_ID, Character.getControl().getPhysicsLocation(), app.getCamera().getRotation()));
+        if(timers[MOVE] >= MOVE_INTERVAL){
+            client.send(new MoveData(CLIENT_ID, Character.getControl().getPhysicsLocation(), S.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
     }
@@ -169,17 +175,14 @@ public class Networking {
         }
         private void ConnectMessage(ConnectData d){
             final int id = d.getID();
-            //if(!PlayerManager.getPlayer(d.getID()).isUsed()){
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    //app.getPlayer(id).create();
                     if(id != CLIENT_ID){
                         PlayerManager.add(id);
                     }
                     return null;
                 }
             });
-            //}
         }
         private void DamageMessage(DamageData d){
             final DamageData m = d;
@@ -190,9 +193,9 @@ public class Networking {
                     }else{
                         String args[] = m.getType().split(":");
                         if(args[0].equals("player")){
-                            HUD.addFloatingText(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                            FloatingTextManager.add(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
                         }else if(args[0].equals("npc")){
-                            HUD.addFloatingText(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                            FloatingTextManager.add(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
                         }else{
                             T.log("Invalid Damage Data!");
                         }

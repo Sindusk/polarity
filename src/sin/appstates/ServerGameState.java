@@ -5,7 +5,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import sin.GameServer;
 import sin.character.MovementManager;
-import sin.weapons.RecoilManager;
 
 /**
  *
