@@ -7,8 +7,10 @@ import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import sin.GameClient;
+import sin.character.AbilityManager;
 import sin.character.Character;
 import sin.character.MovementManager;
 import sin.character.MovementManager.MH;
@@ -63,6 +65,10 @@ public class ClientInputHandler{
                     Character.swapGuns();
                 }else if(bind.equals("Reload")){
                     Character.reload();
+                }
+                // Abilities:
+                else if(bind.equals("Ability_1")){
+                    AbilityManager.getAbility(0).execute(new Ray(app.getCamera().getLocation(), app.getCamera().getDirection()));
                 }
                 // Miscellaneous:
                 else if(bind.equals("Misc_Key_1")){

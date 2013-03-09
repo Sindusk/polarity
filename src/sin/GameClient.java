@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.appstates.ClientGameState;
 import sin.appstates.ClientMenuState;
+import sin.character.AbilityManager;
 import sin.input.ClientInputHandler;
 import sin.network.Networking;
 import sin.tools.S;
@@ -175,6 +176,7 @@ public class GameClient extends Application{
         S.setVersion(CLIENT_VERSION);
         T.initialize(assetManager, inputManager);
         
+        AbilityManager.initialize();
         ClientInputHandler.initialize(app);
         Networking.initialize(app);
         RecoilManager.initialize();

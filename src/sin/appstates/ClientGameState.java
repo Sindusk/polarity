@@ -12,6 +12,7 @@ import sin.character.MovementManager;
 import sin.character.PlayerManager;
 import sin.hud.FloatingTextManager;
 import sin.npc.NPCManager;
+import sin.tools.S;
 import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
@@ -82,7 +83,8 @@ public class ClientGameState extends AbstractAppState{
         app.getRoot().attachChild(root);
         app.getGUI().attachChild(gui);
         
-        // Initialize Projectiles:
+        // Initialize classes:
+        S.setCollisionNode(collisionNode);
         AmmoManager.initialize(app);
         AttackManager.initialize(app.getCamera(), collisionNode);
         Character.initialize(app);

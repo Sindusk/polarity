@@ -235,6 +235,14 @@ public class A {
             return null;
         }
     }
+    public static CollisionResult getClosestCollisionByRange(Ray ray, Node node, float range){
+        CollisionResult result = getClosestCollision(ray, node);
+        if(ray.getOrigin().distance(result.getContactPoint()) <= range){
+            return result;
+        }else{
+            return null;
+        }
+    }
     public static float getDistance(Vector3f player, Vector3f target){
         return target.distance(player);
     }
