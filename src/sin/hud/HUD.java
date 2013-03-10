@@ -7,8 +7,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.player.Character;
 import sin.hud.BarManager.BH;
+import sin.network.ClientNetwork;
+import sin.player.PlayerManager;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.world.CG;
@@ -60,6 +61,10 @@ public class HUD {
     public static void updateBar(BH handle, int value){
         BarManager.updateBar(handle, value);
     }
+    public static void updateLifeBars(float health, float shields){
+        updateBar(BH.HEALTH, (int) FastMath.ceil(health));
+        updateBar(BH.SHIELDS, (int) FastMath.ceil(shields));
+    }
     
     public static void showCrosshairs(boolean show){
         int i = 0;
@@ -75,7 +80,7 @@ public class HUD {
 
     public static void update(float tpf){
         FloatingTextManager.update(tpf);
-        Vector3f ploc = Character.getLocation();
+        Vector3f ploc = PlayerManager.getPlayer(ClientNetwork.getID()).getLocation();
         Vector3f pdir = app.getCamera().getDirection();
         String compass;
         if(FastMath.abs(pdir.getX()) > FastMath.abs(pdir.getZ())){

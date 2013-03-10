@@ -7,9 +7,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import java.util.HashMap;
-import sin.player.Character;
 import sin.player.PlayerManager;
-import sin.player.PlayerManager.Player;
 import sin.hud.FloatingTextManager;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
@@ -18,6 +16,7 @@ import sin.netdata.DecalData;
 import sin.netdata.ProjectileData;
 import sin.network.ClientNetwork;
 import sin.npc.NPCManager;
+import sin.player.Player;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;
 import sin.world.DecalManager;
@@ -98,14 +97,6 @@ public class A {
         }
      }
     
-    // Parsing Helpers:
-    private static String[] getArgs(String s){
-        return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
-    }
-    private static float getValueF(String s){
-        return Float.parseFloat(s);
-    }
-    
     // Attack Parsing:
     public static void initializeUpdate(Projectile p){
         String[] actions = p.getUpdate().split(":");
@@ -114,9 +105,9 @@ public class A {
         int i = 0;
         while(i < actions.length){
             if(actions[i].contains("spiral")){
-                args = getArgs(actions[i]);
+                args = T.getArgs(actions[i]);
                 UpdateMap.get(p).put(i+"spiral.timer", 0f);
-                UpdateMap.get(p).put(i+"spiral.rot", getValueF(args[0]));
+                UpdateMap.get(p).put(i+"spiral.rot", Float.parseFloat(args[0]));
             }
             i++;
         }
@@ -127,11 +118,11 @@ public class A {
         int i = 0;
         while(i < actions.length){
             if(actions[i].contains("damage")){
-                args = getArgs(actions[i]);
-                A.damage(attacker, target, getValueF(args[0]));
+                args = T.getArgs(actions[i]);
+                A.damage(attacker, target, Float.parseFloat(args[0]));
             }else if(actions[i].contains("aoe")){
-                args = getArgs(actions[i]);
-                A.damageAoE(attacker, target, getValueF(args[0]), getValueF(args[1]));
+                args = T.getArgs(actions[i]);
+                A.damageAoE(attacker, target, Float.parseFloat(args[0]), Float.parseFloat(args[1]));
             }
             i++;
         }
@@ -152,17 +143,17 @@ public class A {
         int i = 0;
         while(i < actions.length){
             if(actions[i].contains("spiral")){
-                args = getArgs(actions[i]);
+                args = T.getArgs(actions[i]);
                 HashMap<String, Float> meow = UpdateMap.get(p);
                 float timer = 0;
                 if(meow.get(i+"spiral.timer") != null){
                     timer = meow.get(i+"spiral.timer");
                 }
-                if(timer > getValueF(args[1])){
+                if(timer > Float.parseFloat(args[1])){
                     float rot = UpdateMap.get(p).get(i+"spiral.rot");
                     ProjectileManager.addNew(p.getOwner(), p.getLocation().clone(), spiral(p, rot), new Vector3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy");
                     S.getServer().broadcast(new ProjectileData(p.getOwner(), p.getLocation().clone(), spiral(p, rot), new Vector3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy"));
-                    rot += getValueF(args[2]);
+                    rot += Float.parseFloat(args[2]);
                     UpdateMap.get(p).put(i+"spiral.rot", rot);
                     timer = 0;
                 }else{
@@ -189,18 +180,18 @@ public class A {
             float x = Float.parseFloat(data[0]);
             float y = Float.parseFloat(data[1])+4;
             float z = Float.parseFloat(data[2]);
-            Character.getControl().setPhysicsLocation(new Vector3f(x, y, z));
+            PlayerManager.getPlayer(ClientNetwork.getID()).getControl().setPhysicsLocation(new Vector3f(x, y, z));
         }
     }
     public static void handleDamage(DamageData m){
         if(m.getTarget() == ClientNetwork.getID()){
-            Character.damage(m.getDamage());
+            PlayerManager.getPlayer(ClientNetwork.getID()).damage(m.getAttacker(), m.getDamage());
         }else{
             String args[] = m.getType().split(":");
             if(args[0].equals("player")){
-                FloatingTextManager.add(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                FloatingTextManager.add(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), PlayerManager.getPlayer(ClientNetwork.getID()).getLocation(), m.getDamage());
             }else if(args[0].equals("npc")){
-                FloatingTextManager.add(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), Character.getLocation(), m.getDamage());
+                FloatingTextManager.add(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), PlayerManager.getPlayer(ClientNetwork.getID()).getLocation(), m.getDamage());
             }else{
                 T.log("Invalid Damage Data!");
             }

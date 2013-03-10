@@ -9,13 +9,12 @@ import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
-import sin.GameClient;
-import sin.ability.AbilityManager;
 import sin.netdata.ability.AbilityData;
 import sin.network.ClientNetwork;
-import sin.player.Character;
 import sin.player.MovementManager;
 import sin.player.MovementManager.MH;
+import sin.player.PlayerManager;
+import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.world.TracerManager;
@@ -27,13 +26,11 @@ import sin.world.World;
  * @author SinisteRing
  */
 public class ClientInputHandler{
-    private static GameClient app;
-    
     // Constant Variables:
     public static final float MOUSE_SENSITIVITY = 1;
     
     private static boolean inGameplay(){
-        return app.getStateManager().hasState(app.getGameplayState()) && app.getMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
+        return S.getStateManager().hasState(S.getClientGameState()) && S.getClientMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
     }
     
     private static ActionListener gameAction = new ActionListener(){
@@ -53,26 +50,26 @@ public class ClientInputHandler{
             }else if(bind.equals("Move_Crouch")){
                 MovementManager.setMove(MH.CROUCH, down);
             }else if(bind.equals("Move_Jump") && down){
-                Character.getControl().jump();
+                PlayerManager.getPlayer(ClientNetwork.getID()).getControl().jump();
             }
             // Actions:
             else if(bind.equals("Trigger_Right")){
-                Character.setFiring(false, down);
+                PlayerManager.getPlayer(ClientNetwork.getID()).setFiring(false, down);
             }else if(bind.equals("Trigger_Left")){
-                Character.setFiring(true, down);
+                PlayerManager.getPlayer(ClientNetwork.getID()).setFiring(true, down);
             }
             if(down){
                 // Weapon Swapping:
                 if(bind.equals("Swap")){
-                    Character.swapGuns();
+                    PlayerManager.getPlayer(ClientNetwork.getID()).swapGuns();
                 }else if(bind.equals("Reload")){
-                    Character.reload();
+                    PlayerManager.getPlayer(ClientNetwork.getID()).reload();
                 }
                 // Abilities:
                 else if(bind.equals("Ability_1")){
-                    ClientNetwork.send(new AbilityData(ClientNetwork.getID(), 0, new Ray(app.getCamera().getLocation(), app.getCamera().getDirection())));
+                    ClientNetwork.send(new AbilityData(ClientNetwork.getID(), 0, new Ray(S.getCamera().getLocation(), S.getCamera().getDirection())));
                 }else if(bind.equals("Ability_2")){
-                    ClientNetwork.send(new AbilityData(ClientNetwork.getID(), 1, new Ray(app.getCamera().getLocation(), app.getCamera().getDirection())));
+                    ClientNetwork.send(new AbilityData(ClientNetwork.getID(), 1, new Ray(S.getCamera().getLocation(), S.getCamera().getDirection())));
                 }
                 // Miscellaneous:
                 else if(bind.equals("Misc_Key_1")){
@@ -81,11 +78,11 @@ public class ClientInputHandler{
                     TracerManager.clear();
                     DecalManager.clear();
                 }else if(bind.equals("Misc_Key_3")){
-                    Character.getControl().setPhysicsLocation(T.v3f(0, 110, 0));
+                    PlayerManager.getPlayer(ClientNetwork.getID()).getControl().setPhysicsLocation(new Vector3f(0, 110, 0));
                 }else if(bind.equals("Misc_Key_4")){
                     World.toggleWireframe();
                 }else if(bind.equals("Game_Menu")){
-                    app.getMenuState().toggleGameMenu();
+                    S.getClientMenuState().toggleGameMenu();
                 }
             }
         }
@@ -101,15 +98,14 @@ public class ClientInputHandler{
             }else if (name.equals("Cam_Right")){
                 RecoilManager.rotateCamera(-value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
             }else if (name.equals("Cam_Up")){
-                RecoilManager.rotateCamera(-value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
+                RecoilManager.rotateCamera(-value, MOUSE_SENSITIVITY, S.getCamera().getLeft());
             }else if (name.equals("Cam_Down")){
-                RecoilManager.rotateCamera(value, MOUSE_SENSITIVITY, app.getCamera().getLeft());
+                RecoilManager.rotateCamera(value, MOUSE_SENSITIVITY, S.getCamera().getLeft());
             }
         }
     };
     
-    public static void initialize(GameClient app){
-        ClientInputHandler.app = app;
+    public static void initialize(){
         // Camera:
         T.createMapping(gameAnalog, "Cam_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
         T.createMapping(gameAnalog, "Cam_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));

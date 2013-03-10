@@ -105,6 +105,7 @@ public class GameServer extends Application{
         bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
+        S.setBulletAppState(bulletAppState);
         CG.initialize(bulletAppState);
     }
     public void send(Message m){
@@ -143,6 +144,7 @@ public class GameServer extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize Tools:
+        S.setAssetManager(assetManager);
         S.setCamera(cam);
         T.initialize(assetManager, inputManager);
         ServerInputHandler.initialize(app);

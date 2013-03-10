@@ -67,7 +67,7 @@ public class GameClient extends Application{
     
     // App States:
     private static BulletAppState bulletAppState;       // Physics State.
-    private static ClientGameState gameplayState;   // Gameplay State.
+    private static ClientGameState gameState;   // Gameplay State.
     private static ClientMenuState menuState;           // Main Menu State.
     
     // Nodes:
@@ -83,24 +83,24 @@ public class GameClient extends Application{
     }
     // Gameplay State Nodes:
     public Node getCollisionNode(){
-        return gameplayState.getCollisionNode();
+        return gameState.getCollisionNode();
     }
     public Node getMiscNode(){
-        return gameplayState.getMiscNode();
+        return gameState.getMiscNode();
     }
     public Node getSingleNode(){
-        return gameplayState.getSingleNode();
+        return gameState.getSingleNode();
     }
     public Node getTerrain(){
-        return gameplayState.getTerrainNode();
+        return gameState.getTerrainNode();
     }
     public Node getTracerNode(){
-        return gameplayState.getTracerNode();
+        return gameState.getTracerNode();
     }
     
     // Getters for States:
     public ClientGameState getGameplayState(){
-        return gameplayState;
+        return gameState;
     }
     public ClientMenuState getMenuState(){
         return menuState;
@@ -125,6 +125,7 @@ public class GameClient extends Application{
         bulletAppState.setThreadingType(ThreadingType.PARALLEL);
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
+        S.setBulletAppState(bulletAppState);
         CG.initialize(bulletAppState);
     }
     
@@ -170,18 +171,21 @@ public class GameClient extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize Tools & Classes:
+        S.setAssetManager(assetManager);
         S.setCamera(cam);
+        S.setStateManager(stateManager);
         S.setTimer(timer);
         S.setVersion(CLIENT_VERSION);
         T.initialize(assetManager, inputManager);
         
-        ClientInputHandler.initialize(app);
         ClientNetwork.initialize(app);
         RecoilManager.initialize();
         
         // Initialize App States:
-        gameplayState = new ClientGameState();
+        gameState = new ClientGameState();
         menuState = new ClientMenuState();
+        S.setClientGameState(gameState);
+        S.setClientMenuState(menuState);
         // Attach App States:
         stateManager.attach(menuState);
         resetBulletAppState();

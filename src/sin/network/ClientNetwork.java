@@ -12,19 +12,19 @@ import com.jme3.network.serializing.Serializer;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import sin.GameClient;
-import sin.netdata.ConnectData;
+import sin.netdata.player.ConnectData;
 import sin.netdata.DecalData;
-import sin.netdata.DisconnectData;
+import sin.netdata.player.DisconnectData;
 import sin.netdata.ErrorData;
-import sin.netdata.IDData;
-import sin.netdata.MoveData;
+import sin.netdata.player.IDData;
+import sin.netdata.player.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
 import sin.netdata.SoundData;
-import sin.player.Character;
 import sin.player.PlayerManager;
 import sin.hud.HUD;
+import sin.input.ClientInputHandler;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.GeometryData;
@@ -33,6 +33,7 @@ import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityData;
 import sin.netdata.npc.EntityDeathData;
 import sin.netdata.npc.OrganismData;
+import sin.netdata.player.PlayerData;
 import sin.npc.NPCManager;
 import sin.tools.A;
 import sin.tools.S;
@@ -84,14 +85,10 @@ public class ClientNetwork {
     private static void registerSerials(){
         registerClass(AttackData.class);
         registerClass(CommandData.class);
-        registerClass(ConnectData.class);
         registerClass(DamageData.class);
         registerClass(DecalData.class);
-        registerClass(DisconnectData.class);
         registerClass(ErrorData.class);
         registerClass(GeometryData.class);
-        registerClass(IDData.class);
-        registerClass(MoveData.class);
         registerClass(PingData.class);
         registerClass(ProjectileData.class);
         registerClass(SoundData.class);
@@ -104,12 +101,19 @@ public class ClientNetwork {
         registerClass(EntityData.class);
         registerClass(EntityDeathData.class);
         registerClass(OrganismData.class);
+        
+        // Player Serials:
+        registerClass(ConnectData.class);
+        registerClass(DisconnectData.class);
+        registerClass(IDData.class);
+        registerClass(MoveData.class);
+        registerClass(PlayerData.class);
     }
     
     public static boolean connect(String ip){
         try {
             client = Network.connectToServer(ip, 6143);
-            ClientNetwork.registerSerials();
+            registerSerials();
             client.addClientStateListener(listener);
             client.start();
             client.send(new ConnectData(S.getVersion()));
@@ -148,7 +152,7 @@ public class ClientNetwork {
 
         // Send updated movement data:
         if(timers[MOVE] >= MOVE_INTERVAL){
-            client.send(new MoveData(CLIENT_ID, Character.getControl().getPhysicsLocation(), S.getCamera().getRotation()));
+            client.send(new MoveData(CLIENT_ID, PlayerManager.getPlayer(CLIENT_ID).getControl().getPhysicsLocation(), S.getCamera().getRotation()));
             timers[MOVE] = 0;
         }
     }
@@ -157,6 +161,9 @@ public class ClientNetwork {
         if(isConnected()){
             client.send(message);
         }
+    }
+    public static void sendPlayerData(){
+        
     }
     public static void sendSound(String name){
         send(new SoundData(CLIENT_ID, name));
@@ -170,17 +177,6 @@ public class ClientNetwork {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     A.handleCommand(m.getCommand());
-                    return null;
-                }
-            });
-        }
-        private void ConnectMessage(ConnectData d){
-            final int id = d.getID();
-            app.enqueue(new Callable<Void>(){
-                public Void call() throws Exception{
-                    if(id != CLIENT_ID){
-                        PlayerManager.add(id);
-                    }
                     return null;
                 }
             });
@@ -239,15 +235,14 @@ public class ClientNetwork {
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
                     World.createGeometry(app.getTerrain(), w);
-                    Character.kill();
+                    PlayerManager.getPlayer(CLIENT_ID).kill();
                     return null;
                 }
             });
         }
         private void IDMessage(IDData d){
-            CLIENT_CONNECTED = true;
             CLIENT_ID = d.getID();
-            client.send(new IDData(CLIENT_ID, true));
+            client.send(new PlayerData(CLIENT_ID, "M4A1:RocketLauncher-Raygun:AK47"));
         }
         private void MoveMessage(MoveData d){
             final MoveData m = d;
@@ -292,14 +287,26 @@ public class ClientNetwork {
                 }
             });
         }
+        // Player:
+        private void PlayerMessage(PlayerData d){
+            final PlayerData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    PlayerManager.add(m);
+                    if(m.getID() == CLIENT_ID){
+                        ClientInputHandler.initialize();
+                        CLIENT_CONNECTED = true;
+                    }
+                    return null;
+                }
+            });
+        }
 
         public void messageReceived(Client source, Message m) {
             client = source;
             
             if(m instanceof CommandData){
                 CommandMessage((CommandData) m);
-            }else if(m instanceof ConnectData){
-                ConnectMessage((ConnectData) m);
             }else if(m instanceof DamageData){
                 DamageMessage((DamageData) m);
             }else if(m instanceof DecalData){
@@ -324,6 +331,10 @@ public class ClientNetwork {
                 ProjectileMessage((ProjectileData) m);
             }else if(m instanceof SoundData){
                 SoundMessage((SoundData) m);
+            }
+            // Player:
+            else if(m instanceof PlayerData){
+                PlayerMessage((PlayerData) m);
             }
         }
 

@@ -18,13 +18,13 @@ import sin.GameServer;
 import sin.player.PlayerManager;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
-import sin.netdata.ConnectData;
+import sin.netdata.player.ConnectData;
 import sin.netdata.DecalData;
-import sin.netdata.DisconnectData;
+import sin.netdata.player.DisconnectData;
 import sin.netdata.ErrorData;
 import sin.netdata.GeometryData;
-import sin.netdata.IDData;
-import sin.netdata.MoveData;
+import sin.netdata.player.IDData;
+import sin.netdata.player.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
@@ -34,6 +34,7 @@ import sin.netdata.ability.AbilityData;
 import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityDeathData;
 import sin.netdata.npc.OrganismData;
+import sin.netdata.player.PlayerData;
 import sin.npc.NPCManager;
 import sin.tools.A;
 import sin.tools.S;
@@ -93,6 +94,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
                 }
             });
         }
+        
         private void AttackMessage(AttackData d){
             final AttackData m = d;
             app.enqueue(new Callable<Void>(){
@@ -107,7 +109,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             if(d.GetVersion().equals(app.getVersion())){
                 app.enqueue(new Callable<Void>(){
                     public Void call() throws Exception{
-                        int id = PlayerManager.addNew();
+                        int id = PlayerManager.findEmptyPlayer();
                         if(id == -1){
                             T.log("Server full. Player was denied connection.");
                             connection.send(new ErrorData(-1, "Server Full.", true));
@@ -130,18 +132,6 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             connection.close("Client Disconnection.");
             PlayerManager.getPlayer(d.getID()).destroy();
         }
-        private void IDMessage(IDData d){
-            if(PlayerManager.getPlayer(d.getID()).isConnected()){
-                T.log("Player "+d.getID()+" [Version: "+app.getVersion()+"] connected successfully.");
-                int id = d.getID();
-                PlayerManager.sendData(connection);
-                PlayerManager.add(id);
-                PlayerManager.getPlayer(id).setConnection(connection);
-                server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
-                sendGeometry(connection);
-                NPCManager.sendData(connection);
-            }
-        }
         private void MoveMessage(MoveData d){
             server.broadcast(Filters.notEqualTo(connection), d);
             final MoveData m = d;
@@ -151,7 +141,6 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
                     return null;
                 }
             });
-            //PlayerManager.getPlayer(d.getID()).update(d.getLocation(), d.getRotation());
         }
         private void PingMessage(PingData d){
             connection.send(d);
@@ -170,6 +159,20 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             //System.out.println("Handling SoundData from client "+d.getID());
             server.broadcast(d);
         }
+        // Players:
+        private void PlayerMessage(PlayerData d){
+            T.log("Player "+d.getID()+" [Version "+app.getVersion()+"] connected successfully.");
+            int id = d.getID();
+            T.log("adding");
+            PlayerManager.add(d);
+            T.log("sending");
+            PlayerManager.sendData(connection);
+            T.log("sent");
+            PlayerManager.getPlayer(id).setConnection(connection);
+            server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
+            sendGeometry(connection);
+            NPCManager.sendData(connection);
+        }
         
         public void messageReceived(HostedConnection source, Message m) {
             connection = source;
@@ -183,8 +186,6 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
                 DecalMessage((DecalData) m);
             }else if(m instanceof ErrorData){
                 ErrorMessage((ErrorData) m);
-            }else if(m instanceof IDData){
-                IDMessage((IDData) m);
             }else if(m instanceof MoveData){
                 MoveMessage((MoveData) m);
             }else if(m instanceof PingData){
@@ -198,6 +199,10 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             else if(m instanceof AbilityData){
                 AbilityMessage((AbilityData) m);
             }
+            // Players:
+            else if(m instanceof PlayerData){
+                PlayerMessage((PlayerData) m);
+            }
         }
     }
     
@@ -208,14 +213,10 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
     private void registerSerials(){
         registerClass(AttackData.class);
         registerClass(CommandData.class);
-        registerClass(ConnectData.class);
         registerClass(DamageData.class);
         registerClass(DecalData.class);
-        registerClass(DisconnectData.class);
         registerClass(ErrorData.class);
         registerClass(GeometryData.class);
-        registerClass(IDData.class);
-        registerClass(MoveData.class);
         registerClass(PingData.class);
         registerClass(ProjectileData.class);
         registerClass(SoundData.class);
@@ -228,6 +229,13 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         registerClass(EntityData.class);
         registerClass(EntityDeathData.class);
         registerClass(OrganismData.class);
+        
+        // Player Data:
+        registerClass(ConnectData.class);
+        registerClass(DisconnectData.class);
+        registerClass(IDData.class);
+        registerClass(MoveData.class);
+        registerClass(PlayerData.class);
     }
     
     public Node getWorld(){

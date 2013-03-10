@@ -159,9 +159,7 @@ public class ProjectileManager {
         add(d.getOwner(), d.getLocation(), d.getDirection(), d.getUp(), d.getDistance(), d.getSpeed(), d.getUpdate(), d.getCollision());
     }
     public static void addNew(int owner, Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
-        if(ClientNetwork.isConnected()){
-            ClientNetwork.send(new ProjectileData(owner, loc, dir, up, dist, speed, update, collision));
-        }
+        ClientNetwork.send(new ProjectileData(owner, loc, dir, up, dist, speed, update, collision));
         add(owner, loc, dir, up, dist, speed, update, collision);
     }
     

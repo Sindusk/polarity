@@ -11,10 +11,10 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import sin.GameClient;
-import sin.player.Character;
 import sin.hud.HUD;
 import sin.network.ClientNetwork;
+import sin.player.PlayerManager;
+import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.AmmoManager.RechargeAmmo;
 import sin.weapons.AmmoManager.ReloadAmmo;
@@ -30,7 +30,7 @@ import sin.world.CG;
  * @author SinisteRing
  */
 public class Weapons{
-    private static GameClient app;
+    private static Node node = new Node("WeaponNode");
     
     // Recoils:
     private static class Recoils{
@@ -64,7 +64,7 @@ public class Weapons{
         public void apply(Vector3f target){
             float spread_mult = s_base;
             spread_mult += s_recoil*(RecoilManager.getRecoil(RH.UP)+RecoilManager.getRecoil(RH.LEFT));
-            if(!Character.getControl().onGround()) {
+            if(!PlayerManager.getPlayer(ClientNetwork.getID()).getControl().onGround()) {
                 spread_mult += s_base*SPREAD_INC*.05;
             }
             float spread_sub = spread_mult/2;
@@ -86,7 +86,7 @@ public class Weapons{
 
         public WeaponAudio(String weapon, float fireVolume){
             this.weapon = getSound(weapon, "fire");
-            fireNode = new AudioNode(app.getAssetManager(), this.weapon, false);
+            fireNode = new AudioNode(S.getAssetManager(), this.weapon, false);
             fireNode.setPositional(false);
             fireNode.setVolume(fireVolume);
         }
@@ -105,8 +105,8 @@ public class Weapons{
 
         public WeaponMuzzle(Node node){
             muzzle = new ParticleEmitter("Muzzle", ParticleMesh.Type.Triangle, 8);
-            Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Particle.j3md");
-            mat.setTexture("Texture", app.getAssetManager().loadTexture(getEffect("flame")));
+            Material mat = new Material(S.getAssetManager(), "Common/MatDefs/Misc/Particle.j3md");
+            mat.setTexture("Texture", S.getAssetManager().loadTexture(getEffect("flame")));
             muzzle.setMaterial(mat);
             muzzle.setStartColor(ColorRGBA.Red);
             muzzle.setImagesX(2);
@@ -173,9 +173,10 @@ public class Weapons{
         public void setFiring(boolean firing){
             this.firing = firing;
         }
-
+        
+        public void reload(){}
         public void updateModel(){
-            Vector3f loc = app.getCamera().getLeft().clone();
+            Vector3f loc = S.getCamera().getLeft().clone();
             loc.setX(loc.getX()*0.9f);
             loc.setY(loc.getY()-0.5f);
             loc.setZ(loc.getZ()*0.9f);
@@ -184,13 +185,13 @@ public class Weapons{
                 loc.setZ(loc.getZ()*-1);
             }
             model.setLocalTranslation(loc);
-            Quaternion rot = app.getCamera().getRotation().clone();
+            Quaternion rot = S.getCamera().getRotation().clone();
             model.setLocalRotation(rot);
         }
         public void fire(){
-            Vector3f target = app.getCamera().getDirection().clone();
+            Vector3f target = S.getCamera().getDirection().clone();
             spread.apply(target);
-            damage.attack(new Ray(app.getCamera().getLocation(), target));
+            damage.attack(new Ray(S.getCamera().getLocation(), target));
             RecoilManager.recoil(recoils.up(), recoils.left());
             audio.fire();
             cooling += cooldown;
@@ -210,12 +211,12 @@ public class Weapons{
             }
             this.cool(tpf);
         }
-
+        
         public void enable(Node node){
             node.attachChild(model);
         }
         public void disable(){
-            Character.getNode().detachChild(model);
+            Weapons.getNode().detachChild(model);
             firing = false;
         }
     }
@@ -247,7 +248,7 @@ public class Weapons{
         @Override
         public void updateModel(){
             super.updateModel();
-            Quaternion rot = app.getCamera().getRotation().clone();
+            Quaternion rot = S.getCamera().getRotation().clone();
             if(ammo.isReloading()){
                 rot.multLocal(new Quaternion().fromAngleAxis(FastMath.PI/16, Vector3f.UNIT_X));
             }
@@ -285,7 +286,7 @@ public class Weapons{
             }
             this.cool(tpf);
         }
-        
+        @Override
         public void reload(){
             if(!ammo.isReloading() && ammo.getClip() != ammo.getMax()) {
                 cooling += ammo.reload();
@@ -445,7 +446,7 @@ public class Weapons{
         }
     }
     
-    public static void initialize(GameClient app){
-        Weapons.app = app;
+    public static Node getNode(){
+        return node;
     }
 }

@@ -1,21 +1,11 @@
 package sin.player;
 
-import com.jme3.math.Quaternion;
-import com.jme3.math.Ray;
-import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
-import sin.ability.AbilityManager;
-import sin.ability.AbilityManager.Ability;
-import sin.ability.AbilityManager.Blink;
-import sin.ability.AbilityManager.Infect;
-import sin.ability.StatusManager;
-import sin.animation.Models.PlayerModel;
-import sin.player.StatsManager.PlayerStats;
-import sin.netdata.ConnectData;
-import sin.netdata.DamageData;
-import sin.netdata.MoveData;
+import sin.netdata.player.MoveData;
+import sin.netdata.player.PlayerData;
 import sin.network.ClientNetwork;
+import sin.tools.T;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -24,74 +14,6 @@ import sin.network.ClientNetwork;
 public class PlayerManager{
     private static Node node = new Node("PlayerNode");
     private static Player[] player = new Player[16];
-    
-    public static class Player{
-        private Ability[] ability = new Ability[4];
-        private PlayerStats stats = new PlayerStats(100, 100, 100, 100);
-        private PlayerModel model;
-        private StatusManager status = new StatusManager(this);
-        private Vector3f locA = Vector3f.ZERO;
-        private Vector3f locB = Vector3f.ZERO;
-        private Quaternion rot = new Quaternion();
-        private HostedConnection conn;
-        private int id;
-        private float interp = 0;
-        private boolean connected = false;
-
-        public Player(){}
-        
-        public boolean isConnected(){
-            return connected;
-        }
-        public int getID(){
-            return id;
-        }
-        public HostedConnection getConnection(){
-            return conn;
-        }
-        public StatusManager getStatus(){
-            return status;
-        }
-        public Vector3f getLocation(){
-            return locB;
-        }
-        public void setConnection(HostedConnection conn){
-            this.conn = conn;
-        }
-        public void setLocation(Vector3f loc, Quaternion rot){
-            this.locA = this.locB.clone();
-            this.locB = loc;
-            this.rot = rot;
-            this.interp = 0;
-        }
-        
-        public void damage(int attacker, float damage){
-            stats.damage(damage);
-            if(conn != null){
-                conn.send(new DamageData(attacker, "player", id, damage));
-            }
-        }
-        public void cast(int index, Ray ray){
-            ability[index].execute(id, ray);
-        }
-        
-        public void update(float tpf){
-            status.update(tpf);
-            model.update(locA, locB, rot, tpf, interp);
-            interp += tpf*ClientNetwork.MOVE_INVERSE;
-        }
-        public void create(int id){
-            this.id = id;
-            this.model = new PlayerModel(id, node);
-            ability[0] = new Blink(5, 150);
-            ability[1] = new Infect(10, 100, 5, 3);
-            connected = true;
-        }
-        public void destroy(){
-            model.destroy();
-            connected = false;
-        }
-    }
     
     public static Node getNode(){
         return node;
@@ -107,7 +29,7 @@ public class PlayerManager{
         int i = 0;
         while(i < player.length){
             if(player[i] != null && player[i].isConnected()){
-                conn.send(new ConnectData(i));
+                conn.send(player[i].getData());
             }
             i++;
         }
@@ -119,15 +41,19 @@ public class PlayerManager{
     }
     public static void update(float tpf){
         int i = 0;
-        while(i < player.length){
-            if(player[i] != null && player[i].isConnected()){
-                player[i].update(tpf);
+        if(ClientNetwork.getID() == -1){
+            while(i < player.length){
+                if(player[i] != null && player[i].isConnected()){
+                    player[i].update(tpf);
+                }
+                i++;
             }
-            i++;
+        }else if(player[ClientNetwork.getID()] != null){
+            player[ClientNetwork.getID()].update(tpf);
         }
     }
     
-    private static int findEmptyPlayer(){
+    public static int findEmptyPlayer(){
         int i = 0;
         while(i < player.length){
             if(player[i] == null || !player[i].isConnected()){
@@ -137,20 +63,18 @@ public class PlayerManager{
         }
         return -1;
     }
-    public static void add(int id){
+    public static void add(PlayerData d){
+        int id = d.getID();
+        T.log("id = "+id);
         if(player[id] == null || !player[id].isConnected()){
             if(player[id] == null){
+                T.log("creating new");
                 player[id] = new Player();
             }
-            player[id].create(id);
+            T.log("creating...");
+            player[id].create(d);
+            T.log("created");
         }
-    }
-    public static int addNew(){
-        int id = findEmptyPlayer();
-        if(id != -1){
-            add(id);
-        }
-        return id;
     }
     public static void remove(int id){
         player[id].destroy();

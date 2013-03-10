@@ -1,4 +1,4 @@
-package sin.netdata;
+package sin.netdata.player;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;

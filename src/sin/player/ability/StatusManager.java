@@ -1,7 +1,6 @@
-package sin.ability;
+package sin.player.ability;
 
-import sin.player.PlayerManager.Player;
-import sin.tools.T;
+import sin.player.Player;
 
 /**
  *

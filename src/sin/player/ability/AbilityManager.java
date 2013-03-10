@@ -1,11 +1,9 @@
-package sin.ability;
+package sin.player.ability;
 
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import sin.netdata.CommandData;
-import sin.network.ClientNetwork;
-import sin.player.Character;
 import sin.player.PlayerManager;
 import sin.tools.A;
 import sin.tools.S;

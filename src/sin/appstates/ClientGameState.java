@@ -7,21 +7,15 @@ import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.hud.HUD;
 import sin.network.ClientNetwork;
-import sin.player.Character;
 import sin.player.MovementManager;
 import sin.player.PlayerManager;
 import sin.hud.FloatingTextManager;
 import sin.npc.NPCManager;
 import sin.tools.S;
-import sin.weapons.AmmoManager;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.Weapons;
 import sin.world.TracerManager;
-import sin.weapons.Weapons.AK47;
-import sin.weapons.Weapons.M4A1;
-import sin.weapons.Weapons.Raygun;
-import sin.weapons.Weapons.RocketLauncher;
 import sin.world.DecalManager;
 import sin.world.World;
 
@@ -85,32 +79,25 @@ public class ClientGameState extends AbstractAppState{
         
         // Initialize classes:
         S.setCollisionNode(collisionNode);
-        AmmoManager.initialize(app);
         AttackManager.initialize(app.getCamera(), collisionNode);
-        Character.initialize(app);
         HUD.initialize(app, gui);
         MovementManager.initialize(app.getCamera());
         ProjectileManager.initialize(collisionNode);
         TracerManager.initialize(app);
-        Weapons.initialize(app);
         
         // Initialize HUD & World:
         World.createSinglePlayerArea(singleNode);
-        
-        Character.create(
-                new M4A1(true), new RocketLauncher(false),
-                new Raygun(true), new AK47(false), 100, 100);
         
         collisionNode.attachChild(NPCManager.getNode());
         collisionNode.attachChild(PlayerManager.getNode());
         collisionNode.attachChild(singleNode);
         collisionNode.attachChild(terrainNode);
-        world.attachChild(Character.getNode());
         world.attachChild(collisionNode);
         world.attachChild(DecalManager.getNode());
         world.attachChild(FloatingTextManager.getNode());
         world.attachChild(miscNode);
         world.attachChild(ProjectileManager.getNode());
+        world.attachChild(Weapons.getNode());
         root.attachChild(world);
         
         app.getInputManager().setCursorVisible(false);
@@ -120,7 +107,7 @@ public class ClientGameState extends AbstractAppState{
     public void cleanup(){
         super.cleanup();
         app.getRoot().detachChild(root);
-        Character.getNode().detachAllChildren();
+        Weapons.getNode().detachAllChildren();
         terrainNode.detachAllChildren();
         DecalManager.clear();
         app.resetBulletAppState();
@@ -138,9 +125,10 @@ public class ClientGameState extends AbstractAppState{
         app.getListener().setRotation(app.getCamera().getRotation());
         
         // Update character location & hud:
-        Character.update(tpf);
-        HUD.update(tpf);
-        PlayerManager.update(tpf);
+        if(ClientNetwork.isConnected()){
+            HUD.update(tpf);
+            PlayerManager.update(tpf);
+        }
         ProjectileManager.update(tpf, false);
         
         // Update network if connected:

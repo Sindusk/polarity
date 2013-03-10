@@ -29,6 +29,11 @@ public class T {
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
     public static final float ROOT_HALF = 1.0f/FastMath.sqrt(2);
     
+    // Parsing Assist:
+    public static String[] getArgs(String s){
+        return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
+    }
+    
     // Asset Management:
     public static BitmapFont getFont(String fnt){
         return assetManager.loadFont("Interface/Fonts/"+fnt+".fnt");

@@ -19,6 +19,9 @@ public class StatsManager {
         public float getHealth(){
             return health;
         }
+        public float getMaxHealth(){
+            return maxHealth;
+        }
         
         public boolean damage(float damage){
             health -= damage;
@@ -45,6 +48,9 @@ public class StatsManager {
         
         public float getShields(){
             return shields;
+        }
+        public float getMaxShields(){
+            return maxShields;
         }
         
         @Override

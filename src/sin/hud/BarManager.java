@@ -9,7 +9,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import java.util.HashMap;
-import sin.GameClient;
 import sin.tools.T;
 import sin.world.CG;
 
@@ -18,8 +17,6 @@ import sin.world.CG;
  * @author SinisteRing
  */
 public class BarManager {
-    private static GameClient app;
-    
     private static DynamicBar[] bars = new DynamicBar[5];
     private static HashMap<BH, Integer> handles = new HashMap();
     
@@ -170,9 +167,5 @@ public class BarManager {
             }
             i++;
         }
-    }
-    
-    public static void initialize(GameClient app){
-        BarManager.app = app;
     }
 }

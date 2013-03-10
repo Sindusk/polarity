@@ -4,7 +4,10 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import java.util.HashMap;
+import sin.network.ClientNetwork;
+import sin.tools.S;
 import sin.tools.T;
+import sin.weapons.Weapons;
 
 /**
  * MovementManager - Used for the control and handling of all player movement.
@@ -103,17 +106,17 @@ public class MovementManager {
         
         // If crouching, lower view.
         if(getMove(MH.CROUCH)){
-            cam.setLocation(Character.getControl().getPhysicsLocation().add(new Vector3f(0, -1.5f, 0)));
+            cam.setLocation(PlayerManager.getPlayer(ClientNetwork.getID()).getControl().getPhysicsLocation().add(new Vector3f(0, -1.5f, 0)));
             wd.setX(wd.getX()*CROUCH_PENALTY);
             wd.setZ(wd.getZ()*CROUCH_PENALTY);
         }else{
-            cam.setLocation(Character.getControl().getPhysicsLocation());
+            S.getCamera().setLocation(PlayerManager.getPlayer(ClientNetwork.getID()).getControl().getPhysicsLocation());
         }
         
-        Character.getControl().setWalkDirection(wd);
-        Character.getNode().setLocalTranslation(cam.getLocation());
-        if(Character.getLocation().getY() < -20){
-            Character.kill();
+        PlayerManager.getPlayer(ClientNetwork.getID()).getControl().setWalkDirection(wd);
+        Weapons.getNode().setLocalTranslation(cam.getLocation());
+        if(PlayerManager.getPlayer(ClientNetwork.getID()).getLocation().getY() < -20){
+            PlayerManager.getPlayer(ClientNetwork.getID()).kill();
         }
     }
     public static void move(float tpf){
