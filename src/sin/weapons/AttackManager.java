@@ -6,7 +6,7 @@ import com.jme3.math.Ray;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import sin.netdata.AttackData;
-import sin.network.Networking;
+import sin.network.ClientNetwork;
 import sin.tools.A;
 import sin.tools.T;
 
@@ -44,7 +44,7 @@ public class AttackManager {
         
         public void attack(Ray ray){
             //A.rayAttack(ray, this.getRange(), this.getCollision());
-            Networking.send(new AttackData(Networking.getID(), ray, this.getRange(), this.getCollision()));
+            ClientNetwork.send(new AttackData(ClientNetwork.getID(), ray, this.getRange(), this.getCollision()));
         }
     }
     public static abstract class RangedAttack extends AttackTemplate{
@@ -75,7 +75,7 @@ public class AttackManager {
             this.update = update;
         }
         public void attack(Ray ray){
-            ProjectileManager.addNew(Networking.getID(), ray.getOrigin(), ray.getDirection(), cam.getUp(), this.getRange(), this.getSpeed(), update, this.getCollision());
+            ProjectileManager.addNew(ClientNetwork.getID(), ray.getOrigin(), ray.getDirection(), cam.getUp(), this.getRange(), this.getSpeed(), update, this.getCollision());
         }
     }
     public static class RangedRayAttack extends RangedAttack{
@@ -83,13 +83,13 @@ public class AttackManager {
             super(collision, range);
         }
         public void attack(Ray ray){
-            Networking.send(new AttackData(Networking.getID(), ray, this.getRange(), this.getCollision()));
+            ClientNetwork.send(new AttackData(ClientNetwork.getID(), ray, this.getRange(), this.getCollision()));
             /*CollisionResult target = A.getClosestCollision(ray, collisionNode);
             if(target != null){
                 float d = A.getDistance(ray.getOrigin(), target.getContactPoint());
                 if(d < this.getRange()){
                     TracerManager.add(ray.getOrigin(), target.getContactPoint());
-                    T.parseCollision(Networking.getID(), this.getCollision(), target);
+                    T.parseCollision(ClientNetwork.getID(), this.getCollision(), target);
                 }else{
                     TracerManager.add(ray, this.getRange());
                 }

@@ -1,5 +1,6 @@
 package sin.tools;
 
+import com.jme3.network.Client;
 import com.jme3.network.Server;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;

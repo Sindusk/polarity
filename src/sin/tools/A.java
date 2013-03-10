@@ -7,23 +7,23 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import java.util.HashMap;
-import sin.character.Character;
-import sin.character.PlayerManager;
-import sin.character.PlayerManager.Player;
+import sin.player.Character;
+import sin.player.PlayerManager;
+import sin.player.PlayerManager.Player;
 import sin.hud.FloatingTextManager;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.DamageData;
 import sin.netdata.DecalData;
 import sin.netdata.ProjectileData;
-import sin.network.Networking;
+import sin.network.ClientNetwork;
 import sin.npc.NPCManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;
 import sin.world.DecalManager;
 
 /**
- *
+ * A (Attack & Ability) - Holds tools used for the handling of attacks, abilities, and damage.
  * @author SinisteRing
  */
 public class A {
@@ -45,8 +45,8 @@ public class A {
             int id = Integer.parseInt(data[1]);
             damage = modDamage(data[2], damage);
             // Send Data:
-            S.getServer().broadcast(new DamageData(attacker, "player", id, damage));
-            PlayerManager.getPlayer(id).damage(damage);
+            //S.getServer().broadcast(new DamageData(attacker, "player", id, damage));
+            PlayerManager.getPlayer(id).damage(attacker, damage);
         }else if(data[0].equals("npc")){
             String type = data[1];
             int id = Integer.parseInt(data[2]);
@@ -143,18 +143,6 @@ public class A {
             S.getServer().broadcast(new CommandData("projectile:destroy:"+p.getID()));
         }
     }
-    public static void parseCommand(String command){
-        String[] action = command.split(":");
-        if(action[0].equals("player")){
-            if(action[1].equals("destroy")){
-                PlayerManager.getPlayer(Integer.parseInt(action[2])).destroy();
-            }
-        }else if(action[0].equals("projectile")){
-            if(action[1].equals("destroy")){
-                ProjectileManager.getProjectile(Integer.parseInt(action[2])).destroy();
-            }
-        }
-    }
     public static void parseUpdate(Projectile p, float tpf){
         if(p.getUpdate().isEmpty()){
             return;
@@ -186,8 +174,26 @@ public class A {
         }
     }
     
+    public static void handleCommand(String command){
+        String[] action = command.split(":");
+        if(action[0].equals("player")){
+            if(action[1].equals("destroy")){
+                PlayerManager.getPlayer(Integer.parseInt(action[2])).destroy();
+            }
+        }else if(action[0].equals("projectile")){
+            if(action[1].equals("destroy")){
+                ProjectileManager.getProjectile(Integer.parseInt(action[2])).destroy();
+            }
+        }else if(action[0].equals("teleport")){
+            String[] data = action[1].split(",");
+            float x = Float.parseFloat(data[0]);
+            float y = Float.parseFloat(data[1])+4;
+            float z = Float.parseFloat(data[2]);
+            Character.getControl().setPhysicsLocation(new Vector3f(x, y, z));
+        }
+    }
     public static void handleDamage(DamageData m){
-        if(m.getTarget() == Networking.getID()){
+        if(m.getTarget() == ClientNetwork.getID()){
             Character.damage(m.getDamage());
         }else{
             String args[] = m.getType().split(":");
@@ -203,21 +209,18 @@ public class A {
     
     // Attack Handlers:
     public static void rayAttack(AttackData d){
-        CollisionResults results = getCollisions(d.getRay());
-        String[] data;
-        int i = 0;
-        while(i < results.size()){
-            data = getPartData(results.getCollision(i));
-            if(data[0] != null && data[0].equals("player")){
-                if(data[1] != null && Integer.parseInt(data[1]) != d.getAttacker()){
-                    parseCollision(d.getAttacker(), d.getCollision(), results.getCollision(i));
-                    break;
-                }
-            }else{
-                parseCollision(d.getAttacker(), d.getCollision(), results.getCollision(i));
-                break;
-            }
-            i++;
+        CollisionResult target = getClosestCollisionByRange(d.getRay(), S.getCollisionNode(), d.getAttacker(), d.getRange());
+        if(target != null){
+            parseCollision(d.getAttacker(), d.getCollision(), target);
+        }
+    }
+    
+    // Status Handlers:
+    public static void applyPoison(CollisionResult target, float time, float dps){
+        String[] data = getPartData(target);
+        if(data[0].equals("player")){
+            int id = Integer.parseInt(data[1]);
+            PlayerManager.getPlayer(id).getStatus().poison(time, dps);
         }
     }
     
@@ -227,17 +230,26 @@ public class A {
         S.getCollisionNode().collideWith(ray, results);
         return results;
     }
-    public static CollisionResult getClosestCollision(Ray ray, Node node){
+    public static CollisionResult getClosestCollision(Ray ray, Node node, int attacker){
         CollisionResults results = getCollisions(ray);
-        if(results.size() > 0){
-            return results.getClosestCollision();
-        }else{
-            return null;
+        String[] data;
+        int i = 0;
+        while(i < results.size()){
+            data = getPartData(results.getCollision(i));
+            if(data[0] != null && data[0].equals("player")){
+                if(data[1] != null && Integer.parseInt(data[1]) != attacker){
+                    return results.getCollision(i);
+                }
+            }else{
+                return results.getCollision(i);
+            }
+            i++;
         }
+        return null;
     }
-    public static CollisionResult getClosestCollisionByRange(Ray ray, Node node, float range){
-        CollisionResult result = getClosestCollision(ray, node);
-        if(ray.getOrigin().distance(result.getContactPoint()) <= range){
+    public static CollisionResult getClosestCollisionByRange(Ray ray, Node node, int attacker, float range){
+        CollisionResult result = getClosestCollision(ray, node, attacker);
+        if(result != null && ray.getOrigin().distance(result.getContactPoint()) <= range){
             return result;
         }else{
             return null;
@@ -248,17 +260,5 @@ public class A {
     }
     public static String[] getPartData(CollisionResult target){
         return target.getGeometry().getParent().getName().split(":");
-    }
-    public static int getHitbox(String name){
-        if(name.contains("head")) {
-            return 0;
-        }else if(name.contains("torso")) {
-            return 1;
-        }else if(name.contains("arm")) {
-            return 2;
-        }else if(name.contains("leg")) {
-            return 3;
-        }
-        return -1;
     }
 }

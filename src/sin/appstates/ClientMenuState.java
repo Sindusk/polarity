@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameClient;
 import sin.hud.HUD;
-import sin.network.Networking;
+import sin.network.ClientNetwork;
 
 /**
  *
@@ -67,7 +67,7 @@ public class ClientMenuState extends AbstractAppState implements ScreenControlle
             String q = s.substring(1, s.indexOf(']'));
             Label label = screen.findNiftyControl("multiplayer.message", Label.class);
             label.setText("Contacting Server: "+q+"...");
-            if(Networking.connect(q)){
+            if(ClientNetwork.connect(q)){
                 label.setText("Connection Successful!");
                 action("start");
             }else{
@@ -95,7 +95,7 @@ public class ClientMenuState extends AbstractAppState implements ScreenControlle
         }else if(action.equals("game.mainmenu")){
             app.getStateManager().detach(app.getGameplayState());
             nifty.gotoScreen("menu");
-            Networking.disconnect();
+            ClientNetwork.disconnect();
         }
     }
     

@@ -1,14 +1,21 @@
-package sin.character;
+package sin.player;
 
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
+import sin.ability.AbilityManager;
+import sin.ability.AbilityManager.Ability;
+import sin.ability.AbilityManager.Blink;
+import sin.ability.AbilityManager.Infect;
+import sin.ability.StatusManager;
 import sin.animation.Models.PlayerModel;
-import sin.character.StatsManager.PlayerStats;
+import sin.player.StatsManager.PlayerStats;
 import sin.netdata.ConnectData;
+import sin.netdata.DamageData;
 import sin.netdata.MoveData;
-import sin.network.Networking;
+import sin.network.ClientNetwork;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -19,12 +26,15 @@ public class PlayerManager{
     private static Player[] player = new Player[16];
     
     public static class Player{
+        private Ability[] ability = new Ability[4];
         private PlayerStats stats = new PlayerStats(100, 100, 100, 100);
         private PlayerModel model;
+        private StatusManager status = new StatusManager(this);
         private Vector3f locA = Vector3f.ZERO;
         private Vector3f locB = Vector3f.ZERO;
         private Quaternion rot = new Quaternion();
         private HostedConnection conn;
+        private int id;
         private float interp = 0;
         private boolean connected = false;
 
@@ -33,8 +43,14 @@ public class PlayerManager{
         public boolean isConnected(){
             return connected;
         }
+        public int getID(){
+            return id;
+        }
         public HostedConnection getConnection(){
             return conn;
+        }
+        public StatusManager getStatus(){
+            return status;
         }
         public Vector3f getLocation(){
             return locB;
@@ -49,16 +65,26 @@ public class PlayerManager{
             this.interp = 0;
         }
         
-        public void damage(float damage){
+        public void damage(int attacker, float damage){
             stats.damage(damage);
+            if(conn != null){
+                conn.send(new DamageData(attacker, "player", id, damage));
+            }
+        }
+        public void cast(int index, Ray ray){
+            ability[index].execute(id, ray);
         }
         
         public void update(float tpf){
+            status.update(tpf);
             model.update(locA, locB, rot, tpf, interp);
-            interp += tpf*Networking.MOVE_INVERSE;
+            interp += tpf*ClientNetwork.MOVE_INVERSE;
         }
         public void create(int id){
+            this.id = id;
             this.model = new PlayerModel(id, node);
+            ability[0] = new Blink(5, 150);
+            ability[1] = new Infect(10, 100, 5, 3);
             connected = true;
         }
         public void destroy(){

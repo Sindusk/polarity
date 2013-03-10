@@ -1,8 +1,12 @@
-package sin.character;
+package sin.ability;
 
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
+import sin.netdata.CommandData;
+import sin.network.ClientNetwork;
+import sin.player.Character;
+import sin.player.PlayerManager;
 import sin.tools.A;
 import sin.tools.S;
 
@@ -11,8 +15,6 @@ import sin.tools.S;
  * @author SinisteRing
  */
 public class AbilityManager {
-    private static Ability[] ability = new Ability[4];
-    
     public static abstract class Ability{
         private float cooldown;
         private float cooling;
@@ -29,7 +31,7 @@ public class AbilityManager {
             return cooling;
         }
         
-        public abstract void execute(Ray ray);
+        public abstract void execute(int attacker, Ray ray);
     }
     public static abstract class RangedAbility extends Ability{
         private float range;
@@ -48,31 +50,29 @@ public class AbilityManager {
             super(cooldown, range);
         }
         
-        public void execute(Ray ray){
-            CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), this.getRange());
+        public void execute(int attacker, Ray ray){
+            CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), attacker, this.getRange());
             if(target != null){
-                Character.getControl().setPhysicsLocation(target.getContactPoint().add(new Vector3f(0, 5, 0)));
+                Vector3f loc = target.getContactPoint();
+                PlayerManager.getPlayer(attacker).getConnection().send(new CommandData("teleport:"+loc.getX()+","+loc.getY()+","+loc.getZ()));
             }
         }
     }
     public static class Infect extends RangedAbility{
-        public Infect(float cooldown, float range){
+        private float time;
+        private float dps;
+        
+        public Infect(float cooldown, float range, float time, float dps){
             super(cooldown, range);
+            this.time = time;
+            this.dps = dps;
         }
         
-        public void execute(Ray ray){
-            CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), this.getRange());
+        public void execute(int attacker, Ray ray){
+            CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), attacker, this.getRange());
             if(target != null){
-                //Apply poison.
+                A.applyPoison(target, time, dps);
             }
         }
-    }
-    
-    public static Ability getAbility(int id){
-        return ability[id];
-    }
-    public static void initialize(){
-        ability[0] = new Blink(5, 300);
-        ability[1] = new Infect(4, 150);
     }
 }

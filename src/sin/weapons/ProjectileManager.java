@@ -6,7 +6,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.netdata.ProjectileData;
-import sin.network.Networking;
+import sin.network.ClientNetwork;
 import sin.tools.A;
 import sin.tools.T;
 import sin.world.CG;
@@ -78,7 +78,7 @@ public class ProjectileManager {
                 this.destroy();
             }
             if(doActions){
-                CollisionResult target = A.getClosestCollision(new Ray(location, direction), collisionNode);
+                CollisionResult target = A.getClosestCollision(new Ray(location, direction), collisionNode, owner);
                 if(target != null){
                     this.collide(target, dist);
                 }
@@ -159,8 +159,8 @@ public class ProjectileManager {
         add(d.getOwner(), d.getLocation(), d.getDirection(), d.getUp(), d.getDistance(), d.getSpeed(), d.getUpdate(), d.getCollision());
     }
     public static void addNew(int owner, Vector3f loc, Vector3f dir, Vector3f up, float dist, float speed, String update, String collision){
-        if(Networking.isConnected()){
-            Networking.send(new ProjectileData(owner, loc, dir, up, dist, speed, update, collision));
+        if(ClientNetwork.isConnected()){
+            ClientNetwork.send(new ProjectileData(owner, loc, dir, up, dist, speed, update, collision));
         }
         add(owner, loc, dir, up, dist, speed, update, collision);
     }

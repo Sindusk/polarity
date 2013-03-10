@@ -22,12 +22,13 @@ import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
 import sin.netdata.SoundData;
-import sin.character.Character;
-import sin.character.PlayerManager;
+import sin.player.Character;
+import sin.player.PlayerManager;
 import sin.hud.HUD;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.GeometryData;
+import sin.netdata.ability.AbilityData;
 import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityData;
 import sin.netdata.npc.EntityDeathData;
@@ -41,19 +42,20 @@ import sin.world.DecalManager;
 import sin.world.World;
 
 /**
- * Networking - Used for the connection and maintainence of client-side networking.
+ * ClientNetwork - Used for the connection and maintainence of client-side networking.
  * @author SinisteRing
  */
-public class Networking {
+public class ClientNetwork {
     private static GameClient app;
     private static Client client = null;  // For SpiderMonkey connectivity.
+    private static ClientListener listener = new ClientListener();
     
     // Constants:
     public static final float PING_INTERVAL = 1;
     public static final float MOVE_INTERVAL = 0.05f;
     public static final float MOVE_INVERSE = 1.0f/MOVE_INTERVAL;
     
-    // Networking Variables:
+    // ClientNetwork Variables:
     private static boolean CLIENT_CONNECTED = false;
     private static int     CLIENT_ID = -1;
 
@@ -66,7 +68,7 @@ public class Networking {
     private static float[] timers = new float[2];
     private static float time;
     
-    public Networking(){}
+    public ClientNetwork(){}
     
     public static boolean isConnected(){
         return CLIENT_CONNECTED;
@@ -75,50 +77,40 @@ public class Networking {
         return CLIENT_ID;
     }
     
+    private static void registerClass(Class c){
+        Serializer.registerClass(c);
+        client.addMessageListener(listener, c);
+    }
     private static void registerSerials(){
-        Serializer.registerClass(AttackData.class);
-        client.addMessageListener(new ClientListener(), AttackData.class);
-        Serializer.registerClass(CommandData.class);
-        client.addMessageListener(new ClientListener(), CommandData.class);
-        Serializer.registerClass(ConnectData.class);
-        client.addMessageListener(new ClientListener(), ConnectData.class);
-        Serializer.registerClass(DamageData.class);
-        client.addMessageListener(new ClientListener(), DamageData.class);
-        Serializer.registerClass(DecalData.class);
-        client.addMessageListener(new ClientListener(), DecalData.class);
-        Serializer.registerClass(DisconnectData.class);
-        client.addMessageListener(new ClientListener(), DisconnectData.class);
-        Serializer.registerClass(ErrorData.class);
-        client.addMessageListener(new ClientListener(), ErrorData.class);
-        Serializer.registerClass(GeometryData.class);
-        client.addMessageListener(new ClientListener(), GeometryData.class);
-        Serializer.registerClass(IDData.class);
-        client.addMessageListener(new ClientListener(), IDData.class);
-        Serializer.registerClass(MoveData.class);
-        client.addMessageListener(new ClientListener(), MoveData.class);
-        Serializer.registerClass(PingData.class);
-        client.addMessageListener(new ClientListener(), PingData.class);
-        Serializer.registerClass(ProjectileData.class);
-        client.addMessageListener(new ClientListener(), ProjectileData.class);
-        Serializer.registerClass(SoundData.class);
-        client.addMessageListener(new ClientListener(), SoundData.class);
+        registerClass(AttackData.class);
+        registerClass(CommandData.class);
+        registerClass(ConnectData.class);
+        registerClass(DamageData.class);
+        registerClass(DecalData.class);
+        registerClass(DisconnectData.class);
+        registerClass(ErrorData.class);
+        registerClass(GeometryData.class);
+        registerClass(IDData.class);
+        registerClass(MoveData.class);
+        registerClass(PingData.class);
+        registerClass(ProjectileData.class);
+        registerClass(SoundData.class);
+        
+        // Ability Serials:
+        registerClass(AbilityData.class);
         
         // NPC Serials:
-        Serializer.registerClass(GruntData.class);
-        client.addMessageListener(new ClientListener(), GruntData.class);
-        Serializer.registerClass(EntityData.class);
-        client.addMessageListener(new ClientListener(), EntityData.class);
-        Serializer.registerClass(EntityDeathData.class);
-        client.addMessageListener(new ClientListener(), EntityDeathData.class);
-        Serializer.registerClass(OrganismData.class);
-        client.addMessageListener(new ClientListener(), OrganismData.class);
+        registerClass(GruntData.class);
+        registerClass(EntityData.class);
+        registerClass(EntityDeathData.class);
+        registerClass(OrganismData.class);
     }
     
     public static boolean connect(String ip){
         try {
             client = Network.connectToServer(ip, 6143);
-            Networking.registerSerials();
-            client.addClientStateListener(new ClientListener());
+            ClientNetwork.registerSerials();
+            client.addClientStateListener(listener);
             client.start();
             client.send(new ConnectData(S.getVersion()));
             timers[PING] = 1;
@@ -177,7 +169,7 @@ public class Networking {
             final CommandData m = d;
             app.enqueue(new Callable<Void>(){
                 public Void call() throws Exception{
-                    A.parseCommand(m.getCommand());
+                    A.handleCommand(m.getCommand());
                     return null;
                 }
             });
@@ -303,6 +295,7 @@ public class Networking {
 
         public void messageReceived(Client source, Message m) {
             client = source;
+            
             if(m instanceof CommandData){
                 CommandMessage((CommandData) m);
             }else if(m instanceof ConnectData){
@@ -344,6 +337,6 @@ public class Networking {
     }
     
     public static void initialize(GameClient app){
-        Networking.app = app;
+        ClientNetwork.app = app;
     }
 }

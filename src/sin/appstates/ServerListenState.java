@@ -15,7 +15,7 @@ import com.jme3.scene.Node;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import sin.GameServer;
-import sin.character.PlayerManager;
+import sin.player.PlayerManager;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.ConnectData;
@@ -30,6 +30,7 @@ import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
 import sin.netdata.npc.EntityData;
 import sin.netdata.SoundData;
+import sin.netdata.ability.AbilityData;
 import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityDeathData;
 import sin.netdata.npc.OrganismData;
@@ -82,6 +83,16 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
     private class ServerListener implements MessageListener<HostedConnection>{
         private HostedConnection connection;
         
+        // Abilities:
+        private void AbilityMessage(AbilityData d){
+            final AbilityData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    PlayerManager.getPlayer(m.getAttacker()).cast(m.getAbility(), m.getRay());
+                    return null;
+                }
+            });
+        }
         private void AttackMessage(AttackData d){
             final AttackData m = d;
             app.enqueue(new Callable<Void>(){
@@ -183,46 +194,40 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
             }else if(m instanceof SoundData){
                 SoundMessage((SoundData) m);
             }
+            // Abilities:
+            else if(m instanceof AbilityData){
+                AbilityMessage((AbilityData) m);
+            }
         }
     }
     
+    private void registerClass(Class c){
+        Serializer.registerClass(c);
+        server.addMessageListener(listener, c);
+    }
     private void registerSerials(){
-        Serializer.registerClass(AttackData.class);
-        server.addMessageListener(listener, AttackData.class);
-        Serializer.registerClass(CommandData.class);
-        server.addMessageListener(listener, CommandData.class);
-        Serializer.registerClass(ConnectData.class);
-        server.addMessageListener(listener, ConnectData.class);
-        Serializer.registerClass(DamageData.class);
-        server.addMessageListener(listener, DamageData.class);
-        Serializer.registerClass(DecalData.class);
-        server.addMessageListener(listener, DecalData.class);
-        Serializer.registerClass(DisconnectData.class);
-        server.addMessageListener(listener, DisconnectData.class);
-        Serializer.registerClass(ErrorData.class);
-        server.addMessageListener(listener, ErrorData.class);
-        Serializer.registerClass(GeometryData.class);
-        server.addMessageListener(listener, GeometryData.class);
-        Serializer.registerClass(IDData.class);
-        server.addMessageListener(listener, IDData.class);
-        Serializer.registerClass(MoveData.class);
-        server.addMessageListener(listener, MoveData.class);
-        Serializer.registerClass(PingData.class);
-        server.addMessageListener(listener, PingData.class);
-        Serializer.registerClass(ProjectileData.class);
-        server.addMessageListener(listener, ProjectileData.class);
-        Serializer.registerClass(SoundData.class);
-        server.addMessageListener(listener, SoundData.class);
+        registerClass(AttackData.class);
+        registerClass(CommandData.class);
+        registerClass(ConnectData.class);
+        registerClass(DamageData.class);
+        registerClass(DecalData.class);
+        registerClass(DisconnectData.class);
+        registerClass(ErrorData.class);
+        registerClass(GeometryData.class);
+        registerClass(IDData.class);
+        registerClass(MoveData.class);
+        registerClass(PingData.class);
+        registerClass(ProjectileData.class);
+        registerClass(SoundData.class);
+        
+        // Ability Data:
+        registerClass(AbilityData.class);
         
         // NPC Data:
-        Serializer.registerClass(GruntData.class);
-        server.addMessageListener(listener, GruntData.class);
-        Serializer.registerClass(EntityData.class);
-        server.addMessageListener(listener, EntityData.class);
-        Serializer.registerClass(EntityDeathData.class);
-        server.addMessageListener(listener, EntityDeathData.class);
-        Serializer.registerClass(OrganismData.class);
-        server.addMessageListener(listener, OrganismData.class);
+        registerClass(GruntData.class);
+        registerClass(EntityData.class);
+        registerClass(EntityDeathData.class);
+        registerClass(OrganismData.class);
     }
     
     public Node getWorld(){

@@ -7,7 +7,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.character.Character;
+import sin.player.Character;
 import sin.hud.BarManager.BH;
 import sin.tools.T;
 import sin.weapons.RecoilManager;

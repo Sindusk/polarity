@@ -12,9 +12,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.character.Character;
+import sin.player.Character;
 import sin.hud.HUD;
-import sin.network.Networking;
+import sin.network.ClientNetwork;
 import sin.tools.T;
 import sin.weapons.AmmoManager.RechargeAmmo;
 import sin.weapons.AmmoManager.ReloadAmmo;
@@ -93,7 +93,7 @@ public class Weapons{
 
         public void fire(){
             fireNode.playInstance();
-            Networking.sendSound(weapon);
+            ClientNetwork.sendSound(weapon);
         }
     }
     private static class WeaponMuzzle{

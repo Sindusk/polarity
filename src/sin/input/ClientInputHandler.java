@@ -10,10 +10,12 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import sin.GameClient;
-import sin.character.AbilityManager;
-import sin.character.Character;
-import sin.character.MovementManager;
-import sin.character.MovementManager.MH;
+import sin.ability.AbilityManager;
+import sin.netdata.ability.AbilityData;
+import sin.network.ClientNetwork;
+import sin.player.Character;
+import sin.player.MovementManager;
+import sin.player.MovementManager.MH;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.world.TracerManager;
@@ -68,7 +70,9 @@ public class ClientInputHandler{
                 }
                 // Abilities:
                 else if(bind.equals("Ability_1")){
-                    AbilityManager.getAbility(0).execute(new Ray(app.getCamera().getLocation(), app.getCamera().getDirection()));
+                    ClientNetwork.send(new AbilityData(ClientNetwork.getID(), 0, new Ray(app.getCamera().getLocation(), app.getCamera().getDirection())));
+                }else if(bind.equals("Ability_2")){
+                    ClientNetwork.send(new AbilityData(ClientNetwork.getID(), 1, new Ray(app.getCamera().getLocation(), app.getCamera().getDirection())));
                 }
                 // Miscellaneous:
                 else if(bind.equals("Misc_Key_1")){

@@ -1,4 +1,4 @@
-package sin.character;
+package sin.player;
 
 import com.jme3.math.FastMath;
 
@@ -7,7 +7,7 @@ import com.jme3.math.FastMath;
  * @author SinisteRing
  */
 public class StatsManager {
-    public static class StatsTemplate{
+    public static abstract class StatsTemplate{
         private float health;
         private float maxHealth;
         

@@ -15,9 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.appstates.ClientGameState;
 import sin.appstates.ClientMenuState;
-import sin.character.AbilityManager;
 import sin.input.ClientInputHandler;
-import sin.network.Networking;
+import sin.network.ClientNetwork;
 import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
@@ -176,9 +175,8 @@ public class GameClient extends Application{
         S.setVersion(CLIENT_VERSION);
         T.initialize(assetManager, inputManager);
         
-        AbilityManager.initialize();
         ClientInputHandler.initialize(app);
-        Networking.initialize(app);
+        ClientNetwork.initialize(app);
         RecoilManager.initialize();
         
         // Initialize App States:
@@ -215,8 +213,8 @@ public class GameClient extends Application{
     
     @Override
     public void destroy(){
-        if(Networking.isConnected()){
-            Networking.close();
+        if(ClientNetwork.isConnected()){
+            ClientNetwork.close();
         }
         super.destroy();
     }

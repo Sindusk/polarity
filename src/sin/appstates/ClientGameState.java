@@ -6,10 +6,10 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.hud.HUD;
-import sin.network.Networking;
-import sin.character.Character;
-import sin.character.MovementManager;
-import sin.character.PlayerManager;
+import sin.network.ClientNetwork;
+import sin.player.Character;
+import sin.player.MovementManager;
+import sin.player.PlayerManager;
 import sin.hud.FloatingTextManager;
 import sin.npc.NPCManager;
 import sin.tools.S;
@@ -144,8 +144,8 @@ public class ClientGameState extends AbstractAppState{
         ProjectileManager.update(tpf, false);
         
         // Update network if connected:
-        if(Networking.isConnected()) {
-            Networking.update(tpf);
+        if(ClientNetwork.isConnected()) {
+            ClientNetwork.update(tpf);
         }
     }
 }

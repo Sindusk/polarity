@@ -1,4 +1,4 @@
-package sin.character;
+package sin.player;
 
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.control.CharacterControl;
@@ -6,7 +6,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import sin.GameClient;
-import sin.character.StatsManager.PlayerStats;
+import sin.player.StatsManager.PlayerStats;
 import sin.hud.BarManager;
 import sin.hud.BarManager.BH;
 import sin.hud.HUD;
