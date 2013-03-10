@@ -169,6 +169,9 @@ public class Weapons{
         public Node getModel(){
             return model;
         }
+        public String getName(){
+            return name;
+        }
         
         public void setFiring(boolean firing){
             this.firing = firing;
@@ -213,6 +216,7 @@ public class Weapons{
         }
         
         public void enable(Node node){
+            HUD.getWeaponText(left).setText(name);
             node.attachChild(model);
         }
         public void disable(){

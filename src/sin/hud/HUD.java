@@ -33,6 +33,7 @@ public class HUD {
     private static BitmapText ping;
     private static BitmapText loc;
     private static BitmapText fps;
+    private static BitmapText[] weaponText = new BitmapText[2];
     private static Geometry[] crosshair = new Geometry[4];
 
     public static Node getGUI(){
@@ -40,6 +41,13 @@ public class HUD {
     }
     public static BitmapText getPing(){
         return ping;
+    }
+    public static BitmapText getWeaponText(boolean left){
+        if(left){
+            return weaponText[0];
+        }else{
+            return weaponText[1];
+        }
     }
     
     private static void createCrosshairs(float length, float offset, float width){
@@ -55,7 +63,7 @@ public class HUD {
         crosshair[2].setLocalTranslation(T.v3f(mod, 0));
         crosshair[3].setLocalTranslation(T.v3f(0, mod));
     }
-
+    
     public static void setBarMax(BH handle, int value){
         BarManager.setBarMax(handle, value);
     }
@@ -78,7 +86,7 @@ public class HUD {
             i++;
         }
     }
-
+    
     public static void update(float tpf){
         FloatingTextManager.update(tpf);
         Vector3f ploc = PlayerManager.getPlayer(ClientNetwork.getID()).getLocation();
@@ -139,11 +147,28 @@ public class HUD {
         loc.setText("");
         node.attachChild(loc);
         
+        // Initialize fps display:
         fps = new BitmapText(T.getFont("Batman26"));
         fps.setColor(ColorRGBA.Red);
         fps.setSize(16);
         fps.setLocalTranslation(T.v3f(20, cy*2-100));
         fps.setText("");
         node.attachChild(fps);
+        
+        // Initialize weapon text display:
+        int i = 0;
+        while(i < weaponText.length){
+            weaponText[i] = new BitmapText(T.getFont("Batman26"));
+            weaponText[i].setColor(ColorRGBA.Gray);
+            weaponText[i].setSize(25);
+            if(i == 0){
+                weaponText[i].setLocalTranslation(new Vector3f(cx-(cx*0.6f), 30, 0));
+            }else{
+                weaponText[i].setLocalTranslation(new Vector3f(cx+(cx*0.5f), 30, 0));
+            }
+            weaponText[i].setText("meow!");
+            node.attachChild(weaponText[i]);
+            i++;
+        }
     }
 }
