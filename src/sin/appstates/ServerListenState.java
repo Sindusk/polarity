@@ -163,13 +163,9 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         private void PlayerMessage(PlayerData d){
             T.log("Player "+d.getID()+" [Version "+app.getVersion()+"] connected successfully.");
             int id = d.getID();
-            T.log("adding");
             PlayerManager.add(d);
-            T.log("sending");
-            PlayerManager.sendData(connection);
-            T.log("sent");
             PlayerManager.getPlayer(id).setConnection(connection);
-            server.broadcast(Filters.notEqualTo(connection), new ConnectData(id));
+            PlayerManager.sendData(connection);
             sendGeometry(connection);
             NPCManager.sendData(connection);
         }

@@ -340,7 +340,7 @@ public class Weapons{
             super(Archetype.ANCIENT, Classification.SLASHING, left);
             name = "Sword";
             audio = new WeaponAudio(name, 1);
-            damage = new MeleeAttack("damage(6.5)", 14f);
+            damage = new MeleeAttack("damage(65)", 14f);
             recoils = new Recoils(0, 0, 0, 0);
             spread = new Spread(0, 0);
             automatic = true;
@@ -361,7 +361,7 @@ public class Weapons{
             name = "M4A1";
             audio = new WeaponAudio(name, 1);
             ammo = new ReloadAmmo(30, 1.2f, left);
-            damage = new RangedProjectileAttack("", "damage(4.5):destroy", 100f, 100f);
+            damage = new RangedProjectileAttack("", "damage(45):destroy", 100f, 100f);
             recoils = new Recoils(35, 65, -25, 25);
             spread = new Spread(0, 15);
             automatic = true;
@@ -380,7 +380,7 @@ public class Weapons{
             name = "AK47";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new ReloadAmmo(30, 1.7f, left);
-            damage = new RangedProjectileAttack("spiral(0,0.1,0.1)", "damage(5.5):destroy", 100f, 85f);
+            damage = new RangedProjectileAttack("spiral(0,0.1,0.1)", "damage(55):destroy", 100f, 85f);
             recoils = new Recoils(50, 75, -19, 27);
             spread = new Spread(0, 20);
             automatic = true;
@@ -400,7 +400,7 @@ public class Weapons{
             name = "Laser Pistol";
             audio = new WeaponAudio(name, 1.3f);
             ammo = new RechargeAmmo(20, 0.5f, left);
-            damage = new RangedRayAttack("damage(6.8)", 65f);
+            damage = new RangedRayAttack("damage(68)", 65f);
             recoils = new Recoils(40, 60, -15, 15);
             spread = new Spread(0, 15);
             automatic = false;
@@ -418,7 +418,7 @@ public class Weapons{
             name = "Raygun";
             audio = new WeaponAudio(name, 0.5f);
             ammo = new RechargeAmmo(100, 0.2f, left);
-            damage = new RangedRayAttack("damage(2.5)", 85f);
+            damage = new RangedRayAttack("damage(25)", 85f);
             recoils = new Recoils(15, 30, -10, 10);
             spread = new Spread(0, 5);
             automatic = true;
@@ -437,7 +437,7 @@ public class Weapons{
             name = "Rocket Launcher";
             audio = new WeaponAudio(name, 0.3f);
             ammo = new ReloadAmmo(1, 1.3f, left);
-            damage = new RangedProjectileAttack("", "aoe(25, 3.4):destroy", 150f, 150f);
+            damage = new RangedProjectileAttack("", "aoe(25, 32):destroy", 150f, 150f);
             recoils = new Recoils(180, 240, 30, -30);
             spread = new Spread(0, 0);
             automatic = false;

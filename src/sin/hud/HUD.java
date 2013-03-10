@@ -10,6 +10,7 @@ import sin.GameClient;
 import sin.hud.BarManager.BH;
 import sin.network.ClientNetwork;
 import sin.player.PlayerManager;
+import sin.player.StatsManager.PlayerStats;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.world.CG;
@@ -61,9 +62,9 @@ public class HUD {
     public static void updateBar(BH handle, int value){
         BarManager.updateBar(handle, value);
     }
-    public static void updateLifeBars(float health, float shields){
-        updateBar(BH.HEALTH, (int) FastMath.ceil(health));
-        updateBar(BH.SHIELDS, (int) FastMath.ceil(shields));
+    public static void updateLifeBars(PlayerStats stats){
+        updateBar(BH.HEALTH, (int) FastMath.ceil(stats.getHealth()));
+        updateBar(BH.SHIELDS, (int) FastMath.ceil(stats.getShields()));
     }
     
     public static void showCrosshairs(boolean show){

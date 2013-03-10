@@ -4,8 +4,7 @@ import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
 import sin.netdata.player.MoveData;
 import sin.netdata.player.PlayerData;
-import sin.network.ClientNetwork;
-import sin.tools.T;
+import sin.tools.S;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -28,7 +27,7 @@ public class PlayerManager{
     public static void sendData(HostedConnection conn){
         int i = 0;
         while(i < player.length){
-            if(player[i] != null && player[i].isConnected()){
+            if(player[i] != null && player[i].isConnected() && player[i].getConnection() != conn){
                 conn.send(player[i].getData());
             }
             i++;
@@ -41,15 +40,11 @@ public class PlayerManager{
     }
     public static void update(float tpf){
         int i = 0;
-        if(ClientNetwork.getID() == -1){
-            while(i < player.length){
-                if(player[i] != null && player[i].isConnected()){
-                    player[i].update(tpf);
-                }
-                i++;
+        while(i < player.length){
+            if(player[i] != null && player[i].isConnected()){
+                player[i].update(tpf);
             }
-        }else if(player[ClientNetwork.getID()] != null){
-            player[ClientNetwork.getID()].update(tpf);
+            i++;
         }
     }
     
@@ -65,15 +60,14 @@ public class PlayerManager{
     }
     public static void add(PlayerData d){
         int id = d.getID();
-        T.log("id = "+id);
         if(player[id] == null || !player[id].isConnected()){
             if(player[id] == null){
-                T.log("creating new");
                 player[id] = new Player();
             }
-            T.log("creating...");
             player[id].create(d);
-            T.log("created");
+        }
+        if(S.getServer() != null){
+            S.getServer().broadcast(d);
         }
     }
     public static void remove(int id){

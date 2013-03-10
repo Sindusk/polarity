@@ -125,10 +125,10 @@ public class NPCManager {
     private static void createNewNPC(int id, String type, Vector3f loc){
         if(type.equals("grunt")){
             if(id == -1){
-                grunts.put(NUM_GRUNTS, new Grunt(NUM_GRUNTS, node, loc, 50, 50));
+                grunts.put(NUM_GRUNTS, new Grunt(NUM_GRUNTS, node, loc, 500, 500));
                 NUM_GRUNTS++;
             }else{
-                grunts.put(id, new Grunt(id, node, loc, 50, 50));
+                grunts.put(id, new Grunt(id, node, loc, 500, 500));
             }
         }else{
             T.log("Unknown NPC type: "+type);

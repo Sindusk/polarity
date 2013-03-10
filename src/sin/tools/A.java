@@ -43,14 +43,13 @@ public class A {
         if(data[0].equals("player")){
             int id = Integer.parseInt(data[1]);
             damage = modDamage(data[2], damage);
-            // Send Data:
-            //S.getServer().broadcast(new DamageData(attacker, "player", id, damage));
+            // Damage Player:
             PlayerManager.getPlayer(id).damage(attacker, damage);
         }else if(data[0].equals("npc")){
             String type = data[1];
             int id = Integer.parseInt(data[2]);
             damage = modDamage(data[3], damage);
-            // Send Data:
+            // Damage NPC:
             S.getServer().broadcast(new DamageData(attacker, "npc:"+type, id, damage));
             NPCManager.damageNPC(id, type, damage);
         }else{
@@ -189,9 +188,9 @@ public class A {
         }else{
             String args[] = m.getType().split(":");
             if(args[0].equals("player")){
-                FloatingTextManager.add(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), PlayerManager.getPlayer(ClientNetwork.getID()).getLocation(), m.getDamage());
+                FloatingTextManager.add(PlayerManager.getPlayer(m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), S.getCamera().getLocation(), m.getDamage());
             }else if(args[0].equals("npc")){
-                FloatingTextManager.add(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 4, 0)), PlayerManager.getPlayer(ClientNetwork.getID()).getLocation(), m.getDamage());
+                FloatingTextManager.add(NPCManager.getNPC(args[1], m.getTarget()).getLocation().add(new Vector3f(0, 6, 0)), S.getCamera().getLocation(), m.getDamage());
             }else{
                 T.log("Invalid Damage Data!");
             }

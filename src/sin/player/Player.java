@@ -19,6 +19,7 @@ import sin.network.ClientNetwork;
 import sin.player.StatsManager.PlayerStats;
 import sin.tools.C;
 import sin.tools.S;
+import sin.tools.T;
 import sin.weapons.RecoilManager;
 import sin.weapons.Weapons;
 import sin.weapons.Weapons.Weapon;
@@ -89,8 +90,14 @@ public class Player {
 
     public void damage(int attacker, float damage){
         stats.damage(damage);
-        if(conn != null){
-            conn.send(new DamageData(attacker, "player", id, damage));
+        if(S.getServer() != null){
+            S.getServer().broadcast(new DamageData(attacker, "player", id, damage));
+        }
+        if(ClientNetwork.getID() == id){
+            if(stats.getHealth() <= 0){
+                kill();
+            }
+            HUD.updateLifeBars(stats);
         }
     }
     public void cast(int index, Ray ray){
@@ -99,7 +106,7 @@ public class Player {
     
     public void kill(){
         stats.refresh();
-        HUD.updateLifeBars(stats.getHealth(), stats.getShields());
+        HUD.updateLifeBars(stats);
         control.setPhysicsLocation(new Vector3f(0, 10, 0));
         S.getCamera().lookAtDirection(new Vector3f(1, 0, 0), Vector3f.UNIT_Y);
     }
@@ -120,42 +127,44 @@ public class Player {
     }
 
     public void update(float tpf){
-        status.update(tpf);
-        model.update(locA, locB, rot, tpf, interp);
-        interp += tpf*ClientNetwork.MOVE_INVERSE;
         if(ClientNetwork.getID() == id){
             MovementManager.move(tpf);
             weapons[set][0].tick(tpf);
             weapons[set][1].tick(tpf);
             RecoilManager.decoil(tpf);
+        }else{
+            status.update(tpf);
+            model.update(locA, locB, rot, tpf, interp);
+            interp += tpf*ClientNetwork.MOVE_INVERSE;
         }
     }
     public void create(PlayerData d){
         this.data = d;
         this.id = d.getID();
-        this.model = new PlayerModel(id, PlayerManager.getNode());
         weapons = C.parseWeapons(d.getWeapons());
         
         // Temporary
-        stats = new PlayerStats(100, 100, 100, 100);
+        stats = new PlayerStats(1000, 1000, 1000, 1000);
         ability[0] = new Blink(5, 150);
         ability[1] = new Infect(10, 100, 5, 3);
         // End Temporary
         
-        connected = true;
         if(ClientNetwork.getID() == id){
             weapons[0][0].enable(Weapons.getNode());
             weapons[0][1].enable(Weapons.getNode());
             HUD.setBarMax(BarManager.BH.HEALTH, (int) stats.getMaxHealth());
             HUD.setBarMax(BarManager.BH.SHIELDS, (int) stats.getMaxShields());
-            HUD.updateLifeBars(stats.getHealth(), stats.getShields());
+            HUD.updateLifeBars(stats);
             CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
             control = new CharacterControl(capsuleShape, 0.05f);
             control.setJumpSpeed(30);
             control.setFallSpeed(30);
             control.setGravity(70);
             S.getBulletAppState().getPhysicsSpace().add(control);
+        }else{
+            this.model = new PlayerModel(id, PlayerManager.getNode());
         }
+        connected = true;
     }
     public void destroy(){
         model.destroy();
