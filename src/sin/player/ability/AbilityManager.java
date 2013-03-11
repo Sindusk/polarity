@@ -14,14 +14,19 @@ import sin.tools.S;
  */
 public class AbilityManager {
     public static abstract class Ability{
+        private String name;
         private float cooldown;
         private float cooling;
         
-        public Ability(float cooldown){
+        public Ability(String name, float cooldown){
+            this.name = name;
             this.cooldown = cooldown;
             this.cooling = 0;
         }
         
+        public String getName(){
+            return name;
+        }
         public float getCooldown(){
             return cooldown;
         }
@@ -34,8 +39,8 @@ public class AbilityManager {
     public static abstract class RangedAbility extends Ability{
         private float range;
         
-        public RangedAbility(float cooldown, float range){
-            super(cooldown);
+        public RangedAbility(String name, float cooldown, float range){
+            super(name, cooldown);
             this.range = range;
         }
         
@@ -45,7 +50,7 @@ public class AbilityManager {
     }
     public static class Blink extends RangedAbility{
         public Blink(float cooldown, float range){
-            super(cooldown, range);
+            super("Blink", cooldown, range);
         }
         
         public void execute(int attacker, Ray ray){
@@ -61,7 +66,7 @@ public class AbilityManager {
         private float dps;
         
         public Infect(float cooldown, float range, float time, float dps){
-            super(cooldown, range);
+            super("Infect", cooldown, range);
             this.time = time;
             this.dps = dps;
         }

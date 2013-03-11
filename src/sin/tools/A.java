@@ -8,7 +8,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import java.util.HashMap;
 import sin.player.PlayerManager;
-import sin.hud.FloatingTextManager;
+import sin.world.FloatingTextManager;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.DamageData;

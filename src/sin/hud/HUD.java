@@ -1,8 +1,10 @@
 package sin.hud;
 
+import sin.world.FloatingTextManager;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -126,10 +128,14 @@ public class HUD {
         createCrosshairs(CROSSHAIR_LENGTH, CROSSHAIR_OFFSET, CROSSHAIR_WIDTH);
 
         // Create dynamic bar UI elements:
-        BarManager.add(node, BH.HEALTH, 0, T.v2f(cx, 30), 200, 40, 25, ColorRGBA.Red, 100, true);
-        BarManager.add(node, BH.SHIELDS, 0, T.v2f(cx, 90), 200, 40, 25, ColorRGBA.Blue, 100, true);
-        BarManager.add(node, BH.AMMO_LEFT, 1, T.v2f(cx-130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
-        BarManager.add(node, BH.AMMO_RIGHT, 1, T.v2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
+        BarManager.add(node, BH.HEALTH, 0, new Vector2f(cx, 30), 200, 40, 25, ColorRGBA.Red, 100, true);
+        BarManager.add(node, BH.SHIELDS, 0, new Vector2f(cx, 90), 200, 40, 25, ColorRGBA.Blue, 100, true);
+        BarManager.add(node, BH.AMMO_LEFT, 1, new Vector2f(cx-130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
+        BarManager.add(node, BH.AMMO_RIGHT, 1, new Vector2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
+        
+        // Create ability bar:
+        AbilityBar.initialize(cx, cy);
+        node.attachChild(AbilityBar.getNode());
 
         // Initialize ping display:
         ping = new BitmapText(T.getFont("Tele-Marines"));

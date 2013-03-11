@@ -9,7 +9,7 @@ import sin.hud.HUD;
 import sin.network.ClientNetwork;
 import sin.player.MovementManager;
 import sin.player.PlayerManager;
-import sin.hud.FloatingTextManager;
+import sin.world.FloatingTextManager;
 import sin.npc.NPCManager;
 import sin.tools.S;
 import sin.weapons.AttackManager;

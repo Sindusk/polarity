@@ -42,7 +42,6 @@ public class T {
         Material m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         m.setColor("Color", color);
         if(color.getAlpha() < 1){
-            m.setTransparent(true);
             m.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         }
         return m;
@@ -52,6 +51,9 @@ public class T {
         m.setTexture("ColorMap", assetManager.loadTexture(tex));
         m.getTextureParam("ColorMap").getTextureValue().setWrap(Texture.WrapMode.Repeat);
         return m;
+    }
+    public static String getIconPath(String tex){
+        return "Interface/Icons/"+tex+".png";
     }
     public static String getMaterialPath(String tex){
         return "Textures/Material/"+tex+".png";

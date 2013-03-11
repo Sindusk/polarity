@@ -27,10 +27,11 @@ public class CG {
 
     // Boxes:
     public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
-        Box b = new Box(trans, size.getX(), size.getY(), size.getZ());
+        Box b = new Box(Vector3f.ZERO, size.getX(), size.getY(), size.getZ());
         Geometry g = new Geometry(name, b);
         Material m = T.getMaterial(color);
         g.setMaterial(m);
+        g.setLocalTranslation(trans);
         if(node != null) {
             node.attachChild(g);
         }
