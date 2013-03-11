@@ -97,13 +97,11 @@ public class BarManager {
             fill = CG.createBox(bar, "", new Vector3f(width/2, height/2, 0), Vector3f.ZERO, color);
             fill.setLocalTranslation(fillLoc);
             bar.attachChild(fill);
-
-            //BitmapFont fnt = assetManager.loadFont("Interface/Fonts/OCRAStd.fnt");
+            
             text = new BitmapText(T.getFont("OCRAStd"), false);
             if(type == 0){
                 text.setBox(new Rectangle(0, height, width, height-textSize+3));
             }else if(type == 1){
-                //text.setBox(new Rectangle(0, height, width, 15));
                 text.setBox(new Rectangle(0, height+((Integer.toString(max).length()-3)*textSize/2), width, 15));
             }
             text.setAlignment(BitmapFont.Align.Center);

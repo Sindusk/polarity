@@ -15,6 +15,7 @@ import sin.hud.AbilityBar;
 import sin.hud.BarManager;
 import sin.hud.HUD;
 import sin.netdata.DamageData;
+import sin.netdata.ability.AbilityCooldownData;
 import sin.netdata.player.PlayerData;
 import sin.network.ClientNetwork;
 import sin.player.StatsManager.PlayerStats;
@@ -101,6 +102,9 @@ public class Player {
         }
     }
     public void cast(int index, Ray ray){
+        if(ability[index].getCooldown() <= 0){
+            conn.send(new AbilityCooldownData(index, ability[index].getCooldownMax()));
+        }
         ability[index].execute(id, ray);
     }
     
@@ -133,6 +137,13 @@ public class Player {
             weapons[set][1].tick(tpf);
             RecoilManager.decoil(tpf);
         }else{
+            int i = 0;
+            while(i < ability.length){
+                if(ability[i] != null){
+                    ability[i].update(tpf);
+                }
+                i++;
+            }
             status.update(tpf);
             model.update(locA, locB, rot, tpf, interp);
             interp += tpf*ClientNetwork.MOVE_INVERSE;

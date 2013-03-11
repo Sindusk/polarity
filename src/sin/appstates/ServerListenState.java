@@ -30,6 +30,7 @@ import sin.netdata.ProjectileData;
 import sin.netdata.DamageData;
 import sin.netdata.npc.EntityData;
 import sin.netdata.SoundData;
+import sin.netdata.ability.AbilityCooldownData;
 import sin.netdata.ability.AbilityData;
 import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityDeathData;
@@ -219,6 +220,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         
         // Ability Data:
         registerClass(AbilityData.class);
+        registerClass(AbilityCooldownData.class);
         
         // NPC Data:
         registerClass(GruntData.class);

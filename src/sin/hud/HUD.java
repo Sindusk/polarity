@@ -90,8 +90,9 @@ public class HUD {
     }
     
     public static void update(float tpf){
+        AbilityBar.update(tpf);
         FloatingTextManager.update(tpf);
-        Vector3f ploc = PlayerManager.getPlayer(ClientNetwork.getID()).getLocation();
+        Vector3f ploc = PlayerManager.getPlayer(ClientNetwork.getID()).getControl().getPhysicsLocation();
         Vector3f pdir = app.getCamera().getDirection();
         String compass;
         if(FastMath.abs(pdir.getX()) > FastMath.abs(pdir.getZ())){
@@ -138,28 +139,10 @@ public class HUD {
         node.attachChild(AbilityBar.getNode());
 
         // Initialize ping display:
-        ping = new BitmapText(T.getFont("Tele-Marines"));
-        ping.setColor(ColorRGBA.Green);
-        ping.setSize(16);
-        ping.setLocalTranslation(T.v3f(20, cy*2-20));
+        ping = CG.createText(node, 16, new Vector3f(20, cy*2-20, 0), "Tele-Marines", ColorRGBA.Green);
         ping.setText("Not Connected");
-        node.attachChild(ping);
-        
-        // Initialize location display:
-        loc = new BitmapText(T.getFont("Batman26"));
-        loc.setColor(ColorRGBA.Cyan);
-        loc.setSize(14);
-        loc.setLocalTranslation(T.v3f(20, cy*2-40));
-        loc.setText("");
-        node.attachChild(loc);
-        
-        // Initialize fps display:
-        fps = new BitmapText(T.getFont("Batman26"));
-        fps.setColor(ColorRGBA.Red);
-        fps.setSize(16);
-        fps.setLocalTranslation(T.v3f(20, cy*2-100));
-        fps.setText("");
-        node.attachChild(fps);
+        loc = CG.createText(node, 14, new Vector3f(20, cy*2-40, 0), "Batman26", ColorRGBA.Cyan);
+        fps = CG.createText(node, 16, new Vector3f(20, cy*2-100, 0), "Batman26", ColorRGBA.Red);
         
         // Initialize weapon text display:
         int i = 0;

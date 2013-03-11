@@ -28,6 +28,7 @@ import sin.input.ClientInputHandler;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
 import sin.netdata.GeometryData;
+import sin.netdata.ability.AbilityCooldownData;
 import sin.netdata.ability.AbilityData;
 import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityData;
@@ -35,6 +36,7 @@ import sin.netdata.npc.EntityDeathData;
 import sin.netdata.npc.OrganismData;
 import sin.netdata.player.PlayerData;
 import sin.npc.NPCManager;
+import sin.player.ability.AbilityManager;
 import sin.tools.A;
 import sin.tools.S;
 import sin.tools.T;
@@ -95,6 +97,7 @@ public class ClientNetwork {
         
         // Ability Serials:
         registerClass(AbilityData.class);
+        registerClass(AbilityCooldownData.class);
         
         // NPC Serials:
         registerClass(GruntData.class);
@@ -287,6 +290,16 @@ public class ClientNetwork {
                 }
             });
         }
+        // Ability:
+        private void AbilityCooldownMessage(AbilityCooldownData d){
+            final AbilityCooldownData m = d;
+            app.enqueue(new Callable<Void>(){
+                public Void call() throws Exception{
+                    AbilityManager.addCooldown(m);
+                    return null;
+                }
+            });
+        }
         // Player:
         private void PlayerMessage(PlayerData d){
             final PlayerData m = d;
@@ -331,6 +344,10 @@ public class ClientNetwork {
                 ProjectileMessage((ProjectileData) m);
             }else if(m instanceof SoundData){
                 SoundMessage((SoundData) m);
+            }
+            // Ability:
+            else if(m instanceof AbilityCooldownData){
+                AbilityCooldownMessage((AbilityCooldownData) m);
             }
             // Player:
             else if(m instanceof PlayerData){

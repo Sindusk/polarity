@@ -3,7 +3,9 @@ package sin.player.ability;
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
+import sin.hud.AbilityBar;
 import sin.netdata.CommandData;
+import sin.netdata.ability.AbilityCooldownData;
 import sin.player.PlayerManager;
 import sin.tools.A;
 import sin.tools.S;
@@ -15,23 +17,35 @@ import sin.tools.S;
 public class AbilityManager {
     public static abstract class Ability{
         private String name;
+        private float cooldownMax;
         private float cooldown;
-        private float cooling;
+        private boolean cooling = false;
         
         public Ability(String name, float cooldown){
             this.name = name;
-            this.cooldown = cooldown;
-            this.cooling = 0;
+            this.cooldownMax = cooldown;
+            this.cooldown = 0;
         }
         
         public String getName(){
             return name;
         }
+        public float getCooldownMax(){
+            return cooldownMax;
+        }
         public float getCooldown(){
             return cooldown;
         }
-        public float getCooling(){
-            return cooling;
+        
+        public void casted(){
+            cooldown = cooldownMax;
+            cooling = true;
+        }
+        public void update(float tpf){
+            cooldown -= tpf;
+            if(cooldown <= 0){
+                cooling = false;
+            }
         }
         
         public abstract void execute(int attacker, Ray ray);
@@ -54,10 +68,14 @@ public class AbilityManager {
         }
         
         public void execute(int attacker, Ray ray){
+            if(this.getCooldown() > 0){
+                return;
+            }
             CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), attacker, this.getRange());
             if(target != null){
                 Vector3f loc = target.getContactPoint();
                 PlayerManager.getPlayer(attacker).getConnection().send(new CommandData("teleport:"+loc.getX()+","+loc.getY()+","+loc.getZ()));
+                super.casted();
             }
         }
     }
@@ -72,10 +90,18 @@ public class AbilityManager {
         }
         
         public void execute(int attacker, Ray ray){
+            if(this.getCooldown() > 0){
+                return;
+            }
             CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), attacker, this.getRange());
             if(target != null){
                 A.applyPoison(target, time, dps);
+                super.casted();
             }
         }
+    }
+    
+    public static void addCooldown(AbilityCooldownData d){
+        AbilityBar.addCooldown(d.getAbility(), d.getCooldown());
     }
 }

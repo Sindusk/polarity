@@ -4,6 +4,7 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -24,6 +25,16 @@ import sin.tools.T;
  */
 public class CG {
     private static BulletAppState bulletAppState;
+    
+    // BitmapText:
+    public static BitmapText createText(Node node, int size, Vector3f trans, String font, ColorRGBA color){
+        BitmapText text = new BitmapText(T.getFont(font));
+        text.setColor(color);
+        text.setSize(size);
+        text.setLocalTranslation(trans);
+        node.attachChild(text);
+        return text;
+    }
 
     // Boxes:
     public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
