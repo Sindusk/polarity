@@ -15,6 +15,7 @@ import sin.netdata.DamageData;
 import sin.netdata.DecalData;
 import sin.netdata.ProjectileData;
 import sin.network.ClientNetwork;
+import sin.network.ServerNetwork;
 import sin.npc.NPCManager;
 import sin.player.Player;
 import sin.weapons.ProjectileManager;
@@ -50,11 +51,11 @@ public class A {
             int id = Integer.parseInt(data[2]);
             damage = modDamage(data[3], damage);
             // Damage NPC:
-            S.getServer().broadcast(new DamageData(attacker, "npc:"+type, id, damage));
+            ServerNetwork.broadcast(new DamageData(attacker, "npc:"+type, id, damage));
             NPCManager.damageNPC(id, type, damage);
         }else{
             DecalManager.create(target.getContactPoint());
-            S.getServer().broadcast(new DecalData(target.getContactPoint()));
+            ServerNetwork.broadcast(new DecalData(target.getContactPoint()));
         }
     }
     public static void damageAoE(int attacker, CollisionResult target, float radius, float damage){
@@ -64,7 +65,7 @@ public class A {
             if(players[i] != null){
                 float dist = players[i].getLocation().distance(target.getContactPoint());
                 if(dist <= radius){
-                    S.getServer().broadcast(new DamageData(attacker, "player", i, damage*(radius-dist)));
+                    ServerNetwork.broadcast(new DamageData(attacker, "player", i, damage*(radius-dist)));
                 }
             }
             i++;
@@ -130,7 +131,7 @@ public class A {
         parseCollision(p.getOwner(), p.getCollision(), target);
         if(p.getCollision().contains("destroy")){
             p.destroy();
-            S.getServer().broadcast(new CommandData("projectile:destroy:"+p.getID()));
+            ServerNetwork.broadcast(new CommandData("projectile:destroy:"+p.getID()));
         }
     }
     public static void parseUpdate(Projectile p, float tpf){
@@ -151,7 +152,7 @@ public class A {
                 if(timer > Float.parseFloat(args[1])){
                     float rot = UpdateMap.get(p).get(i+"spiral.rot");
                     ProjectileManager.addNew(p.getOwner(), p.getLocation().clone(), spiral(p, rot), new Vector3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy");
-                    S.getServer().broadcast(new ProjectileData(p.getOwner(), p.getLocation().clone(), spiral(p, rot), new Vector3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy"));
+                    ServerNetwork.broadcast(new ProjectileData(p.getOwner(), p.getLocation().clone(), spiral(p, rot), new Vector3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy"));
                     rot += Float.parseFloat(args[2]);
                     UpdateMap.get(p).put(i+"spiral.rot", rot);
                     timer = 0;

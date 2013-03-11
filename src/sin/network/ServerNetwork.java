@@ -1,8 +1,5 @@
-package sin.appstates;
+package sin.network;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.AbstractAppState;
-import com.jme3.app.state.AppStateManager;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
@@ -11,79 +8,121 @@ import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
-import com.jme3.scene.Node;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import sin.GameServer;
-import sin.player.PlayerManager;
 import sin.netdata.AttackData;
 import sin.netdata.CommandData;
-import sin.netdata.player.ConnectData;
+import sin.netdata.DamageData;
 import sin.netdata.DecalData;
-import sin.netdata.player.DisconnectData;
 import sin.netdata.ErrorData;
 import sin.netdata.GeometryData;
-import sin.netdata.player.IDData;
-import sin.netdata.player.MoveData;
 import sin.netdata.PingData;
 import sin.netdata.ProjectileData;
-import sin.netdata.DamageData;
-import sin.netdata.npc.EntityData;
 import sin.netdata.SoundData;
 import sin.netdata.ability.AbilityCooldownData;
 import sin.netdata.ability.AbilityData;
-import sin.netdata.npc.GruntData;
+import sin.netdata.npc.EntityData;
 import sin.netdata.npc.EntityDeathData;
+import sin.netdata.npc.GruntData;
 import sin.netdata.npc.OrganismData;
+import sin.netdata.player.ConnectData;
+import sin.netdata.player.DisconnectData;
+import sin.netdata.player.IDData;
+import sin.netdata.player.MoveData;
 import sin.netdata.player.PlayerData;
 import sin.npc.NPCManager;
+import sin.player.PlayerManager;
 import sin.tools.A;
-import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.ProjectileManager;
-import sin.world.DecalManager;
 import sin.world.World;
 
 /**
  *
  * @author SinisteRing
  */
-public class ServerListenState extends AbstractAppState implements ConnectionListener{
-    public static GameServer app;
+public class ServerNetwork{
+    private static GameServer app;
+    private static Server server;
+    private static ServerListener listener;
     
-    private Server server;
-    private ServerListener listener;
-    
-    // Nodes:
-    private Node collisionNode = new Node("CollisionNode");
-    private Node world = new Node("World");
-    
-    public void connectionAdded(Server server, HostedConnection conn) {
-        // Nothing needed here.
+    private static void registerClass(Class c){
+        Serializer.registerClass(c);
+        server.addMessageListener(listener, c);
     }
-    public void connectionRemoved(Server server, HostedConnection conn) {
-        int id = PlayerManager.remove(conn);
-        if(id == -1){
-            return;
+    private static void registerSerials(){
+        registerClass(AttackData.class);
+        registerClass(CommandData.class);
+        registerClass(DamageData.class);
+        registerClass(DecalData.class);
+        registerClass(ErrorData.class);
+        registerClass(GeometryData.class);
+        registerClass(PingData.class);
+        registerClass(ProjectileData.class);
+        registerClass(SoundData.class);
+        
+        // Ability Data:
+        registerClass(AbilityData.class);
+        registerClass(AbilityCooldownData.class);
+        
+        // NPC Data:
+        registerClass(GruntData.class);
+        registerClass(EntityData.class);
+        registerClass(EntityDeathData.class);
+        registerClass(OrganismData.class);
+        
+        // Player Data:
+        registerClass(ConnectData.class);
+        registerClass(DisconnectData.class);
+        registerClass(IDData.class);
+        registerClass(MoveData.class);
+        registerClass(PlayerData.class);
+    }
+    
+    public static void create(){
+        try {
+            server = Network.createServer(6143);
+            listener = new ServerListener();
+            registerSerials();
+            server.addConnectionListener(listener);
+            server.start();
+        }catch (IOException ex){
+            T.log(ex);
         }
-        server.broadcast(new DisconnectData(id));
-        conn.close("Disconnected");
-        T.log("Player "+id+" has disconnected.");
+    }
+    public static void stop(){
+        server.close();
     }
     
-    public void sendGeometry(HostedConnection c){
+    public static void sendGeometry(HostedConnection c){
         int i = 0;
         while(i < World.getMap().size()){
             c.send(World.getMap().get(i));
             i++;
         }
     }
-    public void send(Message m){
-        server.broadcast(m);
+    public static void broadcast(Message m){
+        if(server != null){
+            server.broadcast(m);
+        }
     }
     
-    private class ServerListener implements MessageListener<HostedConnection>{
+    private static class ServerListener implements MessageListener<HostedConnection>, ConnectionListener{
         private HostedConnection connection;
+        
+        public void connectionAdded(Server server, HostedConnection conn) {
+            // Nothing needed here.
+        }
+        public void connectionRemoved(Server server, HostedConnection conn) {
+            int id = PlayerManager.remove(conn);
+            if(id == -1){
+                return;
+            }
+            server.broadcast(new DisconnectData(id));
+            conn.close("Disconnected");
+            T.log("Player "+id+" has disconnected.");
+        }
         
         // Abilities:
         private void AbilityMessage(AbilityData d){
@@ -203,90 +242,7 @@ public class ServerListenState extends AbstractAppState implements ConnectionLis
         }
     }
     
-    private void registerClass(Class c){
-        Serializer.registerClass(c);
-        server.addMessageListener(listener, c);
-    }
-    private void registerSerials(){
-        registerClass(AttackData.class);
-        registerClass(CommandData.class);
-        registerClass(DamageData.class);
-        registerClass(DecalData.class);
-        registerClass(ErrorData.class);
-        registerClass(GeometryData.class);
-        registerClass(PingData.class);
-        registerClass(ProjectileData.class);
-        registerClass(SoundData.class);
-        
-        // Ability Data:
-        registerClass(AbilityData.class);
-        registerClass(AbilityCooldownData.class);
-        
-        // NPC Data:
-        registerClass(GruntData.class);
-        registerClass(EntityData.class);
-        registerClass(EntityDeathData.class);
-        registerClass(OrganismData.class);
-        
-        // Player Data:
-        registerClass(ConnectData.class);
-        registerClass(DisconnectData.class);
-        registerClass(IDData.class);
-        registerClass(MoveData.class);
-        registerClass(PlayerData.class);
-    }
-    
-    public Node getWorld(){
-        return world;
-    }
-    
-    @Override
-    public void initialize(AppStateManager stateManager, Application theApp){
-        super.initialize(stateManager, theApp);
-        ServerListenState.app = (GameServer) theApp;
-        
-        // Create server to listen:
-        try {
-            server = Network.createServer(6143);
-            listener = new ServerListener();
-            registerSerials();
-            server.addConnectionListener(this);
-            server.start();
-        }catch (IOException ex){
-            T.log(ex);
-        }
-        
-        // Initialize Nodes:
-        collisionNode.attachChild(NPCManager.getNode());
-        collisionNode.attachChild(PlayerManager.getNode());
-        world.attachChild(ProjectileManager.getNode());
-        world.attachChild(DecalManager.getNode());
-        world.attachChild(collisionNode);
-        
-        // Initialize classes:
-        S.setCollisionNode(collisionNode);
-        S.setServer(server);
-        ProjectileManager.initialize(collisionNode);
-        
-        // Create world:
-        World.generateWorldData();
-        int i = 0;
-        while(i < World.getMap().size()){
-            World.createGeometry(collisionNode, World.getMap().get(i));
-            i++;
-        }
-    }
-    
-    @Override
-    public void update(float tpf){
-        super.update(tpf);  // Execute AppTasks.
-        
-        PlayerManager.update(tpf);
-        ProjectileManager.update(tpf, true);
-    }
-    
-    @Override
-    public void cleanup(){
-        server.close();
+    public static void initialize(GameServer app){
+        ServerNetwork.app = app;
     }
 }

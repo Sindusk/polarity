@@ -9,7 +9,7 @@ import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityData;
 import sin.netdata.npc.EntityDeathData;
 import sin.netdata.npc.OrganismData;
-import sin.tools.S;
+import sin.network.ServerNetwork;
 import sin.tools.T;
 
 /**
@@ -48,9 +48,7 @@ public class NPCManager {
         
         public void destroy(){
             this.model.destroy();
-            if(S.getServer() != null){
-                S.getServer().broadcast(new EntityDeathData(id, type));
-            }
+            ServerNetwork.broadcast(new EntityDeathData(id, type));
         }
     }
     public static abstract class Organism extends Entity{

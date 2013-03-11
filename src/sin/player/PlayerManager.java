@@ -4,7 +4,8 @@ import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
 import sin.netdata.player.MoveData;
 import sin.netdata.player.PlayerData;
-import sin.tools.S;
+import sin.network.ServerNetwork;
+import sin.tools.T;
 
 /**
  * PlayerManager - Used for the creation and controlling of networked players.
@@ -66,9 +67,7 @@ public class PlayerManager{
             }
             player[id].create(d);
         }
-        if(S.getServer() != null){
-            S.getServer().broadcast(d);
-        }
+        ServerNetwork.broadcast(d);
     }
     public static void remove(int id){
         player[id].destroy();

@@ -48,7 +48,7 @@ import sin.world.World;
  * ClientNetwork - Used for the connection and maintainence of client-side networking.
  * @author SinisteRing
  */
-public class ClientNetwork {
+public class ClientNetwork{
     private static GameClient app;
     private static Client client = null;  // For SpiderMonkey connectivity.
     private static ClientListener listener = new ClientListener();
@@ -172,8 +172,16 @@ public class ClientNetwork {
         send(new SoundData(CLIENT_ID, name));
     }
     
-    private static class ClientListener implements MessageListener<Client>, ClientStateListener {
+    private static class ClientListener implements MessageListener<Client>, ClientStateListener{
         private Client client;
+        
+        public void clientConnected(Client c){
+            T.log("Welcome to the server.");
+        }
+        public void clientDisconnected(Client c, DisconnectInfo info){
+            T.log(info.reason);
+            app.getMenuState().action("game.mainmenu");
+        }
         
         private void CommandMessage(CommandData d){
             final CommandData m = d;
@@ -353,14 +361,6 @@ public class ClientNetwork {
             else if(m instanceof PlayerData){
                 PlayerMessage((PlayerData) m);
             }
-        }
-
-        public void clientConnected(Client c) {
-            T.log("Welcome to the server.");
-        }
-
-        public void clientDisconnected(Client c, DisconnectInfo info) {
-            app.getMenuState().action("game.mainmenu");
         }
     }
     

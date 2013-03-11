@@ -18,6 +18,7 @@ import sin.netdata.DamageData;
 import sin.netdata.ability.AbilityCooldownData;
 import sin.netdata.player.PlayerData;
 import sin.network.ClientNetwork;
+import sin.network.ServerNetwork;
 import sin.player.StatsManager.PlayerStats;
 import sin.tools.C;
 import sin.tools.S;
@@ -91,9 +92,7 @@ public class Player {
 
     public void damage(int attacker, float damage){
         stats.damage(damage);
-        if(S.getServer() != null){
-            S.getServer().broadcast(new DamageData(attacker, "player", id, damage));
-        }
+        ServerNetwork.broadcast(new DamageData(attacker, "player", id, damage));
         if(ClientNetwork.getID() == id){
             if(stats.getHealth() <= 0){
                 kill();

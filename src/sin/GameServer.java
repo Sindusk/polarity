@@ -3,7 +3,6 @@ package sin;
 import com.jme3.app.Application;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.network.Message;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
@@ -12,9 +11,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.appstates.ServerGameState;
-import sin.appstates.ServerListenState;
 import sin.appstates.ServerMenuState;
 import sin.input.ServerInputHandler;
+import sin.network.ServerNetwork;
 import sin.tools.S;
 import sin.tools.T;
 import sin.world.*;
@@ -62,7 +61,6 @@ public class GameServer extends Application{
     // App States:
     private BulletAppState bulletAppState;
     private ServerGameState gameState;
-    private ServerListenState listenState;
     private ServerMenuState menuState;
     
     // Nodes:
@@ -76,9 +74,6 @@ public class GameServer extends Application{
     public Node getRoot(){
         return root;
     }
-    public Node getWorld(){
-        return listenState.getWorld();
-    }
     
     // Getters for AppStates:
     public BulletAppState getBulletAppState(){
@@ -87,14 +82,14 @@ public class GameServer extends Application{
     public ServerGameState getGameState(){
         return gameState;
     }
-    public ServerListenState getListenState(){
-        return listenState;
-    }
     public ServerMenuState getMenuState(){
         return menuState;
     }
     public String getVersion(){
         return SERVER_VERSION;
+    }
+    public Node getWorld(){
+        return menuState.getWorld();
     }
     
     public void resetBulletAppState(){
@@ -107,9 +102,6 @@ public class GameServer extends Application{
         bulletAppState.getPhysicsSpace().setAccuracy(BULLET_ACCURACY);
         S.setBulletAppState(bulletAppState);
         CG.initialize(bulletAppState);
-    }
-    public void send(Message m){
-        listenState.send(m);
     }
     
     @Override
@@ -148,10 +140,10 @@ public class GameServer extends Application{
         S.setCamera(cam);
         T.initialize(assetManager, inputManager);
         ServerInputHandler.initialize(app);
+        ServerNetwork.initialize(app);
         
         // Initialize App States:
         gameState = new ServerGameState();
-        listenState = new ServerListenState();
         menuState = new ServerMenuState();
         
         // Attach App States:
@@ -184,9 +176,7 @@ public class GameServer extends Application{
     
     @Override
     public void destroy(){
-        if(stateManager.hasState(listenState)){
-            stateManager.detach(listenState);
-        }
+        ServerNetwork.stop();
         super.destroy();
     }
 }
