@@ -73,6 +73,7 @@ public class Player {
     public Vector3f getLocation(){
         return locB;
     }
+    
     public void setConnection(HostedConnection conn){
         this.conn = conn;
     }
@@ -145,6 +146,7 @@ public class Player {
             }
             status.update(tpf);
             model.update(locA, locB, rot, tpf, interp);
+            control.setPhysicsLocation(model.getLocation());
             interp += tpf*ClientNetwork.MOVE_INVERSE;
         }
     }
@@ -159,6 +161,14 @@ public class Player {
         ability[1] = new Infect(10, 100, 5, 3);
         // End Temporary
         
+        CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
+        control = new CharacterControl(capsuleShape, 0.05f);
+        control.setJumpSpeed(30);
+        control.setFallSpeed(30);
+        control.setGravity(70);
+        control.setCollisionGroup(S.GROUP_PLAYER);
+        S.getBulletAppState().getPhysicsSpace().add(control);
+        
         if(ClientNetwork.getID() == id){
             weapons[0][0].enable(Weapons.getNode());
             weapons[0][1].enable(Weapons.getNode());
@@ -166,12 +176,6 @@ public class Player {
             HUD.setBarMax(BarManager.BH.HEALTH, (int) stats.getMaxHealth());
             HUD.setBarMax(BarManager.BH.SHIELDS, (int) stats.getMaxShields());
             HUD.updateLifeBars(stats);
-            CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 8f, 1);
-            control = new CharacterControl(capsuleShape, 0.05f);
-            control.setJumpSpeed(30);
-            control.setFallSpeed(30);
-            control.setGravity(70);
-            S.getBulletAppState().getPhysicsSpace().add(control);
         }else{
             this.model = new PlayerModel(id, PlayerManager.getNode());
         }

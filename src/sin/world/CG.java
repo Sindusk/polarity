@@ -17,6 +17,7 @@ import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
 import sin.netdata.GeometryData;
+import sin.tools.S;
 import sin.tools.T;
 
 /**
@@ -72,6 +73,8 @@ public class CG {
         Geometry g = createBox(node, name, size, trans, tex, scale);
         CollisionShape cs = CollisionShapeFactory.createMeshShape(g);
         RigidBodyControl rbc = new RigidBodyControl(cs, 0);
+        rbc.setCollisionGroup(S.GROUP_TERRAIN);
+        rbc.setCollideWithGroups(S.GROUP_PLAYER);
         g.addControl(rbc);
         bulletAppState.getPhysicsSpace().add(rbc);
         return g;

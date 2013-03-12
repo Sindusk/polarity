@@ -14,6 +14,10 @@ import sin.appstates.ClientMenuState;
  * @author SinisteRing
  */
 public class S {
+    public static final int GROUP_TERRAIN = 0;
+    public static final int GROUP_PLAYER = 1;
+    public static final int GROUP_ENTITY = 2;
+    
     private static AssetManager assetManager;
     private static BulletAppState bulletAppState;
     private static Camera camera;

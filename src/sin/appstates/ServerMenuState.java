@@ -3,6 +3,7 @@ package sin.appstates;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Node;
 import de.lessvoid.nifty.Nifty;
@@ -95,12 +96,17 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
         
         ServerNetwork.create();
         
+        // Test
+        Node ghostNode = new Node("GhostNode");
+        ghostNode.setLocalTranslation(new Vector3f(0, 10, 0));
+        
         // Initialize Nodes:
         collisionNode.attachChild(NPCManager.getNode());
         collisionNode.attachChild(PlayerManager.getNode());
         world.attachChild(ProjectileManager.getNode());
         world.attachChild(DecalManager.getNode());
         world.attachChild(collisionNode);
+        world.attachChild(ghostNode);
         
         S.setCollisionNode(collisionNode);
         ProjectileManager.initialize(collisionNode);
@@ -120,6 +126,7 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
         
         PlayerManager.update(tpf);
         ProjectileManager.update(tpf, true);
+        NPCManager.update(tpf);
     }
     
     public void bind(Nifty nifty, Screen screen) {

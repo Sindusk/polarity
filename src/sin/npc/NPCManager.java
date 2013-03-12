@@ -1,5 +1,7 @@
 package sin.npc;
 
+import com.jme3.bullet.collision.shapes.BoxCollisionShape;
+import com.jme3.bullet.control.GhostControl;
 import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
@@ -10,6 +12,8 @@ import sin.netdata.npc.EntityData;
 import sin.netdata.npc.EntityDeathData;
 import sin.netdata.npc.OrganismData;
 import sin.network.ServerNetwork;
+import sin.player.PlayerManager;
+import sin.tools.S;
 import sin.tools.T;
 
 /**
@@ -24,6 +28,7 @@ public class NPCManager {
     // Inner Classes:
     public static abstract class Entity{
         private int id;
+        private GhostControl control;
         private EntityModel model;
         private Vector3f location;
         private String type;
@@ -32,8 +37,21 @@ public class NPCManager {
             this.id = id;
             this.location = location;
             this.type = type;
-            this.model = new EntityModel(id, node, type);
-            this.model.setLocalTranslation(location);
+            
+            model = new EntityModel(id, node, type);
+            model.setLocalTranslation(location);
+            control = new GhostControl(new BoxCollisionShape(new Vector3f(70, 5, 70)));
+            control.setCollisionGroup(S.GROUP_ENTITY);
+            control.setCollideWithGroups(S.GROUP_PLAYER);
+            model.getNode().addControl(control);
+            S.getBulletAppState().getPhysicsSpace().add(model.getNode());
+        }
+        public void update(float tpf){
+            if(control.getOverlappingCount() > 0){
+                if(control.getOverlappingObjects().get(0) != null && control.getOverlappingObjects().get(0) == PlayerManager.getPlayer(0).getControl()){
+                    model.getPart("head").lookAt(PlayerManager.getPlayer(0).getControl().getPhysicsLocation(), Vector3f.UNIT_Y);
+                }
+            }
         }
         
         public int getID(){
@@ -118,6 +136,15 @@ public class NPCManager {
     }
     public static void addGrunt(GruntData d){
         grunts.put(d.getID(), new Grunt(d.getID(), node, d.getLocation(), d.getHealth(), d.getMaxHealth()));
+        NUM_GRUNTS++;
+    }
+    
+    public static void update(float tpf){
+        int i = 0;
+        while(i < NUM_GRUNTS){
+            grunts.get(i).update(tpf);
+            i++;
+        }
     }
     
     private static void createNewNPC(int id, String type, Vector3f loc){

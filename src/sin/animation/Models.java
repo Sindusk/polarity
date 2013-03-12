@@ -32,6 +32,9 @@ public class Models {
         public String getHandle(){
             return handle;
         }
+        public Vector3f getLocation(){
+            return node.getLocalTranslation();
+        }
         public Node getPart(String name){
             return parts.get(name);
         }
@@ -122,7 +125,7 @@ public class Models {
     public static class EntityModel extends ModelTemplate{
         public static Node genHead(){
             Node part = new Node();
-            CG.createBox(part, "", new Vector3f(1.2f, 1, 1.8f), Vector3f.ZERO, T.getMaterialPath("BC_Tex"), new Vector2f(1, 1));
+            CG.createBox(part, "", new Vector3f(0.8f, 0.8f, 1.8f), Vector3f.ZERO, T.getMaterialPath("BC_Tex"), new Vector2f(1, 1));
             return part;
         }
         public static Node genBody(){

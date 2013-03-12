@@ -26,7 +26,7 @@ public class World {
     private static final float ZS = 10;     // Zone Size
     private static final int HALL_LENGTH_MIN = 20;
     private static final int HALL_LENGTH_MAX = 25;
-    private static final int HALL_MAX_RADIUS = 25;
+    private static final int HALL_MAX_RADIUS = 40;
     private static final int HALL_SPREAD = 5;
     private static final int HALL_WIDTH = 2;
     

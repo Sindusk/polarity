@@ -128,6 +128,7 @@ public class ClientGameState extends AbstractAppState{
         if(ClientNetwork.isConnected()){
             HUD.update(tpf);
             PlayerManager.update(tpf);
+            NPCManager.update(tpf);
         }
         ProjectileManager.update(tpf, false);
         
