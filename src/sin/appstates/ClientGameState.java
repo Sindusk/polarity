@@ -106,7 +106,8 @@ public class ClientGameState extends AbstractAppState{
     @Override
     public void cleanup(){
         super.cleanup();
-        app.getRoot().detachChild(root);
+        root.removeFromParent();
+        //app.getRoot().detachChild(root);
         Weapons.getNode().detachAllChildren();
         terrainNode.detachAllChildren();
         DecalManager.clear();

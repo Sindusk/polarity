@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sin.appstates.ClientCharState;
 import sin.appstates.ClientGameState;
 import sin.appstates.ClientMenuState;
 import sin.input.ClientInputHandler;
@@ -67,7 +68,8 @@ public class GameClient extends Application{
     
     // App States:
     private static BulletAppState bulletAppState;       // Physics State.
-    private static ClientGameState gameState;   // Gameplay State.
+    private static ClientCharState charState;           // Character State.
+    private static ClientGameState gameState;           // Gameplay State.
     private static ClientMenuState menuState;           // Main Menu State.
     
     // Nodes:
@@ -99,7 +101,10 @@ public class GameClient extends Application{
     }
     
     // Getters for States:
-    public ClientGameState getGameplayState(){
+    public ClientCharState getCharState(){
+        return charState;
+    }
+    public ClientGameState getGameState(){
         return gameState;
     }
     public ClientMenuState getMenuState(){
@@ -150,7 +155,7 @@ public class GameClient extends Application{
         set.setResolution(1280, 720);
         set.setSamples(0);
         set.setVSync(false);
-        set.setRenderer(AppSettings.LWJGL_OPENGL1);
+        //set.setRenderer(AppSettings.LWJGL_OPENGL1);
         set.setTitle("Polarity Client");
         app.setSettings(set);
         app.start();
@@ -173,19 +178,19 @@ public class GameClient extends Application{
         // Initialize Tools & Classes:
         S.setAssetManager(assetManager);
         S.setCamera(cam);
+        S.setInputManager(inputManager);
         S.setStateManager(stateManager);
         S.setTimer(timer);
         S.setVersion(CLIENT_VERSION);
-        T.initialize(assetManager, inputManager);
         
+        ClientInputHandler.initialize(app);
         ClientNetwork.initialize(app);
         RecoilManager.initialize();
         
         // Initialize App States:
+        charState = new ClientCharState();
         gameState = new ClientGameState();
         menuState = new ClientMenuState();
-        S.setClientGameState(gameState);
-        S.setClientMenuState(menuState);
         // Attach App States:
         stateManager.attach(menuState);
         resetBulletAppState();

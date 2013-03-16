@@ -198,7 +198,7 @@ public class World {
             // Return if there's no hallway to generate (0 in size):
             float xs = FastMath.abs(corners[1].getX()-corners[3].getX())+1;
             float zs = FastMath.abs(corners[1].getZ()-corners[3].getZ())+1;
-            if(Math.max(FastMath.abs(xs), FastMath.abs(zs)) < 1){
+            if(Math.min(FastMath.abs(xs), FastMath.abs(zs)) < 1){
                 return;
             }
 
@@ -212,7 +212,7 @@ public class World {
             float zloc = (corners[3].getZ()+corners[1].getZ())*0.5f;
             NPCManager.addNew("grunt", new Vector3f(xloc, start.getY(), zloc).mult(ZS).add(0, 5, 0));
             center = new Vector3f(xloc, start.getY(), zloc);
-            floor = geoFloor(center, xs, zs, T.getMaterialPath("lava_rock"), T.v2f(zs, xs), true);
+            floor = geoFloor(center, xs, zs, T.getMaterialPath("synthetic"), T.v2f(zs, xs), true);
             map.add(floor);
         }
     }

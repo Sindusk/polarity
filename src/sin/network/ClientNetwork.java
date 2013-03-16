@@ -315,7 +315,7 @@ public class ClientNetwork{
                 public Void call() throws Exception{
                     PlayerManager.add(m);
                     if(m.getID() == CLIENT_ID){
-                        ClientInputHandler.initialize();
+                        ClientInputHandler.initializeGame();
                         CLIENT_CONNECTED = true;
                     }
                     return null;

@@ -32,21 +32,25 @@ public class ClientMenuState extends AbstractAppState implements ScreenControlle
     
     public ClientMenuState(){}
     
-    public void toggleGameMenu(){
+    public void toggleGameMenu(boolean hud){
         if(nifty.getCurrentScreen().getScreenId().equals("game.menu")){
             nifty.gotoScreen("empty");
-            app.getInputManager().setCursorVisible(false);
-            HUD.showCrosshairs(true);
+            if(hud){
+                app.getInputManager().setCursorVisible(false);
+                HUD.showCrosshairs(true);
+            }
         }else{
             nifty.gotoScreen("game.menu");
-            app.getInputManager().setCursorVisible(true);
-            HUD.showCrosshairs(false);
+            if(hud){
+                app.getInputManager().setCursorVisible(true);
+                HUD.showCrosshairs(false);
+            }
         }
     }
     public void action(String action){
         // Main Menu:
         if(action.equals("start")){
-            app.getStateManager().attach(app.getGameplayState());
+            app.getStateManager().attach(app.getGameState());
             nifty.gotoScreen("empty");
         }
         else if(action.equals("single")){
@@ -54,7 +58,8 @@ public class ClientMenuState extends AbstractAppState implements ScreenControlle
         }else if(action.equals("multiplayer")){
             nifty.gotoScreen("menu.multiplayer");
         }else if(action.equals("character")){
-            nifty.gotoScreen("menu.character");
+            app.getStateManager().attach(app.getCharState());
+            nifty.gotoScreen("empty");
         }else if(action.equals("options")){
             nifty.gotoScreen("menu.options");
         }else if(action.equals("quit")){
@@ -93,7 +98,7 @@ public class ClientMenuState extends AbstractAppState implements ScreenControlle
             app.getInputManager().setCursorVisible(false);
             HUD.showCrosshairs(true);
         }else if(action.equals("game.mainmenu")){
-            app.getStateManager().detach(app.getGameplayState());
+            app.getStateManager().detach(app.getGameState());
             nifty.gotoScreen("menu");
             ClientNetwork.disconnect();
         }

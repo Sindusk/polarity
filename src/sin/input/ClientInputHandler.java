@@ -1,5 +1,6 @@
 package sin.input;
 
+import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -8,12 +9,15 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import sin.GameClient;
 import sin.netdata.ability.AbilityData;
 import sin.network.ClientNetwork;
 import sin.player.MovementManager;
 import sin.player.MovementManager.MH;
 import sin.player.PlayerManager;
+import sin.tools.C;
 import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
@@ -26,13 +30,25 @@ import sin.world.World;
  * @author SinisteRing
  */
 public class ClientInputHandler{
+    private static GameClient app;
     // Constant Variables:
     public static final float MOUSE_SENSITIVITY = 1;
     
     private static boolean inGameplay(){
-        return S.getStateManager().hasState(S.getClientGameState()) && S.getClientMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
+        return S.getStateManager().hasState(app.getGameState()) && app.getMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
     }
     
+    private static ActionListener charAction = new ActionListener(){
+        public void onAction(String bind, boolean down, float tpf){
+            if(down){
+                if(bind.equals("Click")){
+                    C.handleClick();
+                }else if(bind.equals("Exit")){
+                    app.getMenuState().toggleGameMenu(false);
+                }
+            }
+        }
+    };
     private static ActionListener gameAction = new ActionListener(){
         public void onAction(String bind, boolean down, float tpf){
             if(!inGameplay()){
@@ -82,7 +98,7 @@ public class ClientInputHandler{
                 }else if(bind.equals("Misc_Key_4")){
                     World.toggleWireframe();
                 }else if(bind.equals("Game_Menu")){
-                    S.getClientMenuState().toggleGameMenu();
+                    app.getMenuState().toggleGameMenu(true);
                 }
             }
         }
@@ -105,7 +121,11 @@ public class ClientInputHandler{
         }
     };
     
-    public static void initialize(){
+    public static void initializeChar(){
+        T.createMapping(charAction, "Click", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        T.createMapping(charAction, "Exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
+    }
+    public static void initializeGame(){
         // Camera:
         T.createMapping(gameAnalog, "Cam_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
         T.createMapping(gameAnalog, "Cam_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));
@@ -135,5 +155,8 @@ public class ClientInputHandler{
         T.createMapping(gameAction, "Misc_Key_2", new KeyTrigger(KeyInput.KEY_B));
         T.createMapping(gameAction, "Misc_Key_3", new KeyTrigger(KeyInput.KEY_T));
         T.createMapping(gameAction, "Misc_Key_4", new KeyTrigger(KeyInput.KEY_G));
+    }
+    public static void initialize(GameClient app){
+        ClientInputHandler.app = app;
     }
 }

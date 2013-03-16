@@ -1,8 +1,6 @@
 package sin.tools;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapFont;
-import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
@@ -23,9 +21,6 @@ import java.util.logging.Logger;
  * @author SinisteRing
  */
 public class T {
-    public static AssetManager assetManager;
-    public static InputManager inputManager;
-    
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
     public static final float ROOT_HALF = 1.0f/FastMath.sqrt(2);
     
@@ -36,10 +31,10 @@ public class T {
     
     // Asset Management:
     public static BitmapFont getFont(String fnt){
-        return assetManager.loadFont("Interface/Fonts/"+fnt+".fnt");
+        return S.getAssetManager().loadFont("Interface/Fonts/"+fnt+".fnt");
     }
     public static Material getMaterial(ColorRGBA color){
-        Material m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        Material m = new Material(S.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         m.setColor("Color", color);
         if(color.getAlpha() < 1){
             m.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
@@ -47,8 +42,8 @@ public class T {
         return m;
     }
     public static Material getMaterial(String tex){
-        Material m = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        m.setTexture("ColorMap", assetManager.loadTexture(tex));
+        Material m = new Material(S.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        m.setTexture("ColorMap", S.getAssetManager().loadTexture(tex));
         m.getTextureParam("ColorMap").getTextureValue().setWrap(Texture.WrapMode.Repeat);
         return m;
     }
@@ -61,16 +56,16 @@ public class T {
     
     // Key Mappings:
     public static void createMapping(ActionListener listener, String name, KeyTrigger trigger){
-        inputManager.addMapping(name, trigger);
-        inputManager.addListener(listener, name);
+        S.getInputManager().addMapping(name, trigger);
+        S.getInputManager().addListener(listener, name);
     }
     public static void createMapping(ActionListener listener, String name, MouseButtonTrigger trigger){
-        inputManager.addMapping(name, trigger);
-        inputManager.addListener(listener, name);
+        S.getInputManager().addMapping(name, trigger);
+        S.getInputManager().addListener(listener, name);
     }
     public static void createMapping(AnalogListener listener, String name, MouseAxisTrigger trigger){
-        inputManager.addMapping(name, trigger);
-        inputManager.addListener(listener, name);
+        S.getInputManager().addMapping(name, trigger);
+        S.getInputManager().addListener(listener, name);
     }
     
     // Random numbers:
@@ -103,10 +98,5 @@ public class T {
     }
     public static void log(Throwable t){
         Logger.getLogger("polarity").log(Level.SEVERE, "{0}", t);
-    }
-    
-    public static void initialize(AssetManager assetManager, InputManager inputManager){
-        T.assetManager = assetManager;
-        T.inputManager = inputManager;
     }
 }

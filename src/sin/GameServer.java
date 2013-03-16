@@ -138,7 +138,8 @@ public class GameServer extends Application{
         // Initialize Tools:
         S.setAssetManager(assetManager);
         S.setCamera(cam);
-        T.initialize(assetManager, inputManager);
+        S.setInputManager(inputManager);
+        
         ServerInputHandler.initialize(app);
         ServerNetwork.initialize(app);
         
