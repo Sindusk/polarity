@@ -3,12 +3,18 @@ package sin.appstates;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import sin.GameClient;
 import sin.animation.Models.PlayerModel;
+import sin.character.CharacterScreen;
 import sin.input.ClientInputHandler;
 import sin.tools.S;
+import sin.world.CG;
 
 /**
  *
@@ -33,10 +39,7 @@ public class ClientCharState extends AbstractAppState {
         app.getRoot().attachChild(root);
         app.getGUI().attachChild(gui);
         
-        S.setCollisionNode(root);
-        
-        PlayerModel model = new PlayerModel(0, root);
-        //CG.createBox(root, "meow", new Vector3f(1, 1, 1), new Vector3f(0, 0, 0), T.getMaterialPath("wall"), new Vector2f(1, 1));
+        CharacterScreen.initialize(app, root);
         
         // Initialize Input:
         ClientInputHandler.initializeChar();

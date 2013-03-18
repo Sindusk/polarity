@@ -1,9 +1,5 @@
 package sin.tools;
 
-import com.jme3.collision.CollisionResults;
-import com.jme3.math.Ray;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
@@ -62,17 +58,5 @@ public class C {
             i++;
         }
         return weapons;
-    }
-    
-    public static void handleClick(){
-        Vector2f click2d = S.getInputManager().getCursorPosition();
-        Vector3f click3d = S.getCamera().getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-        Vector3f dir = S.getCamera().getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-        Ray ray = new Ray(click3d, dir);
-        CollisionResults results = new CollisionResults();
-        S.getCollisionNode().collideWith(ray, results);
-        if(results.getClosestCollision() != null){
-            T.log("collision with "+results.getClosestCollision().getGeometry().getName());
-        }
     }
 }

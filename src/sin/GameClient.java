@@ -176,6 +176,8 @@ public class GameClient extends Application{
         setPauseOnLostFocus(false);
         
         // Initialize Tools & Classes:
+        S.height = settings.getHeight();
+        S.width = settings.getWidth();
         S.setAssetManager(assetManager);
         S.setCamera(cam);
         S.setInputManager(inputManager);

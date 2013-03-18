@@ -7,8 +7,6 @@ import com.jme3.input.InputManager;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.jme3.system.Timer;
-import sin.appstates.ClientGameState;
-import sin.appstates.ClientMenuState;
 
 /**
  *
@@ -18,6 +16,9 @@ public class S {
     public static final int GROUP_TERRAIN = 0;
     public static final int GROUP_PLAYER = 1;
     public static final int GROUP_ENTITY = 2;
+    
+    public static int height = 0;
+    public static int width = 0;
     
     private static AssetManager assetManager;
     private static BulletAppState bulletAppState;

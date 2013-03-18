@@ -1,6 +1,5 @@
 package sin.input;
 
-import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -9,15 +8,14 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Ray;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import sin.GameClient;
+import sin.character.CharacterScreen;
 import sin.netdata.ability.AbilityData;
 import sin.network.ClientNetwork;
 import sin.player.MovementManager;
 import sin.player.MovementManager.MH;
 import sin.player.PlayerManager;
-import sin.tools.C;
 import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
@@ -42,7 +40,7 @@ public class ClientInputHandler{
         public void onAction(String bind, boolean down, float tpf){
             if(down){
                 if(bind.equals("Click")){
-                    C.handleClick();
+                    CharacterScreen.handleClick();
                 }else if(bind.equals("Exit")){
                     app.getMenuState().toggleGameMenu(false);
                 }
