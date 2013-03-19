@@ -18,6 +18,7 @@ import sin.appstates.ClientGameState;
 import sin.appstates.ClientMenuState;
 import sin.input.ClientInputHandler;
 import sin.network.ClientNetwork;
+import sin.tools.C;
 import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
@@ -144,8 +145,8 @@ public class GameClient extends Application{
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         if(MODE_DEBUG){
             try {
-                Logger.getLogger("polarity").addHandler(new FileHandler("FPSlog.xml"));
-                Logger.getLogger("com.jme3").addHandler(new FileHandler("FPSlog2.xml"));
+                Logger.getLogger("polarity").addHandler(new FileHandler("PolarityLog.xml"));
+                Logger.getLogger("com.jme3").addHandler(new FileHandler("JMELog.xml"));
             } catch (FileNotFoundException ex) {
                 T.log(ex);
             }
@@ -181,10 +182,12 @@ public class GameClient extends Application{
         S.setAssetManager(assetManager);
         S.setCamera(cam);
         S.setInputManager(inputManager);
+        S.setRenderManager(renderManager);
         S.setStateManager(stateManager);
         S.setTimer(timer);
         S.setVersion(CLIENT_VERSION);
         
+        C.gatherCharacterData();
         ClientInputHandler.initialize(app);
         ClientNetwork.initialize(app);
         RecoilManager.initialize();

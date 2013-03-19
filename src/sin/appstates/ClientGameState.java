@@ -82,7 +82,6 @@ public class ClientGameState extends AbstractAppState{
         AttackManager.initialize(app.getCamera(), collisionNode);
         HUD.initialize(app, gui);
         MovementManager.initialize(app.getCamera());
-        ProjectileManager.initialize(collisionNode);
         TracerManager.initialize(app);
         
         // Initialize HUD & World:

@@ -71,7 +71,7 @@ public class AbilityManager {
             if(this.getCooldown() > 0){
                 return;
             }
-            CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), attacker, this.getRange());
+            CollisionResult target = A.getClosestCollisionByRange(S.getCollisionNode(), ray, attacker, this.getRange());
             if(target != null){
                 Vector3f loc = target.getContactPoint();
                 PlayerManager.getPlayer(attacker).getConnection().send(new CommandData("teleport:"+loc.getX()+","+loc.getY()+","+loc.getZ()));
@@ -93,7 +93,7 @@ public class AbilityManager {
             if(this.getCooldown() > 0){
                 return;
             }
-            CollisionResult target = A.getClosestCollisionByRange(ray, S.getCollisionNode(), attacker, this.getRange());
+            CollisionResult target = A.getClosestCollisionByRange(S.getCollisionNode(), ray, attacker, this.getRange());
             if(target != null){
                 A.applyPoison(target, time, dps);
                 super.casted();

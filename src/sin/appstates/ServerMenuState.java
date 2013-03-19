@@ -109,7 +109,6 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
         world.attachChild(ghostNode);
         
         S.setCollisionNode(collisionNode);
-        ProjectileManager.initialize(collisionNode);
         
         // Create world:
         World.generateWorldData();

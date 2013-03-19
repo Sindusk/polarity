@@ -200,7 +200,7 @@ public class A {
     
     // Attack Handlers:
     public static void rayAttack(AttackData d){
-        CollisionResult target = getClosestCollisionByRange(d.getRay(), S.getCollisionNode(), d.getAttacker(), d.getRange());
+        CollisionResult target = getClosestCollisionByRange(S.getCollisionNode(), d.getRay(), d.getAttacker(), d.getRange());
         if(target != null){
             parseCollision(d.getAttacker(), d.getCollision(), target);
         }
@@ -216,19 +216,23 @@ public class A {
     }
     
     // Helper Functions:
-    public static CollisionResults getCollisions(Ray ray){
+    public static CollisionResults getCollisions(Node node, Ray ray){
         CollisionResults results = new CollisionResults();
-        S.getCollisionNode().collideWith(ray, results);
+        node.collideWith(ray, results);
         return results;
     }
-    public static CollisionResult getClosestCollision(Ray ray, Node node, int attacker){
-        CollisionResults results = getCollisions(ray);
+    public static CollisionResult getClosestCollision(Node node, Ray ray){
+        CollisionResults results = getCollisions(node, ray);
+        return results.getClosestCollision();
+    }
+    public static CollisionResult getClosestCollisionNotPlayer(Node node, Ray ray, int player){
+        CollisionResults results = getCollisions(node, ray);
         String[] data;
         int i = 0;
         while(i < results.size()){
             data = getPartData(results.getCollision(i));
             if(data[0] != null && data[0].equals("player")){
-                if(data[1] != null && Integer.parseInt(data[1]) != attacker){
+                if(data[1] != null && Integer.parseInt(data[1]) != player){
                     return results.getCollision(i);
                 }
             }else{
@@ -238,8 +242,8 @@ public class A {
         }
         return null;
     }
-    public static CollisionResult getClosestCollisionByRange(Ray ray, Node node, int attacker, float range){
-        CollisionResult result = getClosestCollision(ray, node, attacker);
+    public static CollisionResult getClosestCollisionByRange(Node node, Ray ray, int player, float range){
+        CollisionResult result = getClosestCollisionNotPlayer(node, ray, player);
         if(result != null && ray.getOrigin().distance(result.getContactPoint()) <= range){
             return result;
         }else{

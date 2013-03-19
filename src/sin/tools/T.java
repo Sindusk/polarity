@@ -53,6 +53,9 @@ public class T {
     public static String getMaterialPath(String tex){
         return "Textures/Material/"+tex+".png";
     }
+    public static String getNeuroPath(String tex){
+        return "Textures/Neuros/"+tex+".png";
+    }
     
     // Key Mappings:
     public static void createMapping(ActionListener listener, String name, KeyTrigger trigger){

@@ -21,7 +21,7 @@
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
-                <text font="Interface/Fonts/Batman26.fnt" text="Multiplayer [WIP)" />
+                <text font="Interface/Fonts/Batman26.fnt" text="Multiplayer [WIP]" />
                 <interact onClick="action(multiplayer)" />
             </panel>
             <panel height="3%"/>
@@ -29,7 +29,7 @@
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
-                <text font="Interface/Fonts/Batman26.fnt" text="Character (WIP)" />
+                <text font="Interface/Fonts/Batman26.fnt" text="Character [WIP]" />
                 <interact onClick="action(character)"/>
             </panel>
             <panel height="3%"/>
@@ -37,7 +37,7 @@
                 <effect>
                     <onHover name="pulsate" startColor="#8000" endColor="#d00f" post="true" />
                 </effect>
-                <text font="Interface/Fonts/Batman26.fnt" text="Options (WIP)" />
+                <text font="Interface/Fonts/Batman26.fnt" text="Options [WIP]" />
                 <interact onClick="action(options)"/>
             </panel>
             <panel height="3%"/>

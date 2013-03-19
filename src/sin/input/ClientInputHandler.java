@@ -32,12 +32,18 @@ public class ClientInputHandler{
     // Constant Variables:
     public static final float MOUSE_SENSITIVITY = 1;
     
+    private static boolean inCharacter(){
+        return app.getStateManager().hasState(app.getCharState());
+    }
     private static boolean inGameplay(){
-        return S.getStateManager().hasState(app.getGameState()) && app.getMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
+        return app.getStateManager().hasState(app.getGameState()) && app.getMenuState().getNifty().getCurrentScreen().getScreenId().equals("empty");
     }
     
     private static ActionListener charAction = new ActionListener(){
         public void onAction(String bind, boolean down, float tpf){
+            if(!inCharacter()){
+                return;
+            }
             if(down){
                 if(bind.equals("Click")){
                     CharacterScreen.handleClick();
@@ -45,6 +51,14 @@ public class ClientInputHandler{
                     app.getMenuState().toggleGameMenu(false);
                 }
             }
+        }
+    };
+    private static AnalogListener charAnalog = new AnalogListener(){
+        public void onAnalog(String name, float value, float tpf){
+            if(!inCharacter()){
+                return;
+            }
+            CharacterScreen.update();
         }
     };
     private static ActionListener gameAction = new ActionListener(){
@@ -107,28 +121,35 @@ public class ClientInputHandler{
                 return;
             }
             // Camera:
-            if (name.equals("Cam_Left")){
+            if (name.equals("Mouse_Left")){
                 RecoilManager.rotateCamera(value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
-            }else if (name.equals("Cam_Right")){
+            }else if (name.equals("Mouse_Right")){
                 RecoilManager.rotateCamera(-value, MOUSE_SENSITIVITY, Vector3f.UNIT_Y);
-            }else if (name.equals("Cam_Up")){
+            }else if (name.equals("Mouse_Up")){
                 RecoilManager.rotateCamera(-value, MOUSE_SENSITIVITY, S.getCamera().getLeft());
-            }else if (name.equals("Cam_Down")){
+            }else if (name.equals("Mouse_Down")){
                 RecoilManager.rotateCamera(value, MOUSE_SENSITIVITY, S.getCamera().getLeft());
             }
         }
     };
     
     public static void initializeChar(){
+        // Mouse Movement:
+        T.createMapping(charAnalog, "Mouse_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+        T.createMapping(charAnalog, "Mouse_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+        T.createMapping(charAnalog, "Mouse_Up", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+        T.createMapping(charAnalog, "Mouse_Down", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+        
+        // Actions:
         T.createMapping(charAction, "Click", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         T.createMapping(charAction, "Exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
     }
     public static void initializeGame(){
-        // Camera:
-        T.createMapping(gameAnalog, "Cam_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
-        T.createMapping(gameAnalog, "Cam_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));
-        T.createMapping(gameAnalog, "Cam_Up", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
-        T.createMapping(gameAnalog, "Cam_Down", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+        // Mouse Movement:
+        T.createMapping(gameAnalog, "Mouse_Left", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+        T.createMapping(gameAnalog, "Mouse_Right", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+        T.createMapping(gameAnalog, "Mouse_Up", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+        T.createMapping(gameAnalog, "Mouse_Down", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
         // Movement:
         T.createMapping(gameAction, "Move_Left", new KeyTrigger(KeyInput.KEY_A));
         T.createMapping(gameAction, "Move_Right", new KeyTrigger(KeyInput.KEY_D));
