@@ -6,6 +6,7 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.input.InputManager;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.system.Timer;
 
@@ -93,6 +94,14 @@ public class S {
     }
     public static void setVersion(String version){
         S.version = version;
+    }
+    
+    private static ViewPort viewPort;
+    public static ViewPort getViewPort(){
+        return viewPort;
+    }
+    public static void setViewPort(ViewPort viewPort){
+        S.viewPort = viewPort;
     }
     
     private static Timer timer;

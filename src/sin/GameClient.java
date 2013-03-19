@@ -186,6 +186,7 @@ public class GameClient extends Application{
         S.setStateManager(stateManager);
         S.setTimer(timer);
         S.setVersion(CLIENT_VERSION);
+        S.setViewPort(viewPort);
         
         C.gatherCharacterData();
         ClientInputHandler.initialize(app);

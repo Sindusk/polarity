@@ -8,11 +8,11 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import sin.animation.Models;
+import sin.hud.Tooltip;
+import sin.progression.NeuroNetwork;
 import sin.tools.A;
-import sin.tools.C;
 import sin.tools.S;
 import sin.tools.T;
 import sin.world.CG;
@@ -27,7 +27,7 @@ public class CharacterScreen {
     private static String view;
     private static Node node = new Node("CharacterScreenNode");
     private static Node gui = new Node("CharacterScreenGUI");
-    private static Geometry tooltip;
+    private static Tooltip tooltip;
     
     // Char Side:
     private static Camera leftCamera;
@@ -100,7 +100,27 @@ public class CharacterScreen {
     
     public static void update(){
         Vector2f mouseLoc = S.getInputManager().getCursorPosition();
-        tooltip.setLocalTranslation(new Vector3f(mouseLoc.x+60, mouseLoc.y-30, 0));
+        CollisionResult target;
+        if(view.equals("neuronet")){
+            target = getMouseTarget(mouseLoc, S.getCamera(), node);
+            if(target != null){
+                String[] data = target.getGeometry().getName().split(",");
+                int x = Integer.parseInt(data[0]);
+                int y = Integer.parseInt(data[1]);
+                if(tooltip.isVisible()){
+                    tooltip.updateLocation(mouseLoc);
+                    tooltip.setHeader(NeuroNetwork.getNeuroHeader(x, y));
+                    tooltip.setText(NeuroNetwork.getNeuroDescription(x, y));
+                    NeuroNetwork.highlightNeuron(x, y);
+                }else{
+                    tooltip.setVisible(gui, true);
+                }
+            }else{
+                if(tooltip.isVisible()){
+                    tooltip.setVisible(gui, false);
+                }
+            }
+        }
     }
     
     private static void buildChar(){
@@ -108,7 +128,9 @@ public class CharacterScreen {
         model.getNode().rotate(0, 30*FastMath.DEG_TO_RAD, 0);
     }
     private static void buildNeuroNet(){
-        node.attachChild(C.createNeuroNode());
+        NeuroNetwork.initialize();
+        node.attachChild(NeuroNetwork.getNode());
+        S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
     }
     private static void buildMenu(){
         rightNode.detachAllChildren();
@@ -145,7 +167,7 @@ public class CharacterScreen {
         rightView.attachScene(rightNode);
         rightCamera.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
         
-        tooltip = CG.createBox(gui, "tooltip", new Vector3f(50, 20, 1), new Vector3f(0, 0, 0), ColorRGBA.DarkGray);
+        tooltip = new Tooltip(new Vector3f(100, 50, 1), new Vector3f(0, 0, 0), ColorRGBA.LightGray, ColorRGBA.Black);
         
         buildChar();
         buildMenu();
