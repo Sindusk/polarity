@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import sin.character.CharacterScreen;
 import sin.geometry.SinText.Alignment;
+import sin.hud.ContextMenu;
 import sin.hud.Menu;
 import sin.hud.StatsDisplay;
 import sin.hud.Tooltip;
@@ -27,12 +28,16 @@ public class NeuroNetwork {
     private static final float NEURO_SCALE = 0.7f;
     private static final float NEURO_BUFFER = 0f;
     
+    private static Tooltip tooltip = new Tooltip(new Vector3f(100, 50, 1), new Vector3f(0, 0, 0), new ColorRGBA(0.6f, 0.6f, 0.6f, 1), ColorRGBA.Black);
+    private static ContextMenu contextMenu = new ContextMenu(0.24f, Vector3f.ZERO, "Batman26", 1.4f, new ColorRGBA(23/255f, 92/255f, 12/255f, 1), ColorRGBA.Cyan);
     private static Menu neuroMenu;
+    private static StatsDisplay stats;
+    
     private static String[][] neuros = new String[NEURO_SIZE][NEURO_SIZE];
     private static Geometry[][] neuron = new Geometry[NEURO_SIZE][NEURO_SIZE];
     private static Geometry highlight;
     private static Geometry mark;
-    private static Node node;
+    private static Node node = new Node("NeuroNode");
     
     public static Node getNode(){
         return node;
@@ -72,12 +77,15 @@ public class NeuroNetwork {
     }
     
     public static void markNeuron(int x, int y){
-        mark.setName(x+","+y);
+        mark.setName(neuron[x][y].getName());
         mark.setLocalTranslation(neuron[x][y].getLocalTranslation());
     }
     public static void highlightNeuron(int x, int y){
-        highlight.setName(x+","+y);
+        highlight.setName(neuron[x][y].getName());
         highlight.setLocalTranslation(neuron[x][y].getLocalTranslation());
+        if(!node.hasChild(highlight)){
+            node.attachChild(highlight);
+        }
     }
     public static void updateTooltip(Vector2f mouseLoc, Tooltip t, int x, int y){
         t.updateLocation(mouseLoc);
@@ -85,18 +93,34 @@ public class NeuroNetwork {
         t.setText(getNeuroDescription(x, y));
     }
     
-    private static void menuAction(String name){
-        String[] data = mark.getName().split(",");
+    private static void contextAction(String name){
+        String[] data = T.getArgs(mark.getName());
         int x = Integer.parseInt(data[0]);
         int y = Integer.parseInt(data[1]);
         if(name.equals("unlock")){
+            T.log("unlocking");
             if(neuros[x][y].equals("x")){
-                T.log("Unlocking neuro "+x+", "+y);
                 neuros[x][y] = "i";
                 neuron[x][y].setMaterial(T.getMaterial(getNeuroMaterialPath(x, y)));
-            }else{
-                T.log("Neuro is not locked.");
             }
+        }
+        contextMenu.destroy();
+    }
+    public static void handleRightClick(Vector2f mouseLoc){
+        CollisionResult target = CharacterScreen.getMouseTarget(mouseLoc, S.getCamera(), node);
+        if(target == null){
+            return;
+        }
+        String name = target.getGeometry().getName();
+        if(T.getHeader(name).equals("node")){
+            String[] args = T.getArgs(name);
+            int x = Integer.parseInt(args[0]);
+            int y = Integer.parseInt(args[1]);
+            markNeuron(x, y);
+            String[][] data = {{"unlock", "Unlock Node"}, {"other", "Other [NYI]"}};
+            contextMenu.setLocalTranslation(target.getContactPoint().add(0, 0, 0.01f));
+            contextMenu.setData(data);
+            node.attachChild(contextMenu.getNode());
         }
     }
     public static void action(CollisionResult target){
@@ -104,30 +128,41 @@ public class NeuroNetwork {
             return;
         }
         String name = target.getGeometry().getName();
-        if(neuroMenu.isButton(name)){
-            menuAction(name);
-        }else if(!neuroMenu.isElement(name)){
-            String[] data = target.getGeometry().getName().split(",");
-            int x = Integer.parseInt(data[0]);
-            int y = Integer.parseInt(data[1]);
+        if(contextMenu.isOption(name)){
+            contextAction(name);
+        }else if(T.getHeader(name).equals("node")) {
+            String[] args = T.getArgs(name);
+            int x = Integer.parseInt(args[0]);
+            int y = Integer.parseInt(args[1]);
             NeuroNetwork.markNeuron(x, y);
+            contextMenu.destroy();
         }
     }
-    public static void update(Vector2f mouseLoc, Tooltip tooltip){
+    public static void update(Vector2f mouseLoc){
         CollisionResult target = CharacterScreen.getMouseTarget(mouseLoc, S.getCamera(), node);
-        if(target != null && !neuroMenu.isElement(target.getGeometry().getName())){
-            String[] data = target.getGeometry().getName().split(",");
-            int x = Integer.parseInt(data[0]);
-            int y = Integer.parseInt(data[1]);
-            if(tooltip.isVisible()){
-                NeuroNetwork.updateTooltip(mouseLoc, tooltip, x, y);
-                NeuroNetwork.highlightNeuron(x, y);
-            }else{
-                tooltip.setVisible(CharacterScreen.getGUI(), true);
+        String name;
+        if(target != null){
+            name = target.getGeometry().getName();
+            if(contextMenu.isOption(name)){
+                contextMenu.highlightBox(name);
+                tooltip.setVisible(CharacterScreen.getGUI(), false);
+                highlight.removeFromParent();
+            }else if(T.getHeader(name).equals("node")){
+                String[] data = T.getArgs(name);
+                int x = Integer.parseInt(data[0]);
+                int y = Integer.parseInt(data[1]);
+                if(tooltip.isVisible()){
+                    updateTooltip(mouseLoc, tooltip, x, y);
+                    highlightNeuron(x, y);
+                }else{
+                    tooltip.setVisible(CharacterScreen.getGUI(), true);
+                }
+                contextMenu.removeHighlight();
             }
         }else{
             if(tooltip.isVisible()){
                 tooltip.setVisible(CharacterScreen.getGUI(), false);
+                highlight.removeFromParent();
             }
         }
     }
@@ -174,27 +209,13 @@ public class NeuroNetwork {
         }
     }
     
-    private static void createNeuroMenu(float x_offset){
-        neuroMenu = new Menu(x_offset, 0);
-        // Header Text:
-        neuroMenu.addLabel(0.4f, new Vector3f(0, 3.75f, 0), "Batman26", "Neuro Network", ColorRGBA.Green, Alignment.Center);
-        // Stats:
-        StatsDisplay stats = new StatsDisplay(15, new Vector3f(x_offset-2.5f, 2.75f, 0), 0.2f, -0.25f, 3f);
-        stats.setStat(0, "Health:", "1,000");
-        stats.setStat(1, "Shields:", "1,000");
-        node.attachChild(stats.getNode());
-        //neuroMenu.addLabel(0.2f, new Vector3f(-2.5f, 2.75f, 0), "OCRAStd", "A wild stat appears!", ColorRGBA.Cyan, Alignment.Left);
-        //neuroMenu.addLabel(0.2f, new Vector3f(-2.5f, 2.5f, 0), "OCRAStd", "A new and separate stat!", ColorRGBA.Orange, Alignment.Left);
-        node.attachChild(neuroMenu.getNode());
-        CharacterScreen.getGUI().attachChild(neuroMenu.getGUI());
-    }
     private static void createNeuroGrid(float x_offset){
         int x = 0;
         int y;
         while(x < NEURO_SIZE){
             y = 0;
             while(y < NEURO_SIZE){
-                neuron[x][y] = CG.createBox(node, x+","+y, new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0.01f),
+                neuron[x][y] = CG.createBox(node, "node("+x+","+y+")", new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0f),
                         new Vector3f((x*NEURO_SCALE)+(-NEURO_SCALE*5f)+((x-5)*NEURO_BUFFER)+x_offset, (y*NEURO_SCALE)+(-NEURO_SCALE*5f)+((y-5)*NEURO_BUFFER), 0),
                         getNeuroMaterialPath(x, y), new Vector2f(1, 1));
                 y++;
@@ -202,15 +223,33 @@ public class NeuroNetwork {
             x++;
         }
     }
+    private static void createNeuroMenu(float x, float y){
+        neuroMenu = new Menu(x, y);
+        // Header Text:
+        neuroMenu.addLabel(0.4f, new Vector3f(0, 3.75f, 0), "Batman26", "Neuro Network", ColorRGBA.Green, Alignment.Center);
+        node.attachChild(neuroMenu.getNode());
+    }
+    private static void createNeuroStats(float x, float y){
+        String[][] data = {
+            {"Health", "1,000"},
+            {"Shields", "1,000"},
+            {"Damage Increase", "+0%"},
+            {"Jump Height", "+0%"},
+            {"Critical Chance", "0%"},
+            {"Critical Damage", "1.50x"}};
+        stats = new StatsDisplay(data.length, new Vector3f(x, y, 0), 0.22f, "Batman26", -0.27f, 3.5f);
+        stats.setData(data);
+        node.attachChild(stats.getNode());
+    }
     public static void initialize(){
-        node = new Node("NeuroNode");
         createNeuroGrid(-3f);
-        createNeuroMenu(4f);
+        createNeuroMenu(4f, 0f);
+        createNeuroStats(2.25f, 2.75f);
         
         // Create highlight and mark geometries:
-        highlight = CG.createBox(node, "5,5", new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0.02f),
-                neuron[5][5].getLocalTranslation(), new ColorRGBA(1, 1, 1, 0.25f));
-        mark = CG.createBox(node, "5,5", new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0.02f),
-                neuron[5][5].getLocalTranslation(), new ColorRGBA(1, 1, 1, 0.5f));
+        highlight = CG.createBox(node, neuron[5][5].getName(), new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0.02f),
+                neuron[5][5].getLocalTranslation(), new ColorRGBA(1, 1, 1, 0.20f));
+        mark = CG.createBox(node, neuron[5][5].getName(), new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0.02f),
+                neuron[5][5].getLocalTranslation(), new ColorRGBA(1, 1, 1, 0.35f));
     }
 }

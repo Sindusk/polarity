@@ -28,6 +28,12 @@ public class T {
     public static String[] getArgs(String s){
         return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
     }
+    public static String getHeader(String s){
+        if(s.contains("(")){
+            return s.substring(0, s.indexOf("("));
+        }
+        return s;
+    }
     
     // Asset Management:
     public static BitmapFont getFont(String fnt){

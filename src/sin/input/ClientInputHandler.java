@@ -144,6 +144,7 @@ public class ClientInputHandler{
         
         // Actions:
         T.createMapping(charAction, "Click", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        T.createMapping(charAction, "RightClick", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         T.createMapping(charAction, "Exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
     }
     public static void initializeGame(){

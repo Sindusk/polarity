@@ -223,7 +223,16 @@ public class A {
     }
     public static CollisionResult getClosestCollision(Node node, Ray ray){
         CollisionResults results = getCollisions(node, ray);
-        return results.getClosestCollision();
+        String name;
+        int i = 0;
+        while(i < results.size()){
+            name = results.getCollision(i).getGeometry().getName();
+            if(!name.equals("BitmapFont")){
+                return results.getCollision(i);
+            }
+            i++;
+        }
+        return null;
     }
     public static CollisionResult getClosestCollisionNotPlayer(Node node, Ray ray, int player){
         CollisionResults results = getCollisions(node, ray);

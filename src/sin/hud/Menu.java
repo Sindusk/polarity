@@ -17,7 +17,6 @@ import sin.world.CG;
  */
 public class Menu {
     private Node node;
-    private Node gui;
     private ArrayList<SinText> labels = new ArrayList(1);
     private ArrayList<Geometry> buttons = new ArrayList(1);
     private float x, y;
@@ -27,7 +26,6 @@ public class Menu {
         this.y = y;
         node = new Node("Menu");
         node.setLocalTranslation(new Vector3f(x, y, 0));
-        gui = new Node("MenuGUI");
     }
     
     public boolean isButton(String name){
@@ -51,9 +49,6 @@ public class Menu {
     }
     public Node getNode(){
         return node;
-    }
-    public Node getGUI(){
-        return gui;
     }
     
     public void addLabel(float size, Vector3f trans, String font, String text, ColorRGBA color, Alignment align){

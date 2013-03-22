@@ -19,13 +19,12 @@ public class StatsDisplay {
     private ArrayList<SinText> values = new ArrayList(1);
     private Vector3f start;
     
-    public StatsDisplay(int num, Vector3f start, float size, float increment, float space){
+    public StatsDisplay(int num, Vector3f start, float size, String font, float increment, float space){
         this.start = start;
         int i = 0;
         while(i < num){
-            labels.add(CG.createSinText(node, size, start.add(0, increment*i, 0), "OCRAStd", "Label:", ColorRGBA.Orange, Alignment.Left));
-            values.add(CG.createSinText(node, size, start.add(space, increment*i, 0), "OCRAStd", "VAL", ColorRGBA.Orange, Alignment.Right));
-            T.log("meow"+start.toString());
+            labels.add(CG.createSinText(node, size, start.add(0, increment*i, 0), font, "Label:", ColorRGBA.Orange, Alignment.Left));
+            values.add(CG.createSinText(node, size, start.add(space, increment*i, 0), font, "VAL", ColorRGBA.Orange, Alignment.Right));
             i++;
         }
     }
@@ -34,6 +33,14 @@ public class StatsDisplay {
         return node;
     }
     
+    public void setData(String[][] data){
+        int i = 0;
+        while(i < data.length){
+            labels.get(i).setText(data[i][0]);
+            values.get(i).setText(data[i][1]);
+            i++;
+        }
+    }
     public void setStat(int index, String label, String value){
         labels.get(index).setText(label);
         values.get(index).setText(value);
