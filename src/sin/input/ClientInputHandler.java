@@ -47,6 +47,8 @@ public class ClientInputHandler{
             if(down){
                 if(bind.equals("Click")){
                     CharacterScreen.handleClick();
+                }else if(bind.equals("RightClick")){
+                    CharacterScreen.handleRightClick();
                 }else if(bind.equals("Exit")){
                     app.getMenuState().toggleGameMenu(false);
                 }

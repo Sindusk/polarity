@@ -32,6 +32,9 @@ public class Tooltip {
         return visible;
     }
     
+    public BitmapText getHeader(){
+        return header;
+    }
     public void setHeader(String str){
         header.setText(str);
     }

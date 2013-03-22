@@ -9,6 +9,7 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
@@ -16,6 +17,8 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
+import sin.geometry.SinText;
+import sin.geometry.SinText.Alignment;
 import sin.netdata.GeometryData;
 import sin.tools.S;
 import sin.tools.T;
@@ -28,13 +31,24 @@ public class CG {
     private static BulletAppState bulletAppState;
     
     // BitmapText:
-    public static BitmapText createText(Node node, int size, Vector3f trans, String font, ColorRGBA color){
+    public static BitmapText createText(Node node, float size, Vector3f trans, String font, ColorRGBA color){
         BitmapText text = new BitmapText(T.getFont(font));
         text.setColor(color);
         text.setSize(size);
         text.setLocalTranslation(trans);
         node.attachChild(text);
         return text;
+    }
+    public static SinText createSinText(Node node, float size, Vector3f trans, String font, String text, ColorRGBA color, Alignment align){
+        SinText txt = new SinText(T.getFont(font));
+        txt.setColor(color);
+        txt.setSize(size);
+        txt.setLocalTranslation(trans);
+        txt.setQueueBucket(Bucket.Transparent);
+        txt.setText(text);
+        txt.setAlignment(align);
+        node.attachChild(txt.getNode());
+        return txt;
     }
 
     // Boxes:

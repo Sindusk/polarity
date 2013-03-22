@@ -64,7 +64,7 @@ public class GameClient extends Application{
     
     // --- Global Constant Variables --- //
     private static final boolean MODE_DEBUG = false;         // Debug Mode
-    private static final String CLIENT_VERSION = "DEV 0.08"; // Client Version (Important for client-server connections)
+    private static final String CLIENT_VERSION = "DEV 0.09"; // Client Version (Important for client-server connections)
     private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
     
     // App States:
@@ -84,6 +84,7 @@ public class GameClient extends Application{
     public Node getGUI(){
         return gui;
     }
+    
     // Gameplay State Nodes:
     public Node getCollisionNode(){
         return gameState.getCollisionNode();

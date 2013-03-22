@@ -47,6 +47,9 @@ public class T {
         m.getTextureParam("ColorMap").getTextureValue().setWrap(Texture.WrapMode.Repeat);
         return m;
     }
+    public static String getGraphicPath(String tex){
+        return "Interface/Graphic/"+tex+".png";
+    }
     public static String getIconPath(String tex){
         return "Interface/Icons/"+tex+".png";
     }

@@ -75,7 +75,7 @@ public class C {
                 file.createNewFile();
                 T.log(file.getAbsolutePath());
                 BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-                NeuroNetwork.createNewNeuroNet(bw);
+                NeuroNetwork.writeNewNeuroNet(bw);
                 bw.close();
                 T.log("Finished creating new NeuroNet!");
             }else{
