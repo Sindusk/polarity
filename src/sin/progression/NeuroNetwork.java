@@ -9,12 +9,14 @@ import com.jme3.scene.Node;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import sin.character.CharacterScreen;
 import sin.geometry.SinText.Alignment;
 import sin.hud.ContextMenu;
 import sin.hud.Menu;
 import sin.hud.StatsDisplay;
 import sin.hud.Tooltip;
+import sin.tools.N;
 import sin.tools.S;
 import sin.tools.T;
 import sin.world.CG;
@@ -29,7 +31,7 @@ public class NeuroNetwork {
     private static final float NEURO_BUFFER = 0f;
     
     private static Tooltip tooltip = new Tooltip(new Vector3f(100, 50, 1), new Vector3f(0, 0, 0), new ColorRGBA(0.6f, 0.6f, 0.6f, 1), ColorRGBA.Black);
-    private static ContextMenu contextMenu = new ContextMenu(0.24f, Vector3f.ZERO, "Batman26", 1.4f, new ColorRGBA(23/255f, 92/255f, 12/255f, 1), ColorRGBA.Cyan);
+    private static ContextMenu contextMenu = new ContextMenu(0.235f, Vector3f.ZERO, "Batman26", 1.6f, new ColorRGBA(23/255f, 92/255f, 12/255f, 1), ColorRGBA.Cyan);
     private static Menu neuroMenu;
     private static StatsDisplay stats;
     
@@ -44,38 +46,57 @@ public class NeuroNetwork {
     }
     
     private static String getNeuroMaterialPath(int x, int y){
-        if(neuros[x][y].equals("x")){
+        String header = T.getHeader(neuros[x][y]);
+        if(header.equals(N.CONNECTOR)){
+            return T.getNeuroPath("connector");
+        }else if(header.equals(N.SOURCE)){
+            return T.getNeuroPath("source");
+        }else if(header.equals(N.LOCKED)){
             return T.getNeuroPath("locked");
-        }else if(neuros[x][y].equals("i")){
+        }else if(header.equals(N.EMPTY)){
             return T.getNeuroPath("empty");
-        }else if(neuros[x][y].equals("c")){
+        }else if(header.equals(N.CORE)){
             return T.getNeuroPath("core");
         }
-        return T.getMaterialPath("default");
+        T.log("Error @ getNeuroMaterialPath: No material found for ("+neuros[x][y]+")");
+        return T.getNeuroPath("default");
     }
     public static String getNeuroDescription(int x, int y){
-        if(neuros[x][y].equals("x")){
+        String header = T.getHeader(neuros[x][y]);
+        if(header.equals(N.CONNECTOR)){
+            return "Connects nodes.";
+        }else if(header.equals("source")){
+            return "+1% Damage";
+        }else if(header.equals("locked")){
             return "Level up to unlock.";
-        }else if(neuros[x][y].equals("i")){
+        }else if(header.equals("empty")){
             return "Fill with an\nobject to use.";
-        }else if(neuros[x][y].equals("c")){
+        }else if(header.equals("core")){
             return "Connect nodes to\nthe core to use.";
         }
-        T.log("Error @ getNeuroDescription!");
+        T.log("Error @ getNeuroDescription: No description found for ("+neuros[x][y]+")");
         return "NULL";
     }
     public static String getNeuroHeader(int x, int y){
-        if(neuros[x][y].equals("x")){
+        String header = T.getHeader(neuros[x][y]);
+        if(header.equals(N.CONNECTOR)){
+            return "Connector";
+        }else if(header.equals(N.SOURCE)){
+            return "Source (Damage)";
+        }else if(header.equals(N.LOCKED)){
             return "Locked Node";
-        }else if(neuros[x][y].equals("i")){
+        }else if(header.equals(N.EMPTY)){
             return "Empty Node";
-        }else if(neuros[x][y].equals("c")){
+        }else if(header.equals(N.CORE)){
             return "Neuro Core";
         }
-        T.log("Error! No proper string found for neuros["+x+"]["+y+"]! ("+neuros[x][y]+")");
+        T.log("Error @ getNeuroHeader: No header found for ("+neuros[x][y]+")");
         return "NULL";
     }
     
+    private static void updateNeuro(int x, int y){
+        neuron[x][y].setMaterial(T.getMaterial(getNeuroMaterialPath(x, y)));
+    }
     public static void markNeuron(int x, int y){
         mark.setName(neuron[x][y].getName());
         mark.setLocalTranslation(neuron[x][y].getLocalTranslation());
@@ -87,22 +108,28 @@ public class NeuroNetwork {
             node.attachChild(highlight);
         }
     }
-    public static void updateTooltip(Vector2f mouseLoc, Tooltip t, int x, int y){
-        t.updateLocation(mouseLoc);
-        t.setHeader(getNeuroHeader(x, y));
-        t.setText(getNeuroDescription(x, y));
+    public static void updateTooltip(Vector2f mouseLoc, int x, int y){
+        tooltip.updateLocation(mouseLoc);
+        tooltip.setHeader(getNeuroHeader(x, y));
+        tooltip.setText(getNeuroDescription(x, y));
     }
     
     private static void contextAction(String name){
         String[] data = T.getArgs(mark.getName());
         int x = Integer.parseInt(data[0]);
         int y = Integer.parseInt(data[1]);
-        if(name.equals("unlock")){
-            T.log("unlocking");
-            if(neuros[x][y].equals("x")){
-                neuros[x][y] = "i";
-                neuron[x][y].setMaterial(T.getMaterial(getNeuroMaterialPath(x, y)));
-            }
+        if(name.equals("connector")){
+            T.log("Adding connector: "+x+", "+y);
+            neuros[x][y] = N.CONNECTOR+"(vert)";
+            updateNeuro(x, y);
+        }else if(name.equals("source")){
+            T.log("Adding source: "+x+", "+y);
+            neuros[x][y] = N.SOURCE;
+            updateNeuro(x, y);
+        }else if(name.equals("unlock")){
+            T.log("Unlocking: "+x+", "+y);
+            neuros[x][y] = N.EMPTY;
+            updateNeuro(x, y);
         }
         contextMenu.destroy();
     }
@@ -117,9 +144,9 @@ public class NeuroNetwork {
             int x = Integer.parseInt(args[0]);
             int y = Integer.parseInt(args[1]);
             markNeuron(x, y);
-            String[][] data = {{"unlock", "Unlock Node"}, {"other", "Other [NYI]"}};
-            contextMenu.setLocalTranslation(target.getContactPoint().add(0, 0, 0.01f));
+            ArrayList<String[]> data = N.getNeuroOptions(neuros[x][y]);
             contextMenu.setData(data);
+            contextMenu.setLocalTranslation(target.getContactPoint().add(0, 0, 0.01f));
             node.attachChild(contextMenu.getNode());
         }
     }
@@ -152,7 +179,7 @@ public class NeuroNetwork {
                 int x = Integer.parseInt(data[0]);
                 int y = Integer.parseInt(data[1]);
                 if(tooltip.isVisible()){
-                    updateTooltip(mouseLoc, tooltip, x, y);
+                    updateTooltip(mouseLoc, x, y);
                     highlightNeuron(x, y);
                 }else{
                     tooltip.setVisible(CharacterScreen.getGUI(), true);
@@ -190,13 +217,13 @@ public class NeuroNetwork {
             y = 0;
             while(y < NEURO_SIZE){
                 if(x == 5 && y == 5){
-                    neuros[x][y] = "c";
+                    neuros[x][y] = N.CORE;
                 }else if((x >= 3 && x <= 7) && (y >= 3 && y <= 7) &&
                         !(x == 3 && y == 3) && !(x == 3 && y == 7) &&
                         !(x == 7 && y == 3) && !(x == 7 && y == 7)){
-                    neuros[x][y] = "i";
+                    neuros[x][y] = N.EMPTY;
                 }else{
-                    neuros[x][y] = "x";
+                    neuros[x][y] = N.LOCKED;
                 }
                 bw.write(neuros[x][y]);
                 y++;
@@ -241,6 +268,7 @@ public class NeuroNetwork {
         stats.setData(data);
         node.attachChild(stats.getNode());
     }
+    
     public static void initialize(){
         createNeuroGrid(-3f);
         createNeuroMenu(4f, 0f);

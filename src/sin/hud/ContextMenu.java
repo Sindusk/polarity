@@ -56,16 +56,18 @@ public class ContextMenu {
     public void setLocalTranslation(Vector3f trans){
         node.setLocalTranslation(trans);
     }
-    public void setData(String[][] data){
+    public void setData(ArrayList<String[]> data){
         int i = 0;
         node.detachAllChildren();
         labels = new ArrayList(1);
         boxes = new ArrayList(1);
         SinText label = null;
         Geometry box;
-        while(i < data.length){
-            label = CG.createSinText(node, size, new Vector3f(size, -size*i, 0), font, data[i][1], textColor, SinText.Alignment.Left);
-            box = CG.createBox(node, data[i][0], new Vector3f(x_size, label.getLineHeight()*0.5f, 0),
+        String[] temp;
+        while(i < data.size()){
+            temp = data.get(i);
+            label = CG.createSinText(node, size, new Vector3f(size, -size*i, 0), font, temp[1], textColor, SinText.Alignment.Left);
+            box = CG.createBox(node, temp[0], new Vector3f(x_size, label.getLineHeight()*0.5f, 0),
                     new Vector3f(x_size, -label.getLineHeight()+(-size*i), 0), backColor);
             labels.add(label);
             boxes.add(box);
