@@ -16,6 +16,7 @@ import sin.hud.ContextMenu;
 import sin.hud.Menu;
 import sin.hud.StatsDisplay;
 import sin.hud.Tooltip;
+import sin.progression.Neuro.NeuroType;
 import sin.tools.N;
 import sin.tools.S;
 import sin.tools.T;
@@ -27,16 +28,14 @@ import sin.world.CG;
  */
 public class NeuroNetwork {
     private static final int NEURO_SIZE = 11;
-    private static final float NEURO_SCALE = 0.7f;
-    private static final float NEURO_BUFFER = 0f;
+    private static final Vector3f GRID_OFFSET = new Vector3f(-3, 0, 0);
     
     private static Tooltip tooltip = new Tooltip(new Vector3f(100, 50, 1), new Vector3f(0, 0, 0), new ColorRGBA(0.6f, 0.6f, 0.6f, 1), ColorRGBA.Black);
     private static ContextMenu contextMenu = new ContextMenu(0.235f, Vector3f.ZERO, "Batman26", 1.6f, new ColorRGBA(23/255f, 92/255f, 12/255f, 1), ColorRGBA.Cyan);
     private static Menu neuroMenu;
     private static StatsDisplay stats;
+    private static Neuro[][] neuro = new Neuro[NEURO_SIZE][NEURO_SIZE];
     
-    private static String[][] neuros = new String[NEURO_SIZE][NEURO_SIZE];
-    private static Geometry[][] neuron = new Geometry[NEURO_SIZE][NEURO_SIZE];
     private static Geometry highlight;
     private static Geometry mark;
     private static Node node = new Node("NeuroNode");
@@ -45,73 +44,34 @@ public class NeuroNetwork {
         return node;
     }
     
-    private static String getNeuroMaterialPath(int x, int y){
-        String header = T.getHeader(neuros[x][y]);
-        if(header.equals(N.CONNECTOR)){
-            return T.getNeuroPath("connector");
-        }else if(header.equals(N.SOURCE)){
-            return T.getNeuroPath("source");
-        }else if(header.equals(N.LOCKED)){
-            return T.getNeuroPath("locked");
-        }else if(header.equals(N.EMPTY)){
-            return T.getNeuroPath("empty");
-        }else if(header.equals(N.CORE)){
-            return T.getNeuroPath("core");
+    private static void calculateNetwork(){
+        int x = 0;
+        int y;
+        while(x < NEURO_SIZE){
+            y = 0;
+            while(y < NEURO_SIZE){
+                neuro[x][y].pulse();
+                y++;
+            }
+            x++;
         }
-        T.log("Error @ getNeuroMaterialPath: No material found for ("+neuros[x][y]+")");
-        return T.getNeuroPath("default");
-    }
-    public static String getNeuroDescription(int x, int y){
-        String header = T.getHeader(neuros[x][y]);
-        if(header.equals(N.CONNECTOR)){
-            return "Connects nodes.";
-        }else if(header.equals("source")){
-            return "+1% Damage";
-        }else if(header.equals("locked")){
-            return "Level up to unlock.";
-        }else if(header.equals("empty")){
-            return "Fill with an\nobject to use.";
-        }else if(header.equals("core")){
-            return "Connect nodes to\nthe core to use.";
-        }
-        T.log("Error @ getNeuroDescription: No description found for ("+neuros[x][y]+")");
-        return "NULL";
-    }
-    public static String getNeuroHeader(int x, int y){
-        String header = T.getHeader(neuros[x][y]);
-        if(header.equals(N.CONNECTOR)){
-            return "Connector";
-        }else if(header.equals(N.SOURCE)){
-            return "Source (Damage)";
-        }else if(header.equals(N.LOCKED)){
-            return "Locked Node";
-        }else if(header.equals(N.EMPTY)){
-            return "Empty Node";
-        }else if(header.equals(N.CORE)){
-            return "Neuro Core";
-        }
-        T.log("Error @ getNeuroHeader: No header found for ("+neuros[x][y]+")");
-        return "NULL";
     }
     
-    private static void updateNeuro(int x, int y){
-        neuron[x][y].setMaterial(T.getMaterial(getNeuroMaterialPath(x, y)));
-    }
     public static void markNeuron(int x, int y){
-        mark.setName(neuron[x][y].getName());
-        mark.setLocalTranslation(neuron[x][y].getLocalTranslation());
+        mark.setName(neuro[x][y].getGeometry().getName());
+        mark.setLocalTranslation(neuro[x][y].getGeometry().getLocalTranslation().add(GRID_OFFSET));
     }
     public static void highlightNeuron(int x, int y){
-        highlight.setName(neuron[x][y].getName());
-        highlight.setLocalTranslation(neuron[x][y].getLocalTranslation());
+        highlight.setName(neuro[x][y].getGeometry().getName());
+        highlight.setLocalTranslation(neuro[x][y].getGeometry().getLocalTranslation().add(GRID_OFFSET));
         if(!node.hasChild(highlight)){
             node.attachChild(highlight);
         }
     }
     public static void updateTooltip(Vector2f mouseLoc, int x, int y){
         tooltip.updateLocation(mouseLoc);
-        tooltip.setHeader(getNeuroHeader(x, y));
-        tooltip.setText(getNeuroDescription(x, y));
+        tooltip.setHeader(neuro[x][y].getHeader());
+        tooltip.setText(neuro[x][y].getDescription());
     }
     
     private static void contextAction(String name){
@@ -120,17 +80,18 @@ public class NeuroNetwork {
         int y = Integer.parseInt(data[1]);
         if(name.equals("connector")){
             T.log("Adding connector: "+x+", "+y);
-            neuros[x][y] = N.CONNECTOR+"(vert)";
-            updateNeuro(x, y);
+            neuro[x][y].setType(NeuroType.CONNECTOR);
+            neuro[x][y].updateGeometry();
         }else if(name.equals("source")){
             T.log("Adding source: "+x+", "+y);
-            neuros[x][y] = N.SOURCE;
-            updateNeuro(x, y);
+            neuro[x][y].setType(NeuroType.SOURCE);
+            neuro[x][y].updateGeometry();
         }else if(name.equals("unlock")){
             T.log("Unlocking: "+x+", "+y);
-            neuros[x][y] = N.EMPTY;
-            updateNeuro(x, y);
+            neuro[x][y].setType(NeuroType.EMPTY);
+            neuro[x][y].updateGeometry();
         }
+        calculateNetwork();
         contextMenu.destroy();
     }
     public static void handleRightClick(Vector2f mouseLoc){
@@ -144,7 +105,7 @@ public class NeuroNetwork {
             int x = Integer.parseInt(args[0]);
             int y = Integer.parseInt(args[1]);
             markNeuron(x, y);
-            ArrayList<String[]> data = N.getNeuroOptions(neuros[x][y]);
+            ArrayList<String[]> data = N.getNeuroOptions(neuro[x][y]);
             contextMenu.setData(data);
             contextMenu.setLocalTranslation(target.getContactPoint().add(0, 0, 0.01f));
             node.attachChild(contextMenu.getNode());
@@ -203,7 +164,7 @@ public class NeuroNetwork {
                 data = br.readLine().split(":");
                 n = 0;
                 while(n < NEURO_SIZE){
-                    neuros[n][(NEURO_SIZE-1)-i] = data[n];
+                    neuro[n][(NEURO_SIZE-1)-i] = new Neuro(T.getHeader(data[n]), T.getArgs(data[n]));
                     n++;
                 }
             }
@@ -217,15 +178,15 @@ public class NeuroNetwork {
             y = 0;
             while(y < NEURO_SIZE){
                 if(x == 5 && y == 5){
-                    neuros[x][y] = N.CORE;
+                    neuro[x][y].setType(NeuroType.CORE);
                 }else if((x >= 3 && x <= 7) && (y >= 3 && y <= 7) &&
                         !(x == 3 && y == 3) && !(x == 3 && y == 7) &&
                         !(x == 7 && y == 3) && !(x == 7 && y == 7)){
-                    neuros[x][y] = N.EMPTY;
+                    neuro[x][y].setType(NeuroType.EMPTY);
                 }else{
-                    neuros[x][y] = N.LOCKED;
+                    neuro[x][y].setType(NeuroType.LOCKED);
                 }
-                bw.write(neuros[x][y]);
+                bw.write(neuro[x][y].getWritable());
                 y++;
                 if(y != NEURO_SIZE){
                     bw.write(":");
@@ -236,15 +197,13 @@ public class NeuroNetwork {
         }
     }
     
-    private static void createNeuroGrid(float x_offset){
+    private static void createNeuroGrid(){
         int x = 0;
         int y;
         while(x < NEURO_SIZE){
             y = 0;
             while(y < NEURO_SIZE){
-                neuron[x][y] = CG.createBox(node, "node("+x+","+y+")", new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0f),
-                        new Vector3f((x*NEURO_SCALE)+(-NEURO_SCALE*5f)+((x-5)*NEURO_BUFFER)+x_offset, (y*NEURO_SCALE)+(-NEURO_SCALE*5f)+((y-5)*NEURO_BUFFER), 0),
-                        getNeuroMaterialPath(x, y), new Vector2f(1, 1));
+                neuro[x][y].createGeometry(x, y);
                 y++;
             }
             x++;
@@ -270,14 +229,16 @@ public class NeuroNetwork {
     }
     
     public static void initialize(){
-        createNeuroGrid(-3f);
+        createNeuroGrid();
         createNeuroMenu(4f, 0f);
         createNeuroStats(2.25f, 2.75f);
+        node.attachChild(Neuro.getNode());
+        Neuro.getNode().setLocalTranslation(GRID_OFFSET);
         
         // Create highlight and mark geometries:
-        highlight = CG.createBox(node, neuron[5][5].getName(), new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0.02f),
-                neuron[5][5].getLocalTranslation(), new ColorRGBA(1, 1, 1, 0.20f));
-        mark = CG.createBox(node, neuron[5][5].getName(), new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0.02f),
-                neuron[5][5].getLocalTranslation(), new ColorRGBA(1, 1, 1, 0.35f));
+        highlight = CG.createBox(node, "node(5,5)", new Vector3f(Neuro.NEURO_SCALE*0.5f, Neuro.NEURO_SCALE*0.5f, 0.02f),
+                neuro[5][5].getGeometry().getLocalTranslation().add(GRID_OFFSET), new ColorRGBA(1, 1, 1, 0.20f));
+        mark = CG.createBox(node, "node(5,5)", new Vector3f(Neuro.NEURO_SCALE*0.5f, Neuro.NEURO_SCALE*0.5f, 0.02f),
+                neuro[5][5].getGeometry().getLocalTranslation().add(GRID_OFFSET), new ColorRGBA(1, 1, 1, 0.35f));
     }
 }

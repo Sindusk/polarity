@@ -26,7 +26,10 @@ public class T {
     
     // Parsing Assist:
     public static String[] getArgs(String s){
-        return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
+        if(s.contains("(") && s.contains(")")){
+            return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
+        }
+        return "".split(":");
     }
     public static String getHeader(String s){
         if(s.contains("(")){
