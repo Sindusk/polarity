@@ -4,7 +4,9 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import java.util.ArrayList;
 import sin.tools.T;
+import sin.tools.T.Vector2i;
 import sin.world.CG;
 
 /**
@@ -16,15 +18,17 @@ public class Neuro {
     private static final float NEURO_BUFFER = 0f;
     
     private static Node node = new Node("NeuroNode");
+    private ArrayList<Vector2i> outlets = new ArrayList(1);
     private Geometry neuron;
     private NeuroType type;
-    private String[] data;
+    private ArrayList<String> data;
     private String header;
     private String description;
     
     public enum NeuroType{
         CONNECTOR("connector"),
         CORE("core"),
+        CORNER("corner"),
         EMPTY("empty"),
         LOCKED("locked"),
         SOURCE("source");
@@ -42,6 +46,8 @@ public class Neuro {
                 return NeuroType.CONNECTOR;
             }else if(s.equals(CORE.type)){
                 return NeuroType.CORE;
+            }else if(s.equals(CORNER.type)){
+                return NeuroType.CORNER;
             }else if(s.equals(LOCKED.type)){
                 return NeuroType.LOCKED;
             }else if(s.equals(SOURCE.type)){
@@ -51,9 +57,23 @@ public class Neuro {
         }
     }
     
-    public Neuro(String type, String[] data){
+    public Neuro(String type, ArrayList<String> data){
         this.type = NeuroType.convert(type);
         this.data = data;
+        Vector2i temp;
+        if(data.size() > 0){
+            if(T.getHeader(data.get(0)).equals("outs")){
+                ArrayList<String> outs = T.getInnerArgs(data.get(0));
+                int i = 1;
+                int x, y;
+                while(i < outs.size()){
+                    x = Integer.parseInt(outs.get(i-1));
+                    y = Integer.parseInt(outs.get(i));
+                    outlets.add(new Vector2i(x, y));
+                    i+=2;
+                }
+            }
+        }
         header = updateHeader();
         description = updateDescription();
     }
@@ -61,6 +81,7 @@ public class Neuro {
     public static Node getNode(){
         return node;
     }
+    
     public Geometry getGeometry(){
         return neuron;
     }
@@ -73,12 +94,18 @@ public class Neuro {
     public NeuroType getType(){
         return type;
     }
+    public ArrayList<Vector2i> getOuts(){
+        return outlets;
+    }
+    public ArrayList<String> getData(){
+        return data;
+    }
     public String getWritable(){
         String writable = type.getType()+"(";
         if(data != null){
             int i = 0;
-            while(i < data.length){
-                writable += data[i]+",";
+            while(i < data.size()){
+                writable += data.get(i)+",";
                 i++;
             }
         }
@@ -92,7 +119,10 @@ public class Neuro {
         header = updateHeader();
         description = updateDescription();
     }
-    public void setData(String[] data){
+    public void setOuts(ArrayList<Vector2i> outs){
+        this.outlets = outs;
+    }
+    public void setData(ArrayList<String> data){
         this.data = data;
         header = updateHeader();
         description = updateDescription();
@@ -100,6 +130,8 @@ public class Neuro {
     
     private String updateHeader(){
         if(type.equals(NeuroType.CONNECTOR)){
+            return "Connector";
+        }else if(type.equals(NeuroType.CORNER)){
             return "Connector";
         }else if(type.equals(NeuroType.SOURCE)){
             return "Source (Damage)";
@@ -116,6 +148,8 @@ public class Neuro {
     private String updateDescription(){
         if(type.equals(NeuroType.CONNECTOR)){
             return "Connects nodes.";
+        }else if(type.equals(NeuroType.CORNER)){
+            return "Connects nodes.";
         }else if(type.equals(NeuroType.SOURCE)){
             return "+1% Damage";
         }else if(type.equals(NeuroType.LOCKED)){
@@ -130,10 +164,6 @@ public class Neuro {
     }
     public void updateGeometry(){
         neuron.setMaterial(T.getMaterial(T.getNeuroPath(type.getType())));
-    }
-    
-    public void pulse(){
-        // implement
     }
     
     public void createGeometry(int x, int y){

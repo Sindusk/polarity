@@ -6,6 +6,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import java.util.ArrayList;
 import java.util.HashMap;
 import sin.player.PlayerManager;
 import sin.world.FloatingTextManager;
@@ -100,29 +101,29 @@ public class A {
     // Attack Parsing:
     public static void initializeUpdate(Projectile p){
         String[] actions = p.getUpdate().split(":");
-        String[] args;
+        ArrayList<String> args;
         UpdateMap.put(p, new HashMap());
         int i = 0;
         while(i < actions.length){
             if(actions[i].contains("spiral")){
                 args = T.getArgs(actions[i]);
                 UpdateMap.get(p).put(i+"spiral.timer", 0f);
-                UpdateMap.get(p).put(i+"spiral.rot", Float.parseFloat(args[0]));
+                UpdateMap.get(p).put(i+"spiral.rot", Float.parseFloat(args.get(0)));
             }
             i++;
         }
     }
     public static void parseCollision(int attacker, String collision, CollisionResult target){
         String[] actions = collision.split(":");
-        String[] args;
+        ArrayList<String> args;
         int i = 0;
         while(i < actions.length){
             if(actions[i].contains("damage")){
                 args = T.getArgs(actions[i]);
-                A.damage(attacker, target, Float.parseFloat(args[0]));
+                A.damage(attacker, target, Float.parseFloat(args.get(0)));
             }else if(actions[i].contains("aoe")){
                 args = T.getArgs(actions[i]);
-                A.damageAoE(attacker, target, Float.parseFloat(args[0]), Float.parseFloat(args[1]));
+                A.damageAoE(attacker, target, Float.parseFloat(args.get(0)), Float.parseFloat(args.get(1)));
             }
             i++;
         }
@@ -139,7 +140,7 @@ public class A {
             return;
         }
         String[] actions = p.getUpdate().split(":");
-        String[] args;
+        ArrayList<String> args;
         int i = 0;
         while(i < actions.length){
             if(actions[i].contains("spiral")){
@@ -149,11 +150,11 @@ public class A {
                 if(meow.get(i+"spiral.timer") != null){
                     timer = meow.get(i+"spiral.timer");
                 }
-                if(timer > Float.parseFloat(args[1])){
+                if(timer > Float.parseFloat(args.get(1))){
                     float rot = UpdateMap.get(p).get(i+"spiral.rot");
                     ProjectileManager.addNew(p.getOwner(), p.getLocation().clone(), spiral(p, rot), new Vector3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy");
                     ServerNetwork.broadcast(new ProjectileData(p.getOwner(), p.getLocation().clone(), spiral(p, rot), new Vector3f(0, 0, 0), 20, 20, "", "damage(2.3):destroy"));
-                    rot += Float.parseFloat(args[2]);
+                    rot += Float.parseFloat(args.get(2));
                     UpdateMap.get(p).put(i+"spiral.rot", rot);
                     timer = 0;
                 }else{

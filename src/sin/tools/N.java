@@ -23,6 +23,7 @@ public class N {
         }else if(type.equals(NeuroType.EMPTY)){
             options.add(createOption("source", "Create Source"));
             options.add(createOption("connector", "Create Connector"));
+            options.add(createOption("corner", "Create Corner"));
         }
         options.add(createOption("cancel", "Cancel"));
         return options;

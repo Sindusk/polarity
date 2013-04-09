@@ -124,7 +124,7 @@ public class Weapons{
         }
     }
     private enum Archetype{
-        ANCIENT, MODERN, ENERGY, EXPLOSIVE, ELEMENTAL
+        ANCIENT, ELEMENTAL, ENERGY, EXPLOSIVE, MODERN
     }
     private enum Classification{
         SLASHING, PISTOL, ASSAULT, SNIPER, LAUNCHER, LASER

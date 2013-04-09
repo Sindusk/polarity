@@ -20,6 +20,7 @@ import sin.progression.Neuro.NeuroType;
 import sin.tools.N;
 import sin.tools.S;
 import sin.tools.T;
+import sin.tools.T.Vector2i;
 import sin.world.CG;
 
 /**
@@ -40,6 +41,67 @@ public class NeuroNetwork {
     private static Geometry mark;
     private static Node node = new Node("NeuroNode");
     
+    private static class PulseHandler{
+        private ArrayList<Pulse> pulses = new ArrayList(1);
+        
+        private static class Pulse{
+            private Vector2i loc;
+            private Vector2i dir;
+            private ArrayList<String> data = new ArrayList(1);
+            
+            public Pulse(Vector2i loc, Vector2i dir){
+                this.data = neuro[loc.x][loc.y].getData();
+                this.loc = loc.add(dir);
+                this.dir = dir;
+            }
+            
+            private Vector2i canConnect(){
+                ArrayList<Vector2i> outs = neuro[loc.x][loc.y].getOuts();
+                int i = 0;
+                while(i < outs.size()){
+                    if(outs.get(i).equalsInverted(dir)){
+                        return outs.get(i);
+                    }
+                    i++;
+                }
+                return null;
+            }
+            public void execute(){
+                Vector2i in = canConnect();
+                if(in != null){
+                    ArrayList<Vector2i> outs = (ArrayList<Vector2i>) neuro[loc.x][loc.y].getOuts().clone();
+                    outs.remove(in);
+                    if(outs.size() == 1){
+                        dir = outs.get(0);
+                        if(neuro[loc.x][loc.y].getType().equals(NeuroType.CONNECTOR) || neuro[loc.x][loc.y].getType().equals(NeuroType.CORNER)){
+                            loc.addLocal(dir);
+                            execute();
+                        }
+                    }
+                }else if(neuro[loc.x][loc.y].getType().equals(NeuroType.CORE)){
+                    stats.updateStat("Health", "Connected!");
+                }
+            }
+        }
+        
+        public PulseHandler(int x, int y){
+            ArrayList<Vector2i> outs = neuro[x][y].getOuts();
+            int i = 0;
+            while(i < outs.size()){
+                pulses.add(new Pulse(new Vector2i(x, y), outs.get(i).clone()));
+                i++;
+            }
+        }
+        
+        public void execute(){
+            int i = 0;
+            while(i < pulses.size()){
+                pulses.get(i).execute();
+                i++;
+            }
+        }
+    }
+    
     public static Node getNode(){
         return node;
     }
@@ -47,10 +109,14 @@ public class NeuroNetwork {
     private static void calculateNetwork(){
         int x = 0;
         int y;
+        PulseHandler handler;
         while(x < NEURO_SIZE){
             y = 0;
             while(y < NEURO_SIZE){
-                neuro[x][y].pulse();
+                if(neuro[x][y].getType().equals(NeuroType.SOURCE)){
+                    handler = new PulseHandler(x, y);
+                    handler.execute();
+                }
                 y++;
             }
             x++;
@@ -75,16 +141,32 @@ public class NeuroNetwork {
     }
     
     private static void contextAction(String name){
-        String[] data = T.getArgs(mark.getName());
-        int x = Integer.parseInt(data[0]);
-        int y = Integer.parseInt(data[1]);
+        ArrayList<String> data = T.getArgs(mark.getName());
+        int x = Integer.parseInt(data.get(0));
+        int y = Integer.parseInt(data.get(1));
         if(name.equals("connector")){
             T.log("Adding connector: "+x+", "+y);
+            ArrayList<Vector2i> outs = new ArrayList(1);
+            outs.add(new Vector2i(0, 1));
+            outs.add(new Vector2i(0, -1));
             neuro[x][y].setType(NeuroType.CONNECTOR);
+            neuro[x][y].setOuts(outs);
             neuro[x][y].updateGeometry();
-        }else if(name.equals("source")){
+        }else if(name.equals("corner")){
+            T.log("Adding corner: "+x+", "+y);
+            ArrayList<Vector2i> outs = new ArrayList(1);
+            outs.add(new Vector2i(0, 1));
+            outs.add(new Vector2i(-1, 0));
+            neuro[x][y].setType(NeuroType.CORNER);
+            neuro[x][y].setOuts(outs);
+            neuro[x][y].updateGeometry();
+        }
+        else if(name.equals("source")){
             T.log("Adding source: "+x+", "+y);
+            ArrayList<Vector2i> outs = new ArrayList(1);
+            outs.add(new Vector2i(0, -1));
             neuro[x][y].setType(NeuroType.SOURCE);
+            neuro[x][y].setOuts(outs);
             neuro[x][y].updateGeometry();
         }else if(name.equals("unlock")){
             T.log("Unlocking: "+x+", "+y);
@@ -101,9 +183,9 @@ public class NeuroNetwork {
         }
         String name = target.getGeometry().getName();
         if(T.getHeader(name).equals("node")){
-            String[] args = T.getArgs(name);
-            int x = Integer.parseInt(args[0]);
-            int y = Integer.parseInt(args[1]);
+            ArrayList<String> args = T.getArgs(name);
+            int x = Integer.parseInt(args.get(0));
+            int y = Integer.parseInt(args.get(1));
             markNeuron(x, y);
             ArrayList<String[]> data = N.getNeuroOptions(neuro[x][y]);
             contextMenu.setData(data);
@@ -119,9 +201,9 @@ public class NeuroNetwork {
         if(contextMenu.isOption(name)){
             contextAction(name);
         }else if(T.getHeader(name).equals("node")) {
-            String[] args = T.getArgs(name);
-            int x = Integer.parseInt(args[0]);
-            int y = Integer.parseInt(args[1]);
+            ArrayList<String> args = T.getArgs(name);
+            int x = Integer.parseInt(args.get(0));
+            int y = Integer.parseInt(args.get(1));
             NeuroNetwork.markNeuron(x, y);
             contextMenu.destroy();
         }
@@ -136,9 +218,9 @@ public class NeuroNetwork {
                 tooltip.setVisible(CharacterScreen.getGUI(), false);
                 highlight.removeFromParent();
             }else if(T.getHeader(name).equals("node")){
-                String[] data = T.getArgs(name);
-                int x = Integer.parseInt(data[0]);
-                int y = Integer.parseInt(data[1]);
+                ArrayList<String> data = T.getArgs(name);
+                int x = Integer.parseInt(data.get(0));
+                int y = Integer.parseInt(data.get(1));
                 if(tooltip.isVisible()){
                     updateTooltip(mouseLoc, x, y);
                     highlightNeuron(x, y);
@@ -164,7 +246,7 @@ public class NeuroNetwork {
                 data = br.readLine().split(":");
                 n = 0;
                 while(n < NEURO_SIZE){
-                    neuro[n][(NEURO_SIZE-1)-i] = new Neuro(T.getHeader(data[n]), T.getArgs(data[n]));
+                    neuro[n][(NEURO_SIZE-1)-i] = new Neuro(T.getHeader(data[n]), T.getArgs(data[0]));
                     n++;
                 }
             }

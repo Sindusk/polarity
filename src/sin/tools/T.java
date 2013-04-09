@@ -13,6 +13,8 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.texture.Texture;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,12 +26,67 @@ public class T {
     public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
     public static final float ROOT_HALF = 1.0f/FastMath.sqrt(2);
     
-    // Parsing Assist:
-    public static String[] getArgs(String s){
-        if(s.contains("(") && s.contains(")")){
-            return s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",");
+    public static class Vector2i{
+        public int x;
+        public int y;
+        
+        public Vector2i(int x, int y){
+            this.x = x;
+            this.y = y;
         }
-        return "".split(":");
+        
+        public void addLocal(Vector2i other){
+            this.x += other.x;
+            this.y += other.y;
+        }
+        public Vector2i add(Vector2i other){
+            return new Vector2i(x+other.x, y+other.y);
+        }
+        
+        public boolean equalsInverted(Vector2i other){
+            if(other.x != -this.x){
+                return false;
+            }
+            if(other.y != -this.y){
+                return false;
+            }
+            return true;
+        }
+        public boolean equals(Vector2i other){
+            if(this == other){
+                return true;
+            }
+            if(other.x != this.x){
+                return false;
+            }
+            if(other.y != this.y){
+                return false;
+            }
+            return true;
+        }
+        
+        @Override
+        public Vector2i clone(){
+            return new Vector2i(x, y);
+        }
+        @Override
+        public String toString(){
+            return "("+x+", "+y+")";
+        }
+    }
+    
+    // Parsing Assist:
+    public static ArrayList<String> getArgs(String s){
+        if(s.contains("(") && s.contains(")")){
+            return new ArrayList<String>(Arrays.asList(s.substring(s.indexOf("(")+1, s.indexOf(")")).split(",")));
+        }
+        return new ArrayList<String>(Arrays.asList("".split(",")));
+    }
+    public static ArrayList<String> getInnerArgs(String s){
+        if(s.contains("[") && s.contains("]")){
+            return new ArrayList<String>(Arrays.asList(s.substring(s.indexOf("[")+1, s.indexOf("]")).split(";")));
+        }
+        return new ArrayList<String>(Arrays.asList("".split(";")));
     }
     public static String getHeader(String s){
         if(s.contains("(")){

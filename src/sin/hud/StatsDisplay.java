@@ -45,4 +45,16 @@ public class StatsDisplay {
         labels.get(index).setText(label);
         values.get(index).setText(value);
     }
+    
+    public void updateStat(String label, String value){
+        int i = 0;
+        while(i < labels.size()){
+            if(labels.get(i).getText().equals(label)){
+                values.get(i).setText(value);
+                return;
+            }
+            i++;
+        }
+        T.log("Error @ updateStat: Could not find label ("+label+")");
+    }
 }
