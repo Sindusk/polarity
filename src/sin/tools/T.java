@@ -94,6 +94,12 @@ public class T {
         }
         return s;
     }
+    public static String getInnerHeader(String s){
+        if(s.contains("[")){
+            return s.substring(0, s.indexOf("["));
+        }
+        return s;
+    }
     
     // Asset Management:
     public static BitmapFont getFont(String fnt){

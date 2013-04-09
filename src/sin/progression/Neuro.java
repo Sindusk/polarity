@@ -1,10 +1,12 @@
 package sin.progression;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import java.util.ArrayList;
+import sin.tools.N;
 import sin.tools.T;
 import sin.tools.T.Vector2i;
 import sin.world.CG;
@@ -16,159 +18,205 @@ import sin.world.CG;
 public class Neuro {
     public static final float NEURO_SCALE = 0.7f;
     private static final float NEURO_BUFFER = 0f;
-    
     private static Node node = new Node("NeuroNode");
-    private ArrayList<Vector2i> outlets = new ArrayList(1);
-    private Geometry neuron;
-    private NeuroType type;
-    private ArrayList<String> data;
-    private String header;
-    private String description;
-    
-    public enum NeuroType{
-        CONNECTOR("connector"),
-        CORE("core"),
-        CORNER("corner"),
-        EMPTY("empty"),
-        LOCKED("locked"),
-        SOURCE("source");
-        
-        private final String type;
-        
-        NeuroType(String type){
-            this.type = type;
-        }
-        String getType(){
-            return type;
-        }
-        static NeuroType convert(String s){
-            if(s.equals(CONNECTOR.type)){
-                return NeuroType.CONNECTOR;
-            }else if(s.equals(CORE.type)){
-                return NeuroType.CORE;
-            }else if(s.equals(CORNER.type)){
-                return NeuroType.CORNER;
-            }else if(s.equals(LOCKED.type)){
-                return NeuroType.LOCKED;
-            }else if(s.equals(SOURCE.type)){
-                return NeuroType.SOURCE;
-            }
-            return NeuroType.EMPTY;
-        }
-    }
-    
-    public Neuro(String type, ArrayList<String> data){
-        this.type = NeuroType.convert(type);
-        this.data = data;
-        Vector2i temp;
-        if(data.size() > 0){
-            if(T.getHeader(data.get(0)).equals("outs")){
-                ArrayList<String> outs = T.getInnerArgs(data.get(0));
-                int i = 1;
-                int x, y;
-                while(i < outs.size()){
-                    x = Integer.parseInt(outs.get(i-1));
-                    y = Integer.parseInt(outs.get(i));
-                    outlets.add(new Vector2i(x, y));
-                    i+=2;
-                }
-            }
-        }
-        header = updateHeader();
-        description = updateDescription();
-    }
     
     public static Node getNode(){
         return node;
     }
     
-    public Geometry getGeometry(){
-        return neuron;
+    public static abstract class NeuroTemplate{
+        private Vector2i loc;
+        private Geometry neuron;
+        protected String header;
+        protected String description;
+        
+        public NeuroTemplate(Vector2i loc){
+            this.loc = loc;
+        }
+        
+        public static Node getNode(){
+            return node;
+        }
+        
+        public Geometry getGeometry(){
+            return neuron;
+        }
+        public String getHeader(){
+            return header;
+        }
+        public String getDescription(){
+            return description;
+        }
+        public abstract String getWritable();
+        
+        public void rotate(){
+            float deg = -FastMath.DEG_TO_RAD*90;
+            neuron.rotate(0, 0, deg);
+        }
+        
+        protected void createGeometry(String handle){
+            neuron = CG.createBox(node, "node("+loc.x+","+loc.y+")", new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0f),
+                new Vector3f((loc.x*NEURO_SCALE)+(-NEURO_SCALE*5f)+((loc.x-5)*NEURO_BUFFER), (loc.y*NEURO_SCALE)+(-NEURO_SCALE*5f)+((loc.y-5)*NEURO_BUFFER), 0),
+                T.getNeuroPath(handle), new Vector2f(1, 1));
+            node.attachChild(neuron);
+        }
+        public void destroy(){
+            neuron.removeFromParent();
+        }
     }
-    public String getHeader(){
-        return header;
-    }
-    public String getDescription(){
-        return description;
-    }
-    public NeuroType getType(){
-        return type;
-    }
-    public ArrayList<Vector2i> getOuts(){
-        return outlets;
-    }
-    public ArrayList<String> getData(){
-        return data;
-    }
-    public String getWritable(){
-        String writable = type.getType()+"(";
-        if(data != null){
+    public static abstract class NeuroWithOutlets extends NeuroTemplate{
+        protected ArrayList<Vector2i> outlets = new ArrayList(1);
+        
+        public NeuroWithOutlets(Vector2i loc, ArrayList<Vector2i> outs){
+            super(loc);
+            this.outlets = outs;
+        }
+        
+        public ArrayList<Vector2i> getOuts(){
+            return outlets;
+        }
+        public String getWritable(){
+            String writable = "outs[";
             int i = 0;
-            while(i < data.size()){
-                writable += data.get(i)+",";
+            while(i < outlets.size()){
+                writable += outlets.get(i).x+";"+outlets.get(i).y;
+                i++;
+                if(i < outlets.size()){
+                    writable += ";";
+                }
+            }
+            writable += "]";
+            return writable;
+        }
+        
+        @Override
+        public void rotate(){
+            super.rotate();
+            Vector2i temp;
+            int i = 0;
+            while(i < outlets.size()){
+                temp = outlets.get(i);
+                outlets.set(i, new Vector2i(temp.y, -temp.x));
                 i++;
             }
         }
-        writable += ")";
-        return writable;
     }
-    
-    public void setType(NeuroType type){
-        this.type = type;
-        this.data = null;
-        header = updateHeader();
-        description = updateDescription();
-    }
-    public void setOuts(ArrayList<Vector2i> outs){
-        this.outlets = outs;
-    }
-    public void setData(ArrayList<String> data){
-        this.data = data;
-        header = updateHeader();
-        description = updateDescription();
-    }
-    
-    private String updateHeader(){
-        if(type.equals(NeuroType.CONNECTOR)){
-            return "Connector";
-        }else if(type.equals(NeuroType.CORNER)){
-            return "Connector";
-        }else if(type.equals(NeuroType.SOURCE)){
-            return "Source (Damage)";
-        }else if(type.equals(NeuroType.LOCKED)){
-            return "Locked Node";
-        }else if(type.equals(NeuroType.EMPTY)){
-            return "Empty Node";
-        }else if(type.equals(NeuroType.CORE)){
-            return "Neuro Core";
+    // Classes:
+    public static class NeuroConnector extends NeuroWithOutlets{
+        public static final String HANDLE = "connector";
+        
+        private void determineGeometry(){
+            if(outlets.size() <= 2){
+                if(outlets.get(0).equalsInverted(outlets.get(1))){
+                    createGeometry("connector");
+                }else{
+                    createGeometry("corner");
+                }
+            }else if(outlets.size() <= 3){
+                createGeometry("conn3way"); // still needs rotation
+            }else if(outlets.size() <= 4){
+                createGeometry("conn4way"); // still needs rotation
+            }
         }
-        T.log("Error @ updateHeader: No header found for ("+type.getType()+")");
-        return "NULL";
-    }
-    private String updateDescription(){
-        if(type.equals(NeuroType.CONNECTOR)){
-            return "Connects nodes.";
-        }else if(type.equals(NeuroType.CORNER)){
-            return "Connects nodes.";
-        }else if(type.equals(NeuroType.SOURCE)){
-            return "+1% Damage";
-        }else if(type.equals(NeuroType.LOCKED)){
-            return "Level up to unlock.";
-        }else if(type.equals(NeuroType.EMPTY)){
-            return "Fill with an\nobject to use.";
-        }else if(type.equals(NeuroType.CORE)){
-            return "Connect nodes to\nthe core to use.";
+        public NeuroConnector(Vector2i loc, ArrayList<Vector2i> outs){
+            super(loc, outs);
+            this.header = "Connector";
+            this.description = "Connects nodes.";
+            determineGeometry();
         }
-        T.log("Error @ getNeuroDescription: No description found for ("+type.getType()+")");
-        return "NULL";
+        
+        @Override
+        public String getWritable(){
+            return HANDLE+"("+super.getWritable()+")";
+        }
     }
-    public void updateGeometry(){
-        neuron.setMaterial(T.getMaterial(T.getNeuroPath(type.getType())));
+    public static class NeuroCore extends NeuroTemplate{
+        public static final String HANDLE = "core";
+        
+        public NeuroCore(Vector2i loc){
+            super(loc);
+            this.header = "Neuro Core";
+            this.description = "Connect nodes to\nthe core to use.";
+            createGeometry(HANDLE);
+        }
+        
+        public String getWritable(){
+            return HANDLE+"()";
+        }
+    }
+    public static class NeuroEmpty extends NeuroTemplate{
+        public static final String HANDLE = "empty";
+        
+        public NeuroEmpty(Vector2i loc){
+            super(loc);
+            this.header = "Empty Node";
+            this.description = "Fill with an\nobject to use.";
+            createGeometry(HANDLE);
+        }
+        
+        public String getWritable(){
+            return HANDLE+"()";
+        }
+    }
+    public static class NeuroLocked extends NeuroTemplate{
+        public static final String HANDLE = "locked";
+        
+        public NeuroLocked(Vector2i loc){
+            super(loc);
+            this.header = "Locked Node";
+            this.description = "Level up to unlock.";
+            createGeometry(HANDLE);
+        }
+        
+        public String getWritable(){
+            return HANDLE+"()";
+        }
+    }
+    public static class NeuroSource extends NeuroWithOutlets{
+        public static final String HANDLE = "source";
+        private ArrayList<String> data;
+        
+        public NeuroSource(Vector2i loc, ArrayList<Vector2i> outs, ArrayList<String> data){
+            super(loc, outs);
+            this.data = data;
+            this.header = "Source";
+            this.description = "Provides bonuses \nthrough connections.\n\n+1% damage";
+            createGeometry(HANDLE);
+        }
+        
+        public ArrayList<String> getData(){
+            return data;
+        }
+        
+        @Override
+        public String getWritable(){
+            String writable = HANDLE+"("+super.getWritable()+",";
+            int i = 0;
+            while(i < data.size()){
+                writable += data.get(i);
+                i++;
+                if(i < data.size()){
+                    writable += ",";
+                }
+            }
+            return writable;
+        }
     }
     
-    public void createGeometry(int x, int y){
-        neuron = CG.createBox(node, "node("+x+","+y+")", new Vector3f(NEURO_SCALE*0.5f, NEURO_SCALE*0.5f, 0f),
-            new Vector3f((x*NEURO_SCALE)+(-NEURO_SCALE*5f)+((x-5)*NEURO_BUFFER), (y*NEURO_SCALE)+(-NEURO_SCALE*5f)+((y-5)*NEURO_BUFFER), 0),
-            T.getNeuroPath(type.getType()), new Vector2f(1, 1));
+    public static NeuroTemplate createNeuro(Vector2i loc, String type, ArrayList<String> args){
+        if(type.equals(NeuroConnector.HANDLE)){
+            ArrayList<Vector2i> outs = N.parseOuts(args);
+            return new NeuroConnector(loc, outs);
+        }else if(type.equals(NeuroCore.HANDLE)){
+            return new NeuroCore(loc);
+        }else if(type.equals(NeuroEmpty.HANDLE)){
+            return new NeuroEmpty(loc);
+        }else if(type.equals(NeuroLocked.HANDLE)){
+            return new NeuroLocked(loc);
+        }else if(type.equals(NeuroSource.HANDLE)){
+            ArrayList<Vector2i> outs = N.parseOuts(args);
+            return new NeuroSource(loc, outs, args);
+        }
+        return new NeuroLocked(loc);
     }
 }
