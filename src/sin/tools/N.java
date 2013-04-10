@@ -14,6 +14,8 @@ import sin.tools.T.Vector2i;
  * @author SinisteRing
  */
 public class N {
+    public static final int NEURO_SIZE = 11;
+    
     private static String[] createOption(String handle, String label){
         String[] option = new String[2];
         option[0] = handle;
@@ -23,7 +25,8 @@ public class N {
     public static ArrayList<String[]> getNeuroOptions(NeuroTemplate neuro){
         ArrayList<String[]> options = new ArrayList(1);
         if(neuro instanceof NeuroConnector){
-            options.add(createOption("rotate", "Rotate"));
+            options.add(createOption("rot_clock", "Rotate Clock"));
+            options.add(createOption("rot_counter", "Rotate Counter"));
         }else if(neuro instanceof NeuroLocked){
             options.add(createOption("unlock", "Unlock Node"));
         }else if(neuro instanceof NeuroEmpty){
@@ -32,6 +35,10 @@ public class N {
             options.add(createOption("corner", "Create Corner"));
             options.add(createOption("conn3way", "Create 3-Way"));
             options.add(createOption("conn4way", "Create 4-Way"));
+        }else if(neuro instanceof NeuroSource){
+            options.add(createOption("source_health", "Add +30 Health"));
+            options.add(createOption("rot_clock", "Rotate Clock"));
+            options.add(createOption("rot_counter", "Rotate Counter"));
         }
         options.add(createOption("cancel", "Cancel"));
         return options;
@@ -75,5 +82,9 @@ public class N {
             i++;
         }
         return outs;
+    }
+    
+    public static boolean withinBounds(Vector2i loc){
+        return (loc.x >= 0 && loc.x < NEURO_SIZE) && (loc.y >= 0 && loc.y < NEURO_SIZE);
     }
 }

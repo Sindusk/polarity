@@ -23,7 +23,6 @@ import java.util.logging.Logger;
  * @author SinisteRing
  */
 public class T {
-    public static final Vector3f EMPTY_SPACE = new Vector3f(0, -50, 0);
     public static final float ROOT_HALF = 1.0f/FastMath.sqrt(2);
     
     public static class Vector2i{
@@ -46,13 +45,18 @@ public class T {
         public boolean equalsInverted(Vector2i other){
             if(other.x != -this.x){
                 return false;
-            }
-            if(other.y != -this.y){
+            }else if(other.y != -this.y){
                 return false;
             }
             return true;
         }
-        public boolean equals(Vector2i other){
+        
+        @Override
+        public boolean equals(Object o){
+            if (!(o instanceof Vector2i)) {
+                return false;
+            }
+            Vector2i other = (Vector2i) o;
             if(this == other){
                 return true;
             }
@@ -63,6 +67,18 @@ public class T {
                 return false;
             }
             return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 29 * hash + this.x;
+            hash = 29 * hash + this.y;
+            return hash;
+        }
+        
+        public Vector2i invert(){
+            return new Vector2i(-x, -y);
         }
         
         @Override

@@ -15,18 +15,22 @@ import sin.world.CG;
  */
 public class StatsDisplay {
     private Node node = new Node("Stats");
+    private ArrayList<String> handles = new ArrayList(1);
     private ArrayList<SinText> labels = new ArrayList(1);
     private ArrayList<SinText> values = new ArrayList(1);
+    private ArrayList<String> base = new ArrayList(1);
     private Vector3f start;
+    private float size;
+    private String font;
+    private float increment;
+    private float space;
     
-    public StatsDisplay(int num, Vector3f start, float size, String font, float increment, float space){
+    public StatsDisplay(Vector3f start, float size, String font, float increment, float space){
         this.start = start;
-        int i = 0;
-        while(i < num){
-            labels.add(CG.createSinText(node, size, start.add(0, increment*i, 0), font, "Label:", ColorRGBA.Orange, Alignment.Left));
-            values.add(CG.createSinText(node, size, start.add(space, increment*i, 0), font, "VAL", ColorRGBA.Orange, Alignment.Right));
-            i++;
-        }
+        this.size = size;
+        this.font = font;
+        this.increment = increment;
+        this.space = space;
     }
     
     public Node getNode(){
@@ -46,15 +50,30 @@ public class StatsDisplay {
         values.get(index).setText(value);
     }
     
-    public void updateStat(String label, String value){
+    public void addStat(String handle, String label, String value){
+        handles.add(handle);
+        labels.add(CG.createSinText(node, size, start.add(0, increment*labels.size(), 0), font, label, ColorRGBA.Orange, Alignment.Left));
+        values.add(CG.createSinText(node, size, start.add(space, increment*values.size(), 0), font, value, ColorRGBA.Orange, Alignment.Right));
+        base.add(value);
+    }
+    
+    public void updateStat(String handle, String value){
         int i = 0;
-        while(i < labels.size()){
-            if(labels.get(i).getText().equals(label)){
+        while(i < handles.size()){
+            if(handles.get(i).equals(handle)){
                 values.get(i).setText(value);
                 return;
             }
             i++;
         }
-        T.log("Error @ updateStat: Could not find label ("+label+")");
+        T.log("Error @ updateStat: Could not find handle ("+handle+")");
+    }
+    
+    public void reset(){
+        int i = 0;
+        while(i < values.size()){
+            values.get(i).setText(base.get(i));
+            i++;
+        }
     }
 }

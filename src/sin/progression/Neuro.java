@@ -49,8 +49,12 @@ public class Neuro {
         }
         public abstract String getWritable();
         
-        public void rotate(){
-            float deg = -FastMath.DEG_TO_RAD*90;
+        public void rotateClock(){
+            float deg = FastMath.DEG_TO_RAD*-90;
+            neuron.rotate(0, 0, deg);
+        }
+        public void rotateCounter(){
+            float deg = FastMath.DEG_TO_RAD*90;
             neuron.rotate(0, 0, deg);
         }
         
@@ -90,13 +94,24 @@ public class Neuro {
         }
         
         @Override
-        public void rotate(){
-            super.rotate();
+        public void rotateClock(){
+            super.rotateClock();
             Vector2i temp;
             int i = 0;
             while(i < outlets.size()){
                 temp = outlets.get(i);
                 outlets.set(i, new Vector2i(temp.y, -temp.x));
+                i++;
+            }
+        }
+        @Override
+        public void rotateCounter(){
+            super.rotateCounter();
+            Vector2i temp;
+            int i = 0;
+            while(i < outlets.size()){
+                temp = outlets.get(i);
+                outlets.set(i, new Vector2i(-temp.y, temp.x));
                 i++;
             }
         }
