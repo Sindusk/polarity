@@ -10,8 +10,8 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import sin.animation.Models;
-import sin.hud.Tooltip;
-import sin.progression.NeuroNetwork;
+import sin.inventory.InventoryScreen;
+import sin.progression.NeuroNetworkScreen;
 import sin.tools.A;
 import sin.tools.S;
 import sin.tools.T;
@@ -71,18 +71,26 @@ public class CharacterScreen {
             return;
         }
         String action = target.getGeometry().getName();
-        T.log("action = "+action);
-        if(action.equals("neuronet")){
+        if(action.equals("inventory")){
+            hideView(rightView, rightNode);
+            hideView(leftView, leftNode);
+            view = "inventory";
+            InventoryScreen.initialize();
+            node.attachChild(InventoryScreen.getNode());
+            S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
+        }else if(action.equals("neuronet ")){ //BROKE IT TO PREVENT BEING STUPID
             hideView(rightView, rightNode);
             hideView(leftView, leftNode);
             view = "neuronet";
-            buildNeuroNet();
+            NeuroNetworkScreen.initialize();
+            node.attachChild(NeuroNetworkScreen.getNode());
+            S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
         }
     }
     public static void handleRightClick(){
         Vector2f mouseLoc = S.getInputManager().getCursorPosition();
         if(view.equals("neuronet")){
-            NeuroNetwork.handleRightClick(mouseLoc);
+            NeuroNetworkScreen.handleRightClick(mouseLoc);
         }
     }
     public static void handleClick(){
@@ -93,15 +101,17 @@ public class CharacterScreen {
             }else{
                 setRotating(true);
             }
+        }else if(view.equals("inventory")){
+            InventoryScreen.action(getMouseTarget(mouseLoc, S.getCamera(), node));
         }else if(view.equals("neuronet")){
-            NeuroNetwork.action(getMouseTarget(mouseLoc, S.getCamera(), node));
+            NeuroNetworkScreen.action(getMouseTarget(mouseLoc, S.getCamera(), node));
         }
     }
     
     public static void update(){
         Vector2f mouseLoc = S.getInputManager().getCursorPosition();
         if(view.equals("neuronet")){
-            NeuroNetwork.update(mouseLoc);
+            NeuroNetworkScreen.update(mouseLoc);
         }
     }
     
@@ -109,14 +119,9 @@ public class CharacterScreen {
         Models.PlayerModel model = new Models.PlayerModel(0, leftNode);
         model.getNode().rotate(0, 30*FastMath.DEG_TO_RAD, 0);
     }
-    private static void buildNeuroNet(){
-        NeuroNetwork.initialize();
-        node.attachChild(NeuroNetwork.getNode());
-        S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
-    }
     private static void buildMenu(){
         rightNode.detachAllChildren();
-        CG.createBox(rightNode, "inventory", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 3, 0), T.getGraphicPath("weapons"), new Vector2f(1, 1));
+        CG.createBox(rightNode, "inventory", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 3, 0), T.getGraphicPath("loadout"), new Vector2f(1, 1));
         CG.createBox(rightNode, "abilities", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 1, 0), T.getMaterialPath("lava_rock"), new Vector2f(1, 1));
         CG.createBox(rightNode, "neuronet", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -1, 0), T.getGraphicPath("neuronet"), new Vector2f(1, 1));
         CG.createBox(rightNode, "proficiencies", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -3, 0), T.getMaterialPath("BC_Tex"), new Vector2f(1, 1));

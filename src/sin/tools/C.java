@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import sin.progression.NeuroNetwork;
+import sin.progression.NeuroNetworkScreen;
 import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
@@ -75,13 +75,13 @@ public class C {
                 file.createNewFile();
                 T.log(file.getAbsolutePath());
                 BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-                NeuroNetwork.writeNewNeuroNet(bw);
+                NeuroNetworkScreen.writeNewNeuroNet(bw);
                 bw.close();
                 T.log("Finished creating new NeuroNet!");
             }else{
                 T.log("Found Player NeuroNet!");
                 BufferedReader br = new BufferedReader(new FileReader(file.getAbsoluteFile()));
-                NeuroNetwork.readNeuroNet(br);
+                NeuroNetworkScreen.readNeuroNet(br);
                 br.close();
                 T.log("Finished reading NeuroNet!");
             }

@@ -1,7 +1,6 @@
 package sin.progression;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import sin.tools.T;
 
 /**
@@ -21,7 +20,6 @@ public class Stat {
     public Stat(String data){
         handle = T.getInnerHeader(data);
         ArrayList<String> strVals = T.getInnerArgs(data);
-        T.log(strVals.toString());
         int i = 0;
         while(i < strVals.size()){
             values.add(Float.parseFloat(strVals.get(i)));

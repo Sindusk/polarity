@@ -55,7 +55,7 @@ public class GameServer extends Application{
     private static GameServer app;
     
     // Global Constant Variables:
-    private static final String SERVER_VERSION = "DEV 0.09";
+    private static final String SERVER_VERSION = "DEV 0.10";
     private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
     
     // App States:

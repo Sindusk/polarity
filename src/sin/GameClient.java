@@ -64,7 +64,7 @@ public class GameClient extends Application{
     
     // --- Global Constant Variables --- //
     private static final boolean MODE_DEBUG = false;         // Debug Mode
-    private static final String CLIENT_VERSION = "DEV 0.09"; // Client Version (Important for client-server connections)
+    private static final String CLIENT_VERSION = "DEV 0.10"; // Client Version (Important for client-server connections)
     private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
     
     // App States:
@@ -145,10 +145,10 @@ public class GameClient extends Application{
         // Tone down loggers severely:
         Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         if(MODE_DEBUG){
-            try {
+            try{
                 Logger.getLogger("polarity").addHandler(new FileHandler("PolarityLog.xml"));
                 Logger.getLogger("com.jme3").addHandler(new FileHandler("JMELog.xml"));
-            } catch (FileNotFoundException ex) {
+            }catch (FileNotFoundException ex){
                 T.log(ex);
             }
         }
@@ -157,7 +157,7 @@ public class GameClient extends Application{
         set.setResolution(1280, 720);
         set.setSamples(0);
         set.setVSync(false);
-        //set.setRenderer(AppSettings.LWJGL_OPENGL1);
+        set.setRenderer(AppSettings.LWJGL_OPENGL1);
         set.setTitle("Polarity Client");
         app.setSettings(set);
         app.start();

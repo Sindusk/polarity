@@ -29,16 +29,16 @@ import sin.tools.T.Vector2i;
 import sin.world.CG;
 
 /**
- * NeuroNetwork - Class managing the Neuro Network progression system.
+ * NeuroNetworkScreen - Class managing the Neuro Network progression system.
  * @author SinisteRing
  */
-public class NeuroNetwork {
+public class NeuroNetworkScreen {
     private static final Vector3f GRID_OFFSET = new Vector3f(-3, 0, 0);
     
     private static Tooltip tooltip = new Tooltip(new Vector3f(100, 50, 1), new Vector3f(0, 0, 0), new ColorRGBA(0.6f, 0.6f, 0.6f, 1), ColorRGBA.Black);
     private static ContextMenu contextMenu = new ContextMenu(0.235f, Vector3f.ZERO, "Batman26", 1.6f, new ColorRGBA(23/255f, 92/255f, 12/255f, 1), ColorRGBA.Cyan);
-    private static Menu neuroMenu;
-    private static StatsDisplay statsDisplay;
+    private static Menu neuroMenu = new Menu(4, 0);
+    private static StatsDisplay statsDisplay = new StatsDisplay(new Vector3f(1.75f, 2.75f, 0), 0.22f, "Ethno26", -0.27f, 4.5f);
     private static NeuroTemplate[][] neuro = new NeuroTemplate[N.NEURO_SIZE][N.NEURO_SIZE];
     
     private static Geometry highlight;
@@ -239,7 +239,6 @@ public class NeuroNetwork {
                 return null;
             }
             public PulseData execute(){
-                T.log("loc = "+loc);
                 if(!N.withinBounds(loc)){
                     return null;
                 }
@@ -371,30 +370,24 @@ public class NeuroNetwork {
         int x = Integer.parseInt(data.get(0));
         int y = Integer.parseInt(data.get(1));
         if(name.equals("rot_clock")){
-            T.log("Rotate (Clock): "+x+", "+y);
             neuro[x][y].rotateClock();
         }else if (name.equals("rot_counter")){
-            T.log("Rotate (Counter): "+x+", "+y);
             neuro[x][y].rotateCounter();
         }else if(name.equals("source_health")){
             ((NeuroSource) neuro[x][y]).getData().add("health[30]");
-        }
-        else if(name.equals("connector")){
-            T.log("Adding connector: "+x+", "+y);
-            neuro[x][y].destroy(); // Destroy old geometry.
+        }else if(name.equals("connector")){
+            neuro[x][y].destroy();
             ArrayList<Vector2i> outs = new ArrayList(1);
             outs.add(new Vector2i(0, 1));
             outs.add(new Vector2i(0, -1));
             neuro[x][y] = new NeuroConnector(new Vector2i(x, y), outs);
         }else if(name.equals("corner")){
-            T.log("Adding corner: "+x+", "+y);
             neuro[x][y].destroy();
             ArrayList<Vector2i> outs = new ArrayList(1);
             outs.add(new Vector2i(0, 1));
             outs.add(new Vector2i(-1, 0));
             neuro[x][y] = new NeuroConnector(new Vector2i(x, y), outs);
         }else if(name.equals("conn3way")){
-            T.log("Adding 3-way: "+x+", "+y);
             neuro[x][y].destroy();
             ArrayList<Vector2i> outs = new ArrayList(1);
             outs.add(new Vector2i(0, 1));
@@ -402,7 +395,6 @@ public class NeuroNetwork {
             outs.add(new Vector2i(-1, 0));
             neuro[x][y] = new NeuroConnector(new Vector2i(x, y), outs);
         }else if(name.equals("conn4way")){
-            T.log("Adding 4-way: "+x+", "+y);
             neuro[x][y].destroy();
             ArrayList<Vector2i> outs = new ArrayList(1);
             outs.add(new Vector2i(0, 1));
@@ -411,7 +403,6 @@ public class NeuroNetwork {
             outs.add(new Vector2i(-1, 0));
             neuro[x][y] = new NeuroConnector(new Vector2i(x, y), outs);
         }else if(name.equals("source")){
-            T.log("Adding source: "+x+", "+y);
             neuro[x][y].destroy();
             ArrayList<Vector2i> outs = new ArrayList(1);
             outs.add(new Vector2i(0, -1));
@@ -419,7 +410,6 @@ public class NeuroNetwork {
             source.add("damage[1]");
             neuro[x][y] = new NeuroSource(new Vector2i(x, y), outs, source);
         }else if(name.equals("unlock")){
-            T.log("Unlocking: "+x+", "+y);
             neuro[x][y].destroy();
             neuro[x][y] = new NeuroEmpty(new Vector2i(x, y));
         }
@@ -454,7 +444,7 @@ public class NeuroNetwork {
             ArrayList<String> args = T.getArgs(name);
             int x = Integer.parseInt(args.get(0));
             int y = Integer.parseInt(args.get(1));
-            NeuroNetwork.markNeuron(x, y);
+            markNeuron(x, y);
             contextMenu.destroy();
         }
     }
@@ -529,14 +519,11 @@ public class NeuroNetwork {
         }
     }
     
-    private static void createNeuroMenu(float x, float y){
-        neuroMenu = new Menu(x, y);
-        // Header Text:
+    private static void createNeuroMenu(){
         neuroMenu.addLabel(0.4f, new Vector3f(0, 3.75f, 0), "Batman26", "Neuro Network", ColorRGBA.Green, Alignment.Center);
         node.attachChild(neuroMenu.getNode());
     }
-    private static void createNeuroStats(float x, float y){
-        statsDisplay = new StatsDisplay(new Vector3f(x, y, 0), 0.22f, "Ethno26", -0.27f, 4.5f);
+    private static void createNeuroStats(){
         statsDisplay.addStat(Stat.HEALTH, "Health:", "0");
         statsDisplay.addStat(Stat.SHIELDS, "Shields:", "0");
         statsDisplay.addStat(Stat.DAMAGE, "Damage:", "0");
@@ -544,8 +531,8 @@ public class NeuroNetwork {
     }
     
     public static void initialize(){
-        createNeuroMenu(4f, 0f);
-        createNeuroStats(1.75f, 2.75f);
+        createNeuroMenu();
+        createNeuroStats();
         node.attachChild(Neuro.getNode());
         Neuro.getNode().setLocalTranslation(GRID_OFFSET);
         
