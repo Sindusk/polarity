@@ -22,6 +22,7 @@ import sin.progression.Neuro.NeuroEmpty;
 import sin.progression.Neuro.NeuroLocked;
 import sin.progression.Neuro.NeuroSource;
 import sin.progression.Neuro.NeuroTemplate;
+import sin.tools.A;
 import sin.tools.N;
 import sin.tools.S;
 import sin.tools.T;
@@ -417,7 +418,7 @@ public class NeuroNetworkScreen {
         contextMenu.destroy();
     }
     public static void handleRightClick(Vector2f mouseLoc){
-        CollisionResult target = CharacterScreen.getMouseTarget(mouseLoc, S.getCamera(), node);
+        CollisionResult target = A.getMouseTarget(mouseLoc, S.getCamera(), node);
         if(target == null){
             return;
         }
@@ -449,7 +450,7 @@ public class NeuroNetworkScreen {
         }
     }
     public static void update(Vector2f mouseLoc){
-        CollisionResult target = CharacterScreen.getMouseTarget(mouseLoc, S.getCamera(), node);
+        CollisionResult target = A.getMouseTarget(mouseLoc, S.getCamera(), node);
         String name;
         if(target != null){
             name = target.getGeometry().getName();

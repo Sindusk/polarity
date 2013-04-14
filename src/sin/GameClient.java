@@ -63,7 +63,7 @@ public class GameClient extends Application{
     private static GameClient app;
     
     // --- Global Constant Variables --- //
-    private static final boolean MODE_DEBUG = false;         // Debug Mode
+    private static final boolean MODE_DEBUG = true;          // Debug Mode
     private static final String CLIENT_VERSION = "DEV 0.10"; // Client Version (Important for client-server connections)
     private static final float BULLET_ACCURACY = 0.01f;      // Accuracy timer for bullet app state resets
     
@@ -167,7 +167,8 @@ public class GameClient extends Application{
     @Override
     public void initialize(){
         super.initialize();
-
+        
+        T.log("Initializing Viewport...");
         gui.setQueueBucket(Bucket.Gui);
         gui.setCullHint(CullHint.Never);
         viewPort.attachScene(root);
@@ -195,8 +196,11 @@ public class GameClient extends Application{
         RecoilManager.initialize();
         
         // Initialize App States:
+        T.log("Creating Character State...");
         charState = new ClientCharState();
+        T.log("Creating Game State...");
         gameState = new ClientGameState();
+        T.log("Creating Menu State...");
         menuState = new ClientMenuState();
         // Attach App States:
         stateManager.attach(menuState);

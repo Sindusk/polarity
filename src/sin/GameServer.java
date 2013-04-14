@@ -126,6 +126,7 @@ public class GameServer extends Application{
         super.initialize();
         
         // Initialize Root and GUI:
+        T.log("Initializing Viewport...");
         gui.setQueueBucket(Bucket.Gui);
         gui.setCullHint(CullHint.Never);
         viewPort.attachScene(root);
@@ -140,14 +141,19 @@ public class GameServer extends Application{
         S.setCamera(cam);
         S.setInputManager(inputManager);
         
+        T.log("Initializing Input...");
         ServerInputHandler.initialize(app);
+        T.log("Starting Server Network...");
         ServerNetwork.initialize(app);
         
         // Initialize App States:
+        T.log("Creating Game State...");
         gameState = new ServerGameState();
+        T.log("Creating Menu State...");
         menuState = new ServerMenuState();
         
         // Attach App States:
+        T.log("Attaching Menu State...");
         stateManager.attach(menuState);
         resetBulletAppState();
     }

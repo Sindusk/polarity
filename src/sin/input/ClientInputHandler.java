@@ -52,6 +52,10 @@ public class ClientInputHandler{
                 }else if(bind.equals("Exit")){
                     app.getMenuState().toggleGameMenu(false);
                 }
+            }else{
+                if(bind.equals("Click")){
+                    CharacterScreen.handleUnclick();
+                }
             }
         }
     };

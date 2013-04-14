@@ -4,7 +4,9 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -216,7 +218,7 @@ public class A {
         }
     }
     
-    // Helper Functions:
+    // Collision Assistance:
     public static CollisionResults getCollisions(Node node, Ray ray){
         CollisionResults results = new CollisionResults();
         node.collideWith(ray, results);
@@ -260,6 +262,21 @@ public class A {
             return null;
         }
     }
+    
+    // Mouse Collision:
+    private static Vector3f getWorldDir(Vector3f loc, Vector2f mouseLoc, Camera cam){
+        return cam.getWorldCoordinates(mouseLoc, 1f).subtract(loc).normalize();
+    }
+    private static Vector3f getWorldLoc(Vector2f mouseLoc, Camera cam){
+        return cam.getWorldCoordinates(mouseLoc, 0f).clone();
+    }
+    public static CollisionResult getMouseTarget(Vector2f mouseLoc, Camera cam, Node node){
+        Vector3f loc = getWorldLoc(mouseLoc, cam);
+        Vector3f dir = getWorldDir(loc, mouseLoc, cam);
+        return A.getClosestCollision(node, new Ray(loc, dir));
+    }
+    
+    // Helper Functions:
     public static float getDistance(Vector3f player, Vector3f target){
         return target.distance(player);
     }

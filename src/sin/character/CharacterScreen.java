@@ -3,7 +3,6 @@ package sin.character;
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -45,12 +44,6 @@ public class CharacterScreen {
         return gui;
     }
     
-    private static Vector3f getWorldDir(Vector3f loc, Vector2f mouseLoc, Camera cam){
-        return cam.getWorldCoordinates(mouseLoc, 1f).subtract(loc).normalize();
-    }
-    private static Vector3f getWorldLoc(Vector2f mouseLoc, Camera cam){
-        return cam.getWorldCoordinates(mouseLoc, 0f).clone();
-    }
     private static void hideView(ViewPort view, Node scene){
         S.getRenderManager().removeMainView(view);
         node.detachChild(scene);
@@ -61,11 +54,6 @@ public class CharacterScreen {
         rotating = rot;
     }
     
-    public static CollisionResult getMouseTarget(Vector2f mouseLoc, Camera cam, Node node){
-        Vector3f loc = getWorldLoc(mouseLoc, cam);
-        Vector3f dir = getWorldDir(loc, mouseLoc, cam);
-        return A.getClosestCollision(node, new Ray(loc, dir));
-    }
     private static void menuAction(CollisionResult target){
         if(target == null){
             return;
@@ -97,20 +85,27 @@ public class CharacterScreen {
         Vector2f mouseLoc = S.getInputManager().getCursorPosition();
         if(view.equals("main")){
             if(mouseLoc.x >= S.width*split){
-                menuAction(getMouseTarget(mouseLoc, rightCamera, rightNode));
+                menuAction(A.getMouseTarget(mouseLoc, rightCamera, rightNode));
             }else{
                 setRotating(true);
             }
         }else if(view.equals("inventory")){
-            InventoryScreen.action(getMouseTarget(mouseLoc, S.getCamera(), node));
+            InventoryScreen.action(A.getMouseTarget(mouseLoc, S.getCamera(), node));
         }else if(view.equals("neuronet")){
-            NeuroNetworkScreen.action(getMouseTarget(mouseLoc, S.getCamera(), node));
+            NeuroNetworkScreen.action(A.getMouseTarget(mouseLoc, S.getCamera(), node));
+        }
+    }
+    public static void handleUnclick(){
+        if(view.equals("inventory")){
+            InventoryScreen.unaction();
         }
     }
     
     public static void update(){
         Vector2f mouseLoc = S.getInputManager().getCursorPosition();
-        if(view.equals("neuronet")){
+        if(view.equals("inventory")){
+            InventoryScreen.update(mouseLoc);
+        }else if(view.equals("neuronet")){
             NeuroNetworkScreen.update(mouseLoc);
         }
     }
