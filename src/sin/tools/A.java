@@ -219,13 +219,22 @@ public class A {
     }
     
     // Collision Assistance:
-    public static CollisionResults getCollisions(Node node, Ray ray){
+    public static ArrayList<CollisionResult> getCollisions(Node node, Ray ray){
         CollisionResults results = new CollisionResults();
         node.collideWith(ray, results);
-        return results;
+        ArrayList<CollisionResult> list = new ArrayList(1);
+        int i = 0;
+        while(i < results.size()){
+            if(!results.getCollision(i).getGeometry().getName().equals("BitmapFont")){
+                list.add(results.getCollision(i));
+            }
+            i++;
+        }
+        return list;
     }
     public static CollisionResult getClosestCollision(Node node, Ray ray){
-        CollisionResults results = getCollisions(node, ray);
+        CollisionResults results = new CollisionResults();
+        node.collideWith(ray, results);
         String name;
         int i = 0;
         while(i < results.size()){
@@ -238,7 +247,8 @@ public class A {
         return null;
     }
     public static CollisionResult getClosestCollisionNotPlayer(Node node, Ray ray, int player){
-        CollisionResults results = getCollisions(node, ray);
+        CollisionResults results = new CollisionResults();
+        node.collideWith(ray, results);
         String[] data;
         int i = 0;
         while(i < results.size()){
@@ -270,10 +280,15 @@ public class A {
     private static Vector3f getWorldLoc(Vector2f mouseLoc, Camera cam){
         return cam.getWorldCoordinates(mouseLoc, 0f).clone();
     }
+    public static ArrayList<CollisionResult> getMouseTargets(Vector2f mouseLoc, Camera cam, Node node){
+        Vector3f loc = getWorldLoc(mouseLoc, cam);
+        Vector3f dir = getWorldDir(loc, mouseLoc, cam);
+        return getCollisions(node, new Ray(loc, dir));
+    }
     public static CollisionResult getMouseTarget(Vector2f mouseLoc, Camera cam, Node node){
         Vector3f loc = getWorldLoc(mouseLoc, cam);
         Vector3f dir = getWorldDir(loc, mouseLoc, cam);
-        return A.getClosestCollision(node, new Ray(loc, dir));
+        return getClosestCollision(node, new Ray(loc, dir));
     }
     
     // Helper Functions:

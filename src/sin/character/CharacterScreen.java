@@ -66,7 +66,7 @@ public class CharacterScreen {
             InventoryScreen.initialize();
             node.attachChild(InventoryScreen.getNode());
             S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
-        }else if(action.equals("neuronet ")){ //BROKE IT TO PREVENT BEING STUPID
+        }else if(action.equals("neuronet")){
             hideView(rightView, rightNode);
             hideView(leftView, leftNode);
             view = "neuronet";
