@@ -7,6 +7,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import java.util.ArrayList;
 import sin.inventory.Items.ItemSlot;
+import sin.tools.T;
 import sin.tools.T.Vector2i;
 import sin.world.CG;
 
@@ -27,8 +28,8 @@ public class Grid {
         int i = 0;
         while(i < size.x*size.y){
             x = i%size.x;
-            y = i/(size.y+1);
-            slots.add(new ItemSlot(node, scale, new Vector2i(x, y), new Vector3f((-size.x/2f)+x, (size.y/2f)-y, -0.002f), new ColorRGBA(0, 0, 0.5f, 1)));
+            y = i/size.x;
+            slots.add(new ItemSlot(node, scale, new Vector2i(x, y), new Vector3f(((-size.x/2f)+x)+0.5f, ((size.y/2f)-y)-0.5f, -0.002f), new ColorRGBA(0, 0, 0.5f, 1)));
             i++;
         }
     }

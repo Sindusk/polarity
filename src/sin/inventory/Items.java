@@ -16,8 +16,7 @@ import sin.world.CG;
  * @author SinisteRing
  */
 public class Items {
-    public static final float SLOT_SIZE = 0.46f;
-    public static final float SLOT_BUFFER = 0.02f;
+    public static final float SLOT_SIZE = 0.48f;
     public static final float ITEM_SIZE = 0.39f;
     
     public static class ItemSlot{
@@ -42,57 +41,49 @@ public class Items {
     }
     public static class Item{
         private Geometry geo;
-        private Vector2i loc;
         private String name;
         private ArrayList<Stat> stats;
         private String description;
         private String image;
 
-        public Item(Vector2i loc){
+        public Item(){
             this.name = "empty";
-            this.loc = loc;
             this.image = T.getGraphicPath("default");
         }
-        public Item(Vector2i loc, String name, ArrayList<Stat> stats, String description, String image){
-            this.loc = loc;
+        public Item(String name, ArrayList<Stat> stats, String description, String image){
             this.name = name;
             this.stats = stats;
             this.description = description;
             this.image = image;
         }
-
-        public void update(Node node, Vector3f trans){
-            if(!isEmpty()){
-                geo.removeFromParent();
-                generateTile(node, trans);
-            }
-        }
-
+        
         public boolean isEmpty(){
             return name.equals("empty");
-        }
-        public void setLocation(Vector2i loc){
-            this.loc = loc;
         }
         public Geometry getGeometry(){
             return geo;
         }
-        public Vector2i getLocation(){
-            return loc;
-        }
         public String getName(){
             return name;
         }
-
-        public Geometry generateTile(Node node, Vector3f trans){
-            geo =  CG.createBox(node, name+"("+loc.x+","+loc.y+")", new Vector3f(ITEM_SIZE, ITEM_SIZE, 0),
+        
+        public Geometry generateTile(Node node, String data, Vector3f trans){
+            geo =  CG.createBox(node, name+"("+data+")", new Vector3f(ITEM_SIZE, ITEM_SIZE, 0),
                     trans, image, new Vector2f(1, 1));
             return geo;
         }
+        public void update(Node node, String data, Vector3f trans){
+            if(geo != null){
+                geo.removeFromParent();
+            }
+            if(!isEmpty()){
+                generateTile(node, data, trans);
+            }
+        }
     }
     public static class Equipment extends Item{
-        public Equipment(Vector2i loc, String name, ArrayList<Stat> stats, String description, String image){
-            super(loc, name, stats, description, image);
+        public Equipment(String name, ArrayList<Stat> stats, String description, String image){
+            super(name, stats, description, image);
         }
     }
     
@@ -100,22 +91,22 @@ public class Items {
     public static class Helmet extends Equipment{
         private float headshotMult;
         
-        public Helmet(Vector2i loc, String name, ArrayList<Stat> stats, String description, String image){
-            super(loc, name, stats, description, image);
+        public Helmet(String name, ArrayList<Stat> stats, String description, String image){
+            super(name, stats, description, image);
         }
     }
     public static class Chestplate extends Equipment{
         private float critMult;
         
-        public Chestplate(Vector2i loc, String name, ArrayList<Stat> stats, String description, String image){
-            super(loc, name, stats, description, image);
+        public Chestplate(String name, ArrayList<Stat> stats, String description, String image){
+            super(name, stats, description, image);
         }
     }
     public static class Greaves extends Equipment{
         private float jumpMult;
         
-        public Greaves(Vector2i loc, String name, ArrayList<Stat> stats, String description, String image){
-            super(loc, name, stats, description, image);
+        public Greaves(String name, ArrayList<Stat> stats, String description, String image){
+            super(name, stats, description, image);
         }
     }
 }

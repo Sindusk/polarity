@@ -141,6 +141,9 @@ public class T {
     public static String getIconPath(String tex){
         return "Interface/Icons/"+tex+".png";
     }
+    public static String getItemPath(String tex){
+        return "Textures/Items/"+tex+".png";
+    }
     public static String getMaterialPath(String tex){
         return "Textures/Material/"+tex+".png";
     }

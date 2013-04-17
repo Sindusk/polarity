@@ -1,6 +1,5 @@
 package sin.inventory;
 
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -8,7 +7,6 @@ import java.util.ArrayList;
 import sin.inventory.Items.Item;
 import sin.tools.T;
 import sin.tools.T.Vector2i;
-import sin.world.CG;
 
 /**
  *
@@ -29,11 +27,11 @@ public class Inventory {
         grid = new Grid(node, Items.SLOT_SIZE, gridSize);
         int x, y;
         int i = 0;
-        i = 0;
         while(i < maxSize){
             x = i%gridSize.x;
-            y = i/(gridSize.y+1);
-            items.add(new Item(new Vector2i(x, y)));
+            y = i/gridSize.x;
+            items.add(new Item());
+            items.get(i).update(node, x+","+y, trans);
             i++;
         }
     }
@@ -42,24 +40,27 @@ public class Inventory {
         return (y*gridSize.x)+x;
     }
     
-    public boolean isItem(String name){
+    public boolean isInventoryItem(Geometry geo){
         int i = 0;
         while(i < items.size()){
-            if(items.get(i) != null && items.get(i).getName().equals(name)){
+            if(items.get(i).getGeometry() != null && items.get(i).getGeometry().equals(geo)){
                 return true;
             }
             i++;
         }
         return false;
     }
-    public boolean isSlot(Geometry geo){
+    public boolean isInventorySlot(Geometry geo){
         if(T.getHeader(geo.getName()).equals("slot")){
             return true;
         }
         return false;
     }
+    public void setItem(int x, int y, Item item){
+        items.set(getIndex(x, y), item);
+    }
     public Item getItem(int x, int y){
-        return items.get((y*gridSize.x)+x);
+        return items.get(getIndex(x, y));
     }
     public Node getNode(){
         return node;
@@ -67,7 +68,7 @@ public class Inventory {
     
     public void updateItem(int x, int y){
         int i = getIndex(x, y);
-        items.get(i).update(node, grid.getInsertPosition(x, y));
+        items.get(i).update(node, x+","+y, grid.getInsertPosition(x, y));
     }
     
     public void addItem(Item item){
@@ -75,23 +76,13 @@ public class Inventory {
         int i = 0;
         while(i < maxSize){
             x = i%gridSize.x;
-            y = i/(gridSize.y+1);
+            y = i/gridSize.x;
             if(items.get(i) == null || items.get(i).isEmpty()){
                 items.set(i, item);
-                items.get(i).setLocation(new Vector2i(x, y));
-                items.get(i).generateTile(node, grid.getInsertPosition(x, y));
+                items.get(i).generateTile(node, x+","+y, grid.getInsertPosition(x, y));
                 return;
             }
             i++;
         }
-    }
-    public void swapItem(Vector2i from, Vector2i to){
-        int fromLoc = (from.y*gridSize.x)+from.x;
-        int toLoc = (to.y*gridSize.x)+to.x;
-        Item temp = items.set(fromLoc, items.get(toLoc));
-        Vector2i tempLoc = items.get(fromLoc).getLocation().clone();
-        items.get(fromLoc).setLocation(temp.getLocation().clone());
-        temp.setLocation(tempLoc);
-        items.set(toLoc, temp);
     }
 }
