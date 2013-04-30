@@ -22,7 +22,7 @@ import sin.tools.T.Vector2i;
  */
 public class InventoryScreen {
     private static Node node = new Node("InventoryScreenNode");
-    private static Inventory inventory = new Inventory(200, new Vector2i(8, 7), new Vector3f(2, 0, 0));
+    private static Inventory inventory = new Inventory(200, new Vector2i(8, 6), new Vector3f(2, 0, 0));
     private static Equipment equipment = new Equipment(new Vector3f(-3, 0, 0));
     private static Item dragItem = null;
     private static boolean dragging = false;

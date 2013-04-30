@@ -8,6 +8,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
+import sin.abilities.AbilityScreen;
 import sin.animation.Models;
 import sin.inventory.InventoryScreen;
 import sin.progression.NeuroNetworkScreen;
@@ -66,6 +67,13 @@ public class CharacterScreen {
             InventoryScreen.initialize();
             node.attachChild(InventoryScreen.getNode());
             S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
+        }else if(action.equals("abilities")){
+            hideView(rightView, rightNode);
+            hideView(leftView, leftNode);
+            view = "abilities";
+            AbilityScreen.initialize();
+            node.attachChild(AbilityScreen.getNode());
+            S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
         }else if(action.equals("neuronet")){
             hideView(rightView, rightNode);
             hideView(leftView, leftNode);
@@ -117,7 +125,7 @@ public class CharacterScreen {
     private static void buildMenu(){
         rightNode.detachAllChildren();
         CG.createBox(rightNode, "inventory", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 3, 0), T.getGraphicPath("loadout"), new Vector2f(1, 1));
-        CG.createBox(rightNode, "abilities", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 1, 0), T.getMaterialPath("lava_rock"), new Vector2f(1, 1));
+        CG.createBox(rightNode, "abilities", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 1, 0), T.getGraphicPath("abilities"), new Vector2f(1, 1));
         CG.createBox(rightNode, "neuronet", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -1, 0), T.getGraphicPath("neuronet"), new Vector2f(1, 1));
         CG.createBox(rightNode, "proficiencies", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -3, 0), T.getMaterialPath("BC_Tex"), new Vector2f(1, 1));
     }

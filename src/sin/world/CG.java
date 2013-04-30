@@ -51,7 +51,8 @@ public class CG {
         return txt;
     }
 
-    // Boxes:
+    // --- Boxes --- //
+    // Color:
     public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, ColorRGBA color){
         Box b = new Box(Vector3f.ZERO, size.getX(), size.getY(), size.getZ());
         Geometry g = new Geometry(name, b);
@@ -63,6 +64,10 @@ public class CG {
         }
         return g;
     }
+    public static Geometry createBox(Node node, Vector3f size, Vector3f trans, ColorRGBA color){
+        return createBox(node, "", size, trans, color);
+    }
+    // Texture:
     public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, String tex, Vector2f scale){
         Box b = new Box(Vector3f.ZERO, size.getX(), size.getY(), size.getZ());
         b.scaleTextureCoordinates(scale);
@@ -75,6 +80,12 @@ public class CG {
             node.attachChild(g);
         }
         return g;
+    }
+    public static Geometry createBox(Node node, String name, Vector3f size, Vector3f trans, String tex){
+        return createBox(node, name, size, trans, tex, new Vector2f(1, 1));
+    }
+    public static Geometry createBox(Node node, Vector3f size, Vector3f trans, String tex){
+        return createBox(node, "", size, trans, tex, new Vector2f(1, 1));
     }
     public static Geometry createBox(Node node, GeometryData d){
         Geometry g = createBox(node, "", d.getSize(), d.getTrans(), d.getTex(), d.getScale());
