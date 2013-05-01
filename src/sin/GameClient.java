@@ -56,7 +56,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  * Game Client
- * @author SinisteRing + Deadhate
+ * @author SinisteRing -+- Deadhate
  */
 
 public class GameClient extends Application{
