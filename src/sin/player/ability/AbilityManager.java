@@ -3,7 +3,7 @@ package sin.player.ability;
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
-import sin.hud.AbilityBar;
+import sin.hud.AbilityHotbar;
 import sin.netdata.CommandData;
 import sin.netdata.ability.AbilityCooldownData;
 import sin.player.PlayerManager;
@@ -102,6 +102,6 @@ public class AbilityManager {
     }
     
     public static void addCooldown(AbilityCooldownData d){
-        AbilityBar.addCooldown(d.getAbility(), d.getCooldown());
+        AbilityHotbar.addCooldown(d.getAbility(), d.getCooldown());
     }
 }

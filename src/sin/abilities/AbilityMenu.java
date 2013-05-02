@@ -19,6 +19,9 @@ public class AbilityMenu {
     public Node getNode(){
         return node;
     }
+    public AbilityEntry getEntry(int index){
+        return entries.get(index);
+    }
     
     public void addAbility(Ability abil){
         AbilityEntry entry = new AbilityEntry(abil);

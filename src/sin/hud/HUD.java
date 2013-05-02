@@ -90,7 +90,7 @@ public class HUD {
     }
     
     public static void update(float tpf){
-        AbilityBar.update(tpf);
+        AbilityHotbar.update(tpf);
         FloatingTextManager.update(tpf);
         Vector3f ploc = PlayerManager.getPlayer(ClientNetwork.getID()).getControl().getPhysicsLocation();
         Vector3f pdir = app.getCamera().getDirection();
@@ -135,8 +135,8 @@ public class HUD {
         BarManager.add(node, BH.AMMO_RIGHT, 1, new Vector2f(cx+130, 60), 30, 100, 30, ColorRGBA.Orange, 30, false);
         
         // Create ability bar:
-        AbilityBar.initialize(cx, cy);
-        node.attachChild(AbilityBar.getNode());
+        AbilityHotbar.initialize(cx, cy);
+        node.attachChild(AbilityHotbar.getNode());
 
         // Initialize ping display:
         ping = CG.createText(node, 16, new Vector3f(20, cy*2-20, 0), "Tele-Marines", ColorRGBA.Green);

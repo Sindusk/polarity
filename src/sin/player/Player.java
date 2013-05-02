@@ -11,7 +11,7 @@ import sin.player.ability.AbilityManager.Blink;
 import sin.player.ability.AbilityManager.Infect;
 import sin.player.ability.StatusManager;
 import sin.animation.Models.PlayerModel;
-import sin.hud.AbilityBar;
+import sin.hud.AbilityHotbar;
 import sin.hud.BarManager;
 import sin.hud.HUD;
 import sin.netdata.DamageData;
@@ -172,7 +172,7 @@ public class Player {
         if(ClientNetwork.getID() == id){
             weapons[0][0].enable(Weapons.getNode());
             weapons[0][1].enable(Weapons.getNode());
-            AbilityBar.createIcons(ability);
+            AbilityHotbar.createIcons(ability);
             HUD.setBarMax(BarManager.BH.HEALTH, (int) stats.getMaxHealth());
             HUD.setBarMax(BarManager.BH.SHIELDS, (int) stats.getMaxShields());
             HUD.updateLifeBars(stats);

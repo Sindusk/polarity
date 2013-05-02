@@ -30,6 +30,9 @@ public class Ability {
     public String getIcon(){
         return icon;
     }
+    public ArrayList<AbilityAction> getActions(){
+        return (ArrayList<AbilityAction>) actions.clone();
+    }
     public float getCooldownMax(){
         return cooldownMax;
     }

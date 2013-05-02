@@ -18,7 +18,7 @@ import sin.world.CG;
  *
  * @author SinisteRing
  */
-public class AbilityBar {
+public class AbilityHotbar {
     private static Node node = new Node("AbilityBarNode");
     private static Geometry bar;
     private static AbilityIcon[] icons = new AbilityIcon[4];

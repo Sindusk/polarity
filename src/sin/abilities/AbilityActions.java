@@ -15,5 +15,21 @@ public class AbilityActions {
             this.damage = damage;
             HANDLE = "damage";
         }
+        
+        public float getDamage(){
+            return damage;
+        }
+    }
+    public static class Stun extends AbilityAction{
+        private float duration;
+        
+        public Stun(float duration){
+            this.duration = duration;
+            HANDLE = "stun";
+        }
+        
+        public float getDuration(){
+            return duration;
+        }
     }
 }
