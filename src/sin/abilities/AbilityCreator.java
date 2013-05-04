@@ -6,7 +6,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import java.util.ArrayList;
 import sin.abilities.AbilityActions.AbilityAction;
+import sin.abilities.AbilityActions.Blind;
 import sin.abilities.AbilityActions.Damage;
+import sin.abilities.AbilityActions.Slow;
 import sin.abilities.AbilityActions.Stun;
 import sin.geometry.SinText;
 import sin.geometry.SinText.Alignment;
@@ -29,19 +31,26 @@ public class AbilityCreator {
     }
     
     private void createAction(int index, AbilityAction action){
-        CG.createBox(node, new Vector3f(3, 0.4f, 0), new Vector3f(0, 4-index, 0), ColorRGBA.Yellow);
-        if(action instanceof Damage){
+        CG.createBox(node, new Vector3f(3, 0.22f, 0), new Vector3f(0, 4-(index/2f), 0), ColorRGBA.Yellow);
+        SinText text = CG.createSinText(node, 0.2f, Vector3f.ZERO, "Batman26", "Action", ColorRGBA.Blue, Alignment.Left);
+        if(action instanceof Blind){
+            Blind blind = (Blind) action;
+            text.setText("Blind: "+blind.getDuration()+" seconds");
+        }else if(action instanceof Damage){
             Damage dmg = (Damage) action;
-            SinText text = CG.createSinText(node, 0.3f, Vector3f.ZERO, "Batman26", "Damage: "+dmg.getDamage(), ColorRGBA.Blue, Alignment.Left);
-            text.setLocalTranslation(-2, (4-index)+(text.getLineHeight()/2), 0);
+            text.setText("Damage: "+dmg.getDamage());
+        }else if(action instanceof Slow){
+            Slow slow = (Slow) action;
+            text.setText("Slow: "+Math.round(slow.getPercentage()*100)+"% for "+slow.getDuration()+" seconds.");
         }else if(action instanceof Stun){
             Stun stun = (Stun) action;
-            SinText text = CG.createSinText(node, 0.3f, Vector3f.ZERO, "Batman26", "Stun: "+stun.getDuration(), ColorRGBA.Blue, Alignment.Left);
-            text.setLocalTranslation(-2, (4-index)+(text.getLineHeight()/2), 0);
+            text.setText("Stun: "+stun.getDuration()+" seconds");
         }
+        text.setLocalTranslation(-2.5f, (4-index/2f)+(text.getLineHeight()/2), 0);
     }
     public void setEntry(AbilityEntry entry){
         this.entry = entry;
+        node.detachAllChildren();
         ArrayList<AbilityAction> actions = entry.getAbility().getActions();
         if(actions == null){
             return;

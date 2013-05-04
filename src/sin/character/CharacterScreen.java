@@ -99,6 +99,8 @@ public class CharacterScreen {
             }
         }else if(view.equals("inventory")){
             InventoryScreen.action(A.getMouseTarget(mouseLoc, S.getCamera(), node));
+        }else if(view.equals("abilities")){
+            AbilityScreen.action(A.getMouseTarget(mouseLoc, S.getCamera(), node));
         }else if(view.equals("neuronet")){
             NeuroNetworkScreen.action(A.getMouseTarget(mouseLoc, S.getCamera(), node));
         }
