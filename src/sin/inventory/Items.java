@@ -6,7 +6,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import java.util.ArrayList;
-import sin.progression.Stat;
+import sin.neuronet.Stat;
 import sin.tools.T;
 import sin.tools.T.Vector2i;
 import sin.world.CG;

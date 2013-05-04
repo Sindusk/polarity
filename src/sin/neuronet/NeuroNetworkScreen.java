@@ -1,4 +1,4 @@
-package sin.progression;
+package sin.neuronet;
 
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.ColorRGBA;
@@ -16,12 +16,12 @@ import sin.hud.ContextMenu;
 import sin.hud.Menu;
 import sin.hud.StatsDisplay;
 import sin.hud.Tooltip;
-import sin.progression.Neuro.NeuroConnector;
-import sin.progression.Neuro.NeuroCore;
-import sin.progression.Neuro.NeuroEmpty;
-import sin.progression.Neuro.NeuroLocked;
-import sin.progression.Neuro.NeuroSource;
-import sin.progression.Neuro.NeuroTemplate;
+import sin.neuronet.Neuro.NeuroConnector;
+import sin.neuronet.Neuro.NeuroCore;
+import sin.neuronet.Neuro.NeuroEmpty;
+import sin.neuronet.Neuro.NeuroLocked;
+import sin.neuronet.Neuro.NeuroSource;
+import sin.neuronet.Neuro.NeuroTemplate;
 import sin.tools.A;
 import sin.tools.N;
 import sin.tools.S;
@@ -410,7 +410,7 @@ public class NeuroNetworkScreen {
             ArrayList<String> source = new ArrayList(1);
             source.add("damage[1]");
             neuro[x][y] = new NeuroSource(new Vector2i(x, y), outs, source);
-        }else if(name.equals("unlock")){
+        }else if(name.equals("unlock") || name.equals("remove")){
             neuro[x][y].destroy();
             neuro[x][y] = new NeuroEmpty(new Vector2i(x, y));
         }
@@ -494,6 +494,22 @@ public class NeuroNetworkScreen {
             i++;
         }
     }
+    public static void saveNeuroNet(BufferedWriter bw) throws IOException{
+        int x = 0;
+        int y;
+        while(x < N.NEURO_SIZE){
+            y = 0;
+            while(y < N.NEURO_SIZE){
+                bw.write(neuro[x][y].getWritable());
+                y++;
+                if(y != N.NEURO_SIZE){
+                    bw.write(":");
+                }
+            }
+            bw.write("\n");
+            x++;
+        }
+    }
     public static void writeNewNeuroNet(BufferedWriter bw) throws IOException{
         int x = 0;
         int y;
@@ -509,15 +525,11 @@ public class NeuroNetworkScreen {
                 }else{
                     neuro[x][y] = new NeuroLocked(new Vector2i(x, y));
                 }
-                bw.write(neuro[x][y].getWritable());
                 y++;
-                if(y != N.NEURO_SIZE){
-                    bw.write(":");
-                }
             }
-            bw.write("\n");
             x++;
         }
+        saveNeuroNet(bw);
     }
     
     private static void createNeuroMenu(){

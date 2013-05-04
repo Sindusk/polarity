@@ -1,4 +1,4 @@
-package sin.progression;
+package sin.neuronet;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;

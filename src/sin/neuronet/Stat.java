@@ -1,4 +1,4 @@
-package sin.progression;
+package sin.neuronet;
 
 import java.util.ArrayList;
 import sin.tools.T;

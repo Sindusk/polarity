@@ -6,7 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import sin.progression.NeuroNetworkScreen;
+import sin.proficiencies.ProficienciesScreen;
+import sin.neuronet.NeuroNetworkScreen;
 import sin.weapons.Weapons.AK47;
 import sin.weapons.Weapons.LaserPistol;
 import sin.weapons.Weapons.M4A1;
@@ -67,26 +68,54 @@ public class C {
         return weapons;
     }
     
-    public static void gatherCharacterData(){
+    private static void gatherNeuroNet(){
+        String handle = "Neuro Network";
         try{
             File file = new File("neuronet.txt");
             if(!file.exists()){
-                T.log("No NeuroNet found. Creating new file...");
+                T.log("No "+handle+" found. Creating new file...");
                 file.createNewFile();
-                T.log(file.getAbsolutePath());
+                T.log("Creating "+handle+" at: "+file.getAbsolutePath());
                 BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
                 NeuroNetworkScreen.writeNewNeuroNet(bw);
                 bw.close();
-                T.log("Finished creating new NeuroNet!");
+                T.log("Finished creating new "+handle+"!");
             }else{
-                T.log("Found Player NeuroNet!");
+                T.log("Found "+handle+"!");
                 BufferedReader br = new BufferedReader(new FileReader(file.getAbsoluteFile()));
                 NeuroNetworkScreen.readNeuroNet(br);
                 br.close();
-                T.log("Finished reading NeuroNet!");
+                T.log("Finished reading "+handle+"!");
             }
         }catch(IOException e){
             T.log(e);
         }
+    }
+    private static void gatherProficiencies(){
+        String handle = "Proficiencies";
+        try{
+            File file = new File("proficiencies.txt");
+            if(!file.exists()){
+                T.log("No "+handle+" found. Creating new file...");
+                file.createNewFile();
+                T.log("Creating "+handle+" at: "+file.getAbsolutePath());
+                BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
+                ProficienciesScreen.writeNewProficiencies(bw);
+                bw.close();
+                T.log("Finished creating new "+handle+"!");
+            }else{
+                T.log("Found "+handle+"!");
+                BufferedReader br = new BufferedReader(new FileReader(file.getAbsoluteFile()));
+                ProficienciesScreen.readProficiencies(br);
+                br.close();
+                T.log("Finished reading "+handle+"!");
+            }
+        }catch(IOException e){
+            T.log(e);
+        }
+    }
+    public static void gatherCharacterData(){
+        gatherNeuroNet();
+        gatherProficiencies();
     }
 }

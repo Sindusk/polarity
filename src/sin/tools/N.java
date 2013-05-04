@@ -1,12 +1,12 @@
 package sin.tools;
 
 import java.util.ArrayList;
-import sin.progression.Neuro.NeuroConnector;
-import sin.progression.Neuro.NeuroEmpty;
-import sin.progression.Neuro.NeuroLocked;
-import sin.progression.Neuro.NeuroSource;
-import sin.progression.Neuro.NeuroTemplate;
-import sin.progression.Neuro.NeuroWithOutlets;
+import sin.neuronet.Neuro.NeuroConnector;
+import sin.neuronet.Neuro.NeuroEmpty;
+import sin.neuronet.Neuro.NeuroLocked;
+import sin.neuronet.Neuro.NeuroSource;
+import sin.neuronet.Neuro.NeuroTemplate;
+import sin.neuronet.Neuro.NeuroWithOutlets;
 import sin.tools.T.Vector2i;
 
 /**
@@ -27,6 +27,7 @@ public class N {
         if(neuro instanceof NeuroConnector){
             options.add(createOption("rot_clock", "Rotate Clock"));
             options.add(createOption("rot_counter", "Rotate Counter"));
+            options.add(createOption("remove", "Remove"));
         }else if(neuro instanceof NeuroLocked){
             options.add(createOption("unlock", "Unlock Node"));
         }else if(neuro instanceof NeuroEmpty){
@@ -39,6 +40,7 @@ public class N {
             options.add(createOption("source_health", "Add +30 Health"));
             options.add(createOption("rot_clock", "Rotate Clock"));
             options.add(createOption("rot_counter", "Rotate Counter"));
+            options.add(createOption("remove", "Remove"));
         }
         options.add(createOption("cancel", "Cancel"));
         return options;

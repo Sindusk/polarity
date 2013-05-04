@@ -10,7 +10,7 @@ import sin.inventory.Items.Chestplate;
 import sin.inventory.Items.Greaves;
 import sin.inventory.Items.Helmet;
 import sin.inventory.Items.Item;
-import sin.progression.Stat;
+import sin.neuronet.Stat;
 import sin.tools.A;
 import sin.tools.S;
 import sin.tools.T;

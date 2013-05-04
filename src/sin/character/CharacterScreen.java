@@ -11,7 +11,8 @@ import com.jme3.scene.Node;
 import sin.abilities.AbilityScreen;
 import sin.animation.Models;
 import sin.inventory.InventoryScreen;
-import sin.progression.NeuroNetworkScreen;
+import sin.proficiencies.ProficienciesScreen;
+import sin.neuronet.NeuroNetworkScreen;
 import sin.tools.A;
 import sin.tools.S;
 import sin.tools.T;
@@ -81,6 +82,13 @@ public class CharacterScreen {
             NeuroNetworkScreen.initialize();
             node.attachChild(NeuroNetworkScreen.getNode());
             S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
+        }else if(action.equals("proficiencies")){
+            hideView(rightView, rightNode);
+            hideView(leftView, leftNode);
+            view = "proficiencies";
+            ProficienciesScreen.initialize();
+            node.attachChild(ProficienciesScreen.getNode());
+            S.getViewPort().setBackgroundColor(ColorRGBA.DarkGray);
         }
     }
     public static void handleRightClick(){
@@ -129,7 +137,7 @@ public class CharacterScreen {
         CG.createBox(rightNode, "inventory", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 3, 0), T.getGraphicPath("loadout"), new Vector2f(1, 1));
         CG.createBox(rightNode, "abilities", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 1, 0), T.getGraphicPath("abilities"), new Vector2f(1, 1));
         CG.createBox(rightNode, "neuronet", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -1, 0), T.getGraphicPath("neuronet"), new Vector2f(1, 1));
-        CG.createBox(rightNode, "proficiencies", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -3, 0), T.getMaterialPath("BC_Tex"), new Vector2f(1, 1));
+        CG.createBox(rightNode, "proficiencies", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -3, 0), T.getGraphicPath("proficiencies"), new Vector2f(1, 1));
     }
     
     public static void initialize(){
