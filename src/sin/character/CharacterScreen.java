@@ -134,10 +134,10 @@ public class CharacterScreen {
     }
     private static void buildMenu(){
         rightNode.detachAllChildren();
-        CG.createBox(rightNode, "inventory", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 3, 0), T.getGraphicPath("loadout"), new Vector2f(1, 1));
-        CG.createBox(rightNode, "abilities", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 1, 0), T.getGraphicPath("abilities"), new Vector2f(1, 1));
-        CG.createBox(rightNode, "neuronet", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -1, 0), T.getGraphicPath("neuronet"), new Vector2f(1, 1));
-        CG.createBox(rightNode, "proficiencies", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -3, 0), T.getGraphicPath("proficiencies"), new Vector2f(1, 1));
+        CG.createBox(rightNode, "inventory", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 3, 0), T.getGraphicPath("inventory"));
+        CG.createBox(rightNode, "abilities", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, 1, 0), T.getGraphicPath("abilities"));
+        CG.createBox(rightNode, "neuronet", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -1, 0), T.getGraphicPath("neuronet"));
+        CG.createBox(rightNode, "proficiencies", new Vector3f(3.5f, 0.4f, 0f), new Vector3f(0, -3, 0), T.getGraphicPath("proficiencies"));
     }
     
     public static void initialize(){

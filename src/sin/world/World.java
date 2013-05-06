@@ -20,11 +20,11 @@ import sin.tools.T;
  */
 public class World {
     // Constant Variables:
-    private static final float WW = 0.1f;   // Wall Width
     private static final float ZS = 10;     // Zone Size
+    private static final float WW = ZS/2;   // Wall Width
     private static final int HALL_LENGTH_MIN = 20;
     private static final int HALL_LENGTH_MAX = 25;
-    private static final int HALL_MAX_RADIUS = 50;
+    private static final int HALL_MAX_RADIUS = 30;
     private static final int HALL_SPREAD = 5;
     private static final int HALL_WIDTH = 2;
     
@@ -51,64 +51,61 @@ public class World {
         }
     }
     
-    public static GeometryData geoData(String type, Vector3f size, Vector3f trans, Quaternion rot, String tex, Vector2f scale, boolean phy){
-        return new GeometryData(type, size, trans, rot, tex, scale, phy);
-    }
     public static GeometryData geoFloor(Vector3f center, float xl, float zl, String tex, Vector2f scale, boolean phy){
-        return geoData("box", new Vector3f(xl*ZS/2.0f, WW, zl*ZS/2.0f), center.mult(ZS), null, tex, scale, phy);
+        return new GeometryData("box", new Vector3f(xl*ZS/2.0f, WW, zl*ZS/2.0f), center.mult(ZS), null, tex, scale, phy);
     }
-    public static GeometryData geoWall(float x, float y, float z, float xl, float zl, String tex, Vector2f scale, boolean phy){
+    public static GeometryData geoWall(Vector3f loc, float xl, float zl, String tex, Vector2f scale, boolean phy){
         if(xl == 0){
             xl = WW;
         }else{
-            xl *= ZS/2;
+            xl *= WW;
         }
+        xl = FastMath.abs(xl);
         if(zl == 0){
             zl = WW;
         }else{
-            zl *= ZS/2;
+            zl *= WW;
         }
-        return geoData("box", T.v3f(xl, ZS/2, zl), T.v3f(x*ZS, (y*ZS)+(ZS/2), z*ZS), null, tex, scale, phy);
+        zl = FastMath.abs(zl);
+        return new GeometryData("box", new Vector3f(xl, WW*2, zl), new Vector3f(loc.x*ZS, (loc.y*ZS)+ZS, loc.z*ZS), null, tex, scale, phy);
     }
     
     private static class Wall{
         private Vector3f[] ends = new Vector3f[2];
         
-        public Wall(Vector3f start, float xi, float zi, int spaces, boolean left){
+        public Wall(Vector3f start, float xi, float zi, int spaces){
             float x = start.getX();
             float z = start.getZ();
             float xl = 0;
             float zl = 0;
-            Vector3f loc;
+            Vector3f loc = new Vector3f(0, 0, 0);
             int i = 0;
-            float mod;
             ends[0] = start.clone();
-            if(left){
-                x -= xi;
-                z -= zi;
-                mod = -1;
-            }else{
-                mod = 1;
-            }
             while(i < spaces){
                 loc = new Vector3f(x+(i*xi), start.getY(), z+(i*zi));
-                if(world.get(loc) != null && world.get(loc).contains("h")){
-                    if(left && (xl != 0 || zl != 0)){
-                        xl -= xi;
-                        zl -= zi;
-                        i--;
-                    }
+                if(world.get(loc) != null && (world.get(loc).contains("h") || world.get(loc).contains("w"))){
                     break;
+                }else{
+                    world.put(loc, "w");
                 }
                 xl += xi;
                 zl += zi;
                 i++;
             }
+            i--;
+            if(i > 0){
+                spaces -= i;
+            }else{
+                spaces -= 1;
+            }
+            if(spaces > 0){
+                walls.add(new Wall(loc.clone().add(xi, 0, zi), xi, zi, spaces));
+            }
             if(xl == 0 && zl == 0){
                 return;
             }
-            loc = T.v3f(x+(i*xi)-(xl/2), start.getY(), z+(i*zi)-(zl/2));
-            map.add(geoWall(loc.getX()-((xi-zi)*mod/2), loc.getY(), loc.getZ()-((zi-xi)*mod/2), xl, zl, T.getMaterialPath("BC_Tex"), T.v2f(Math.max(FastMath.abs(xl), FastMath.abs(zl)), 1), true));
+            loc = new Vector3f(x+((i/2f)*xi), start.getY(), z+((i/2f)*zi));
+            map.add(geoWall(loc, xl, zl, T.getMaterialPath("synthetic"), new Vector2f(Math.max(FastMath.abs(xl), FastMath.abs(zl)), 2), true));
         }
     }
     private static class Hallway{
@@ -131,9 +128,9 @@ public class World {
             float x = start.getX()+xi;
             float z = start.getZ()+zi;
             float rng, dist;
-            int i = 0;
+            int len = 0;
             int spread = 0;
-            int iMax = FastMath.nextRandomInt(HALL_LENGTH_MIN, HALL_LENGTH_MAX);
+            int lenMax = FastMath.nextRandomInt(HALL_LENGTH_MIN, HALL_LENGTH_MAX);
             boolean b = false;
             // Make sure both xi and zi have an absolute value of 1:
             xi = A.sign(xi);
@@ -143,8 +140,8 @@ public class World {
             corners[1] = new Vector3f((-zi*(HALL_WIDTH-1))+x, start.getY(), (-xi*(HALL_WIDTH-1))+z); // Bottom Right
             Vector3f left = corners[0].clone();
             Vector3f right = corners[1].clone();
-            ArrayList<HallData> d = new ArrayList(1);
-            while(i <= iMax){
+            ArrayList<HallData> newHalls = new ArrayList(1);
+            while(len <= lenMax){
                 if(world.get(left) != null && world.get(left).contains("h")){
                     b = true;
                 }
@@ -163,23 +160,23 @@ public class World {
                 // Check distance & random to see if more hallways should be created:
                 dist = left.distance(Vector3f.ZERO);
                 rng = FastMath.nextRandomFloat();
-                if(dist < HALL_MAX_RADIUS && spread > HALL_SPREAD && i < iMax){
+                if(dist < HALL_MAX_RADIUS && spread > HALL_SPREAD && len < lenMax){
                     if(rng < 0.13f){
-                        d.add(new HallData(left.clone(), zi, xi));
+                        newHalls.add(new HallData(left.clone(), zi, xi));
                         spread = 0;
                     }else if(rng < 0.26f){
-                        d.add(new HallData(right.clone(), -zi, -xi));
+                        newHalls.add(new HallData(right.clone(), -zi, -xi));
                         spread = 0;
                     }else if(rng < 0.33f){
-                        d.add(new HallData(left.clone(), zi, xi));
-                        d.add(new HallData(right.clone(), -zi, -xi));
+                        newHalls.add(new HallData(left.clone(), zi, xi));
+                        newHalls.add(new HallData(right.clone(), -zi, -xi));
                         spread = 0;
                     }
                 }
                 x += xi;
                 z += zi;
                 spread++;
-                i++;
+                len++;
                 left.addLocal(xi, 0, zi);
                 right.addLocal(xi, 0, zi);
             }
@@ -188,47 +185,41 @@ public class World {
             
             // Generate hallways:
             int j = 0;
-            while(j < d.size()){
-                generateHallway(d.get(j).start, d.get(j).xi, d.get(j).zi);
+            while(j < newHalls.size()){
+                hallways.add(new Hallway(newHalls.get(j).start, newHalls.get(j).xi, newHalls.get(j).zi));
                 j++;
             }
-
+            
             // Return if there's no hallway to generate (0 in size):
             float xs = FastMath.abs(corners[1].getX()-corners[3].getX())+1;
             float zs = FastMath.abs(corners[1].getZ()-corners[3].getZ())+1;
             if(Math.min(FastMath.abs(xs), FastMath.abs(zs)) < 1){
                 return;
             }
-
+            
             // Generate the front wall:
-            generateWall(left.add(xi, 0, zi), -zi, -xi, HALL_WIDTH*2-1, false);
-            generateWall(left.add(zi, 0, xi), -xi, -zi, i+1, false);
-            generateWall(right.add(-zi, 0, -xi), -xi, -zi, i+1, true);
+            walls.add(new Wall(left.add(xi, 0, zi), -zi, -xi, HALL_WIDTH*2-1));
+            walls.add(new Wall(left.add(zi, 0, xi), -xi, -zi, len+1));
+            walls.add(new Wall(right.add(-zi, 0, -xi), -xi, -zi, len+1));
             
             // Generate the actual floor:
             float xloc = (corners[3].getX()+corners[1].getX())*0.5f;
             float zloc = (corners[3].getZ()+corners[1].getZ())*0.5f;
             NPCManager.addNew("grunt", new Vector3f(xloc, start.getY(), zloc).mult(ZS).add(0, 5, 0));
-            center = new Vector3f(xloc, start.getY(), zloc);
-            floor = geoFloor(center, xs, zs, T.getMaterialPath("synthetic"), T.v2f(zs, xs), true);
+            center = new Vector3f(xloc, start.getY()-0.5f, zloc);
+            floor = geoFloor(center, xs, zs, T.getMaterialPath("BC_Tex"), new Vector2f(zs, xs), true);
             map.add(floor);
         }
     }
     
-    public static void generateWall(Vector3f start, float xi, float zi, int spaces, boolean left){
-        walls.add(new Wall(start, xi, zi, spaces, left));
-    }
-    public static void generateHallway(Vector3f start, float xi, float zi){
-        hallways.add(new Hallway(start, xi, zi));
-    }
     public static void generateStart(){
-        map.add(geoFloor(new Vector3f(0, 0, 0), 5, 5, T.getMaterialPath("brick"), T.v2f(5, 5), true));
+        map.add(geoFloor(new Vector3f(0, -0.5f, 0), 5, 5, T.getMaterialPath("brick"), new Vector2f(5, 5), true));
         int x = -2;
         int z;
         while(x <= 2){
             z = -2;
             while(z <= 2){
-                world.put(T.v3f(x, 0, z), "h");
+                world.put(new Vector3f(x, 0, z), "h");
                 z++;
             }
             x++;
@@ -236,11 +227,12 @@ public class World {
     }
     
     public static void generateWorldData(){
-        Vector3f start = T.v3f(2, 0, 0);
+        Vector3f start = new Vector3f(2, 0, 0);
         float xi = 1;
         float zi = 0;
         generateStart();
-        generateHallway(start, xi, zi);
+        hallways.add(new Hallway(start, xi, zi));
+        //generateHallway(start, xi, zi);
     }
     public static void createGeometry(Node node, GeometryData d){
         if(d.getType().equals("box")){
