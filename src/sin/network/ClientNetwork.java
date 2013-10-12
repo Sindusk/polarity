@@ -35,7 +35,7 @@ import sin.netdata.npc.EntityData;
 import sin.netdata.npc.EntityDeathData;
 import sin.netdata.npc.OrganismData;
 import sin.netdata.player.PlayerData;
-import sin.npc.NPCManager;
+import sin.ai.NPCManager;
 import sin.player.ability.AbilityManager;
 import sin.tools.A;
 import sin.tools.S;

@@ -10,7 +10,7 @@ import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import sin.netdata.GeometryData;
-import sin.npc.NPCManager;
+import sin.ai.NPCManager;
 import sin.tools.A;
 import sin.tools.T;
 
@@ -28,6 +28,7 @@ public class World {
     private static final int HALL_SPREAD = 5;
     private static final int HALL_WIDTH = 2;
     
+    private static ArrayList<ArrayList<Integer>> world2d = new ArrayList();
     private static HashMap<Vector3f, String> world = new HashMap();
     private static ArrayList<GeometryData> map = new ArrayList();
     private static ArrayList<Material> mats = new ArrayList();

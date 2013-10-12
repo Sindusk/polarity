@@ -5,18 +5,18 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
 import sin.GameClient;
+import sin.ai.NPCManager;
 import sin.hud.HUD;
 import sin.network.ClientNetwork;
 import sin.player.MovementManager;
 import sin.player.PlayerManager;
-import sin.world.FloatingTextManager;
-import sin.npc.NPCManager;
 import sin.tools.S;
 import sin.weapons.AttackManager;
 import sin.weapons.ProjectileManager;
 import sin.weapons.Weapons;
-import sin.world.TracerManager;
 import sin.world.DecalManager;
+import sin.world.FloatingTextManager;
+import sin.world.TracerManager;
 import sin.world.World;
 
 /**

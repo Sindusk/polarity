@@ -19,7 +19,7 @@ import sin.netdata.DecalData;
 import sin.netdata.ProjectileData;
 import sin.network.ClientNetwork;
 import sin.network.ServerNetwork;
-import sin.npc.NPCManager;
+import sin.ai.NPCManager;
 import sin.player.Player;
 import sin.weapons.ProjectileManager;
 import sin.weapons.ProjectileManager.Projectile;

@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sin.GameServer;
 import sin.network.ServerNetwork;
-import sin.npc.NPCManager;
+import sin.ai.NPCManager;
 import sin.player.PlayerManager;
 import sin.tools.S;
 import sin.weapons.ProjectileManager;
@@ -94,6 +94,7 @@ public class ServerMenuState extends AbstractAppState implements ScreenControlle
         nifty.fromXml("Interface/ServerGUI.xml", "menu");
         ServerMenuState.app.getGuiViewPort().addProcessor(niftyDisplay);
         
+        // Initialize server & begin listening for connections.
         ServerNetwork.create();
         
         // Test

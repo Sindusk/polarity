@@ -19,8 +19,8 @@ import sin.player.PlayerManager;
 import sin.tools.S;
 import sin.tools.T;
 import sin.weapons.RecoilManager;
-import sin.world.TracerManager;
 import sin.world.DecalManager;
+import sin.world.TracerManager;
 import sin.world.World;
 
 /**

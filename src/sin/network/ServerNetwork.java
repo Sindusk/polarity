@@ -31,7 +31,7 @@ import sin.netdata.player.DisconnectData;
 import sin.netdata.player.IDData;
 import sin.netdata.player.MoveData;
 import sin.netdata.player.PlayerData;
-import sin.npc.NPCManager;
+import sin.ai.NPCManager;
 import sin.player.PlayerManager;
 import sin.tools.A;
 import sin.tools.T;

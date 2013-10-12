@@ -144,7 +144,7 @@ public class ClientMenuState extends AbstractAppState implements ScreenControlle
         }else if(screen.getScreenId().equals("menu.multiplayer")){
             ListBox<String> list = screen.findNiftyControl("multiplayer.serverlist", ListBox.class);
             list.addItem("[localhost] Local Server");
-            list.addItem("[25.216.174.196] Sinister Server");
+            list.addItem("[25.183.100.124] Sinister Server");
         }else if(screen.getScreenId().equals("menu.options")){
             DropDown<String> dd = screen.findNiftyControl("options.resolution", DropDown.class);
             dd.addItem("1024 x 720");

@@ -1,4 +1,4 @@
-package sin.npc;
+package sin.ai;
 
 import com.jme3.bullet.collision.shapes.BoxCollisionShape;
 import com.jme3.bullet.control.GhostControl;
@@ -7,9 +7,9 @@ import com.jme3.network.HostedConnection;
 import com.jme3.scene.Node;
 import java.util.HashMap;
 import sin.animation.Models.EntityModel;
-import sin.netdata.npc.GruntData;
 import sin.netdata.npc.EntityData;
 import sin.netdata.npc.EntityDeathData;
+import sin.netdata.npc.GruntData;
 import sin.netdata.npc.OrganismData;
 import sin.network.ServerNetwork;
 import sin.player.PlayerManager;
@@ -69,11 +69,11 @@ public class NPCManager {
             ServerNetwork.broadcast(new EntityDeathData(id, type));
         }
     }
-    public static abstract class Organism extends Entity{
+    public static abstract class LivingEntity extends Entity{
         private float health;
         private float maxHealth;
         
-        public Organism(int id, Node node, Vector3f location, String type, float health, float maxHealth){
+        public LivingEntity(int id, Node node, Vector3f location, String type, float health, float maxHealth){
             super(id, node, location, type);
             this.health = health;
             this.maxHealth = maxHealth;
@@ -93,7 +93,7 @@ public class NPCManager {
             return health;
         }
     }
-    public static class Grunt extends Organism{
+    public static class Grunt extends LivingEntity{
         private static final String name = "grunt";
         public Grunt(int id, Node node, Vector3f location, float health, float maxHealth){
             super(id, node, location, name, health, maxHealth);
